@@ -1,0 +1,92 @@
+wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+
+panel->SetSizer(sizer);
+return panel;
+
+//
+//
+
+friend class boost::serialization::access;
+
+template<class Archive>
+void serialize(Archive& ar, const unsigned int version)
+{
+	ar& Name;
+	ar& level;
+	ar& school;
+	ar& castingTime;
+	ar& range;
+	ar& range_feet;
+	ar& components;
+	ar& duration;
+	ar& description;
+	ar& applicableClases;
+	ar& matsLength;
+}
+
+//SERIALISATION
+friend class boost::serialization::access;
+
+template<class Archive>
+void serialize(Archive& ar, const unsigned int version)
+{
+	ar& casterType;
+	ar& classType;
+	ar& level;
+	ar& hitDie;
+}
+
+//SERIALISATION
+friend class boost::serialization::access;
+
+template<class Archive>
+void serialize(Archive& ar, const unsigned int version)
+{
+	ar& allSpells;
+	ar& character;
+	/*ar& BigFont1;
+	ar& BigFont2;
+	ar& ctrlColor;
+	ar& DescColor;
+	ar& ListColor;
+	ar& baseColSize;*/
+}
+
+
+//SERIALISATION
+friend class boost::serialization::access;
+
+template<class Archive>
+void serialize(Archive& ar, const unsigned int version)
+{
+	ar& charConditions;
+	ar& usesSpellPoint;
+	ar& characterName;
+	ar& characterClassStr;
+	ar& charClass;
+	ar& languages;
+	ar& toolProf;
+	ar& features;
+	ar& inventory;
+	ar& knownSpells;
+
+	ar& totalLevel;
+	ar& charStats;
+	ar& charStatMods;
+	ar& skillProficiencies;
+	ar& skillExpertises;
+	ar& charSlots;
+	ar& AC;
+	ar& initMod;
+	ar& totHP;
+	ar& totHPMod;
+	ar& curHP;
+	ar& profBonus; 
+	ar& speed;
+	ar& platinum;
+	ar& gold;
+	ar& silver;;
+	ar& copper;
+	ar& tempHP;
+}

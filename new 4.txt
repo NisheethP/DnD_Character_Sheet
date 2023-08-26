@@ -1,0 +1,12 @@
+return CreateSpellDescription(static_cast<wxPanel*>(parent), *knownPagePanels.dispSpell, knownPagePanels.Title, knownPagePanels.Level, knownPagePanels.CastingTime, knownPagePanels.Range, knownPagePanels.Duration, knownPagePanels.Components, knownPagePanels.Type, knownPagePanels.AppClasses, knownPagePanels.Description, knownPagePanels.ColWidth);
+
+
+Features to Add
+	Saving
+	Options for spell slot and spell points
+	Death Saves
+	Inventory (with images?)
+	Long Rest and Short Rest
+	Dynamic Search in all spells
+	Level Up Options
+	Change Name and other read-only
