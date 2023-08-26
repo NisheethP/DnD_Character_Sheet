@@ -150,8 +150,6 @@ void MainFrame::BindControls()
 
 	mainPagePanels.SlidersButtons.first->Bind(wxEVT_BUTTON, &MainFrame::onAddRemSlider, this);
 	mainPagePanels.SlidersButtons.second->Bind(wxEVT_BUTTON, &MainFrame::onAddRemSlider, this);
-
-
 }
 
 wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
@@ -542,7 +540,7 @@ wxPanel* MainFrame::CreateACPanel(wxPanel* parent)
 
 	AC_Label->SetFont(BigFont1);
 	mainPagePanels.AC->SetFont(BigFont1);
-	mainPagePanels.AC->SetValidator(wxTextValidator(wxFILTER_DIGITS));
+	mainPagePanels.AC->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
 	panel->SetSizerAndFit(mainSizer);
 	panel->Layout();
@@ -644,7 +642,7 @@ wxPanel* MainFrame::CreateSpeedPanel(wxPanel* parent)
 	mainPagePanels.Speed->SetBackgroundColour(ctrlColour.first);
 	mainPagePanels.Speed->SetForegroundColour(ctrlColour.second);
 
-	mainPagePanels.Speed->SetValidator(wxTextValidator(wxFILTER_DIGITS));
+	mainPagePanels.Speed->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 	
 	headSpeed->SetFont(BigFont1);	
 	mainPagePanels.Speed->SetFont(BigFont1);
@@ -712,8 +710,8 @@ wxPanel* MainFrame::CreateStats(wxPanel* parent)
 		setWindowColour(mainPagePanels.Stat_TextCtrls[i].first, ctrlColour);
 		setWindowColour(mainPagePanels.Stat_TextCtrls[i].second, ctrlColour);
 
-		mainPagePanels.Stat_TextCtrls[i].first->SetValidator(wxTextValidator(wxFILTER_DIGITS));
-		mainPagePanels.Stat_TextCtrls[i].second->SetValidator(wxTextValidator(wxFILTER_DIGITS));
+		mainPagePanels.Stat_TextCtrls[i].first->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+		mainPagePanels.Stat_TextCtrls[i].second->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 	}
 	
 	wxStaticBoxSizer* profBox = new wxStaticBoxSizer(wxVERTICAL, panel, "Profeciency Bonus");
@@ -759,7 +757,7 @@ wxPanel* MainFrame::CreateSavingThrows(wxPanel* parent)
 	{
 		savingThrowName = new wxStaticText(panel, wxID_ANY, "");
 		savingThrowValue = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
-		savingThrowValue->SetValidator(wxTextValidator(wxFILTER_DIGITS));
+		savingThrowValue->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 		savingThrowValue->SetBackgroundColour(ctrlColour.first);
 		savingThrowValue->SetForegroundColour(ctrlColour.second);
 
@@ -834,7 +832,7 @@ wxPanel* MainFrame::CreateSkillProf(wxPanel* parent)
 	{
 		skillName = new wxStaticText(panel, wxID_ANY, "");
 		skillValue = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
-		skillValue->SetValidator(wxTextValidator(wxFILTER_DIGITS));
+		skillValue->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 		skillValue->SetBackgroundColour(ctrlColour.first);
 		skillValue->SetForegroundColour(ctrlColour.second);
 
@@ -1092,8 +1090,8 @@ wxPanel* MainFrame::CreateInitiativePanel(wxPanel* parent)
 
 	auto initModText = new wxStaticText(panel, wxID_ANY, "Initiative Mod");
 
-	initMod->SetValidator(wxTextValidator(wxFILTER_DIGITS));
-	Init->SetValidator(wxTextValidator(wxFILTER_DIGITS));
+	initMod->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+	Init->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
 	int initiative = character.getInitiative();
 
@@ -1421,10 +1419,10 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	sizer->Add(verBar, 0, wxEXPAND);
 	sizer->Add(gapBig, -1);
 
-	knownPagePanels.ProfBonus_Val->SetValidator(wxTextValidator(wxFILTER_DIGITS));
-	knownPagePanels.SpellCastMod_Val->SetValidator(wxTextValidator(wxFILTER_DIGITS));
-	knownPagePanels.SpellSaveMod_Val->SetValidator(wxTextValidator(wxFILTER_DIGITS));
-	knownPagePanels.SelectedSpells_Val->SetValidator(wxTextValidator(wxFILTER_DIGITS, &knownPagePanels.selectedSpells));
+	knownPagePanels.ProfBonus_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+	knownPagePanels.SpellCastMod_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+	knownPagePanels.SpellSaveMod_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+	knownPagePanels.SelectedSpells_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC, &knownPagePanels.selectedSpells));
 
 	knownPagePanels.SelectedSpells_Val->SetLabel(knownPagePanels.selectedSpells);
 
@@ -2469,10 +2467,8 @@ void MainFrame::onAddRemSlider(wxCommandEvent& event)
 	if (obj == mainPagePanels.SlidersButtons.second)
 	{
 		auto panel = mainPagePanels.SlidersButtons.second->GetParent();
-		//auto& panel = mainPagePanels.sliderPanel;
-		//auto& sizer = mainPagePanels.sliderSizer;
 		auto sizer = panel->GetSizer();
-
+		
 		SliderDialog dialog(this);
 
 		int release = dialog.ShowModal();
@@ -2482,29 +2478,44 @@ void MainFrame::onAddRemSlider(wxCommandEvent& event)
 			int min = dialog.getMin();
 			int max = dialog.getMax();
 			int def = dialog.getDef();
-			auto slider = new wxSlider(panel, wxID_ANY, def, min, max, wxDefaultPosition, wxDefaultSize, wxSL_LABELS);
+			auto slider = new wxSlider(panel, wxID_ANY, def, min, max, wxDefaultPosition, wxDefaultSize, wxSL_MIN_MAX_LABELS | wxSL_TICKS);
 
-			auto text = new wxStaticText(panel, wxID_ANY, title);
+			auto text = new wxStaticText(panel, wxID_ANY, title, wxDefaultPosition, wxDefaultSize);
 			auto horLine = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(1.5*baseColSize.x,-1)));
+
+			auto value = new wxTextCtrl(panel, wxID_ANY, std::to_string(def), wxDefaultPosition, FromDIP(wxSize(50, -1)), wxALIGN_CENTER_HORIZONTAL);
+
+			value->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
 			setWindowColour(text, ctrlColour);
 			setWindowColour(slider , ctrlColour);
+			setWindowColour(value, ctrlColour);
 
 			auto font = text->GetFont();
-			//font.MakeLarger();
+			font.MakeLarger();
 			font.MakeBold();
 			font.MakeUnderlined();
 			text->SetFont(font);
 
+			value->SetFont(value->GetFont().MakeBold().MakeLarger());
+
 			auto subSizer = new wxBoxSizer(wxHORIZONTAL);
 
-			subSizer->Add(text, 0, wxALIGN_CENTER);
-			subSizer->Add(slider, 1, wxEXPAND | wxLEFT | wxRIGHT, 10);
+			auto sizeFlag = wxALIGN_CENTER;
+
+			subSizer->Add(text, 0, sizeFlag);
+			subSizer->Add(value, 0, sizeFlag | wxLEFT, 5);
+			subSizer->Add(slider, 1, wxEXPAND | wxLEFT, 10);
+			//subSizer->Add(-1,5);
+
+			sizer->Add(-1, 3);
 			sizer->Add(subSizer, 0, wxEXPAND | wxRIGHT, 20);
 			sizer->Add(horLine, 0, wxEXPAND);
-			
+			sizer->Add(-1, 3);
+
 			mainPagePanels.Sliders.push_back({text, slider});
 			mainPagePanels.sliderLine.push_back(horLine);
+			mainPagePanels.SliderVal.push_back(value);
 
 			character.addSlider({title, slider->GetValue()});
 
@@ -2512,6 +2523,7 @@ void MainFrame::onAddRemSlider(wxCommandEvent& event)
 			panel->Layout();
 
 			slider->Bind(wxEVT_SLIDER, &MainFrame::onSliderChange, this);
+			value->Bind(wxEVT_TEXT, &MainFrame::onSliderValChange, this);
 		}
 
 	}
@@ -2531,9 +2543,11 @@ void MainFrame::onAddRemSlider(wxCommandEvent& event)
 				delete mainPagePanels.Sliders[x].first;
 				delete mainPagePanels.Sliders[x].second;
 				delete mainPagePanels.sliderLine[x];
+				delete mainPagePanels.SliderVal[x];
 				
 				mainPagePanels.Sliders.erase(mainPagePanels.Sliders.begin() + x);
 				mainPagePanels.sliderLine.erase(mainPagePanels.sliderLine.begin() + x);
+				mainPagePanels.SliderVal.erase(mainPagePanels.SliderVal.begin() + x);
 				character.remSlider(x);
 
 				auto panel = mainPagePanels.SlidersButtons.second->GetParent();
@@ -2561,6 +2575,52 @@ void MainFrame::onSliderChange(wxCommandEvent& event)
 	int val = slider->GetValue();
 
 	character.updateSlider(mainPagePanels.Sliders[sliderNum].first->GetLabel().ToStdString(), val);
+	mainPagePanels.SliderVal[sliderNum]->SetValue(std::to_string(val));
+}
+
+void MainFrame::onSliderValChange(wxCommandEvent& event)
+{
+	auto obj = event.GetEventObject();
+	int sliderNum = 0;
+	for (auto it = mainPagePanels.SliderVal.begin(); it != mainPagePanels.SliderVal.end(); ++it)
+	{
+		if (obj == *it)
+			break;
+		sliderNum++;
+	}
+
+	auto& slider = mainPagePanels.Sliders[sliderNum].second;
+	auto& value = mainPagePanels.SliderVal[sliderNum];
+	auto str = value->GetValue().ToStdString();
+	int num = 0;
+	if (str != "" && str != "-")
+	{
+		num = std::stoi(str);
+
+		if (num < slider->GetMin())
+		{
+			num = slider->GetMin();
+			value->SetValue(std::to_string(num));
+		}
+		else if (num > slider->GetMax())
+		{
+			num = slider->GetMax();
+			value->SetValue(std::to_string(num));
+
+		}
+	}
+
+	if (str == "")
+		num = slider->GetMin();
+
+	if (str == "-")
+		num = 0;
+
+
+	slider->SetValue(num);
+	character.updateSlider(mainPagePanels.Sliders[sliderNum].first->GetLabel().ToStdString(), num);
+
+
 }
 
 void MainFrame::onFeatureButton(wxCommandEvent& event)

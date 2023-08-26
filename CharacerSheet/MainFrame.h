@@ -133,6 +133,7 @@ class MainFrame : public wxFrame
 		std::vector<std::tuple<wxSpinCtrl*, wxStaticText*>> HitDie;
 
 		std::pair<wxButton*, wxButton*> SlidersButtons;
+		std::vector<wxTextCtrl*> SliderVal;
 		std::vector<std::pair<wxStaticText* ,wxSlider*>> Sliders;
 		std::vector<wxStaticLine*> sliderLine;
 		//MainPagePanels();
@@ -275,6 +276,7 @@ public:
 	void onMaxHPChange(wxCommandEvent& event);
 	void onAddRemSlider(wxCommandEvent& event);
 	void onSliderChange(wxCommandEvent& event);
+	void onSliderValChange(wxCommandEvent& event);
 
 	void onFeatureButton(wxCommandEvent& event);
 	void onFeatureSelect(wxCommandEvent& event);
