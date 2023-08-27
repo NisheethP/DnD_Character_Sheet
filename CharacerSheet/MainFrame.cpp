@@ -113,7 +113,7 @@ void MainFrame::BindControls()
 {
 	using std::get;
 
-	Bind(wxEVT_TEXT, &MainFrame::onSpellSearchType, this);
+	spellDesc.spellSearch->Bind(wxEVT_TEXT, &MainFrame::onSpellSearchType, this);
 	spellDesc.spellSearch->Bind(wxEVT_SEARCHCTRL_SEARCH_BTN, &MainFrame::onSpellSearch, this);
 	spellDesc.spellList->Bind(wxEVT_TREE_SEL_CHANGED, &MainFrame::onSpellTreeSelect, this);
 
@@ -136,6 +136,7 @@ void MainFrame::BindControls()
 
 	get<0>(knownPagePanels.SpellSlotLevelList[0])->GetParent()->GetParent()->Bind(wxEVT_BUTTON, &MainFrame::onKnownSpellsUseSpell, this);
 	get<3>(knownPagePanels.SpellSlotLevelList[0])->GetParent()->GetParent()->Bind(wxEVT_CHECKLISTBOX, &MainFrame::onTickSpellKnownSpells, this);
+	get<3>(knownPagePanels.SpellSlotLevelList[0])->GetParent()->GetParent()->Bind(wxEVT_LISTBOX, &MainFrame::onKnownSpellsSelectSpell, this);
 	knownPagePanels.AddSpellSlot_Button[0]->GetParent()->GetParent()->Bind(wxEVT_BUTTON, &MainFrame::onKnownSpellsAddRemSpell, this);
 
 	get<2>(mainPagePanels.HealToX)->Bind(wxEVT_BUTTON, &MainFrame::onHealToButton, this);
@@ -1257,60 +1258,21 @@ wxPanel* MainFrame::CreateSpellTreeList(wxWindow* parent)
 	
 	//wxTreeItemId AllSpellsId;
 	wxTreeItemId spellRootId;
-	wxTreeItemId spellLevelId[10];
 	
 	spellRootId = spellDesc.spellList->AddRoot("Root");
 
-	spellLevelId[0] = spellDesc.spellList->AppendItem(spellRootId, "Cantrips");
-	spellLevelId[1] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 1");
-	spellLevelId[2] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 2");
-	spellLevelId[3] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 3");
-	spellLevelId[4] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 4");
-	spellLevelId[5] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 5");
-	spellLevelId[6] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 6");
-	spellLevelId[7] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 7");
-	spellLevelId[8] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 8");
-	spellLevelId[9] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 9");
+	spellDesc.spellLevelId[0] = spellDesc.spellList->AppendItem(spellRootId, "Cantrips");
+	spellDesc.spellLevelId[1] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 1");
+	spellDesc.spellLevelId[2] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 2");
+	spellDesc.spellLevelId[3] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 3");
+	spellDesc.spellLevelId[4] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 4");
+	spellDesc.spellLevelId[5] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 5");
+	spellDesc.spellLevelId[6] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 6");
+	spellDesc.spellLevelId[7] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 7");
+	spellDesc.spellLevelId[8] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 8");
+	spellDesc.spellLevelId[9] = spellDesc.spellList->AppendItem(spellRootId, "Spell Level 9");
 
-	for (auto it = allSpells.begin(); it != allSpells.end(); ++it)
-	{
-		int lev = it->getLevel();
-		switch (lev)
-		{
-		case 0:
-			spellDesc.spellList->AppendItem(spellLevelId[0], it->getName());
-			break;
-		case 1:
-			spellDesc.spellList->AppendItem(spellLevelId[1], it->getName());
-			break;
-		case 2:
-			spellDesc.spellList->AppendItem(spellLevelId[2], it->getName());
-			break;
-		case 3:
-			spellDesc.spellList->AppendItem(spellLevelId[3], it->getName());
-			break;
-		case 4:
-			spellDesc.spellList->AppendItem(spellLevelId[4], it->getName());
-			break;
-		case 5:
-			spellDesc.spellList->AppendItem(spellLevelId[5], it->getName());
-			break;
-		case 6:
-			spellDesc.spellList->AppendItem(spellLevelId[6], it->getName());
-			break;
-		case 7:
-			spellDesc.spellList->AppendItem(spellLevelId[7], it->getName());
-			break;
-		case 8:
-			spellDesc.spellList->AppendItem(spellLevelId[8], it->getName());
-			break;
-		case 9:
-			spellDesc.spellList->AppendItem(spellLevelId[9], it->getName());
-			break;
-		default:
-			break;
-		}
-	}
+	spellDesc.fillAllSpellTree(allSpells);
 
 	//spellList->Expand(spellRootId);
 	
@@ -1318,6 +1280,13 @@ wxPanel* MainFrame::CreateSpellTreeList(wxWindow* parent)
 	spellDesc.spellList->SetForegroundColour(listColour.second);
 
 	spellDesc.spellList->SetMinSize(wxSize(200, 100));
+	spellDesc.spellList->SetFont(spellDesc.spellList->GetFont().MakeLarger());
+	
+	for (int i = 0; i < 10; ++i)
+	{
+		//spellDesc.spellList->SetItemFont(spellDesc.spellLevelId[i], spellDesc.spellList->GetFont().MakeBold());
+		spellDesc.spellList->SetItemBold(spellDesc.spellLevelId[i], true);
+	}
 
 	spellDesc.spellSearch = new wxSearchCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxSize(200,-1));
 	spellDesc.spellSearch->ShowCancelButton(true);
@@ -1326,8 +1295,8 @@ wxPanel* MainFrame::CreateSpellTreeList(wxWindow* parent)
 	mainSizer->Add(spellDesc.spellSearch, 0, wxEXPAND| wxTOP | wxLEFT, 5);
 	mainSizer->Add(spellDesc.spellList, 1, wxEXPAND | wxTOP | wxLEFT, 5);
 
-	spellDesc.fullSpellList = new wxTreeCtrl(spellDesc.spellList);
-	spellDesc.fullSpellList->Hide();
+	//spellDesc.fullSpellList = new wxTreeCtrl(spellDesc.spellList);
+	//spellDesc.fullSpellList->Hide();
 
 	panel->SetSizer(mainSizer);
 	return panel;
@@ -1942,6 +1911,8 @@ void MainFrame::updateKnownSpellDesc()
 	knownPagePanels.Type->SetLabel(spacerStr + "Type: " + knownPagePanels.dispSpell->getSpellType());
 	knownPagePanels.Type->Wrap(wrapWidth);
 
+	setWindowColour(knownPagePanels.Description, descColour);
+
 	knownPagePanels.Title->GetParent()->GetParent()->Layout();
 }
 
@@ -1967,7 +1938,7 @@ void MainFrame::updateKnownDispSpell(std::string str)
 
 		if (name == str)
 		{
-			spellDesc.dispSpell = &(*it);
+			knownPagePanels.dispSpell = &(*it);
 			return;
 		}
 
@@ -2021,6 +1992,49 @@ void MainFrame::updateMoneyCtrls()
 	
 	for (int i = 0; i < 4; i++)
 		mainPagePanels.moneyVals[i]->SetValue(money[i]);
+}
+
+void MainFrame::SpellDesc::fillAllSpellTree(std::vector<Spell>& allSpells)
+{
+	for (auto it = allSpells.begin(); it != allSpells.end(); ++it)
+	{
+		int lev = it->getLevel();
+		switch (lev)
+		{
+		case 0:
+			spellList->AppendItem(spellLevelId[0], it->getName());
+			break;
+		case 1:
+			spellList->AppendItem(spellLevelId[1], it->getName());
+			break;
+		case 2:
+			spellList->AppendItem(spellLevelId[2], it->getName());
+			break;
+		case 3:
+			spellList->AppendItem(spellLevelId[3], it->getName());
+			break;
+		case 4:
+			spellList->AppendItem(spellLevelId[4], it->getName());
+			break;
+		case 5:
+			spellList->AppendItem(spellLevelId[5], it->getName());
+			break;
+		case 6:
+			spellList->AppendItem(spellLevelId[6], it->getName());
+			break;
+		case 7:
+			spellList->AppendItem(spellLevelId[7], it->getName());
+			break;
+		case 8:
+			spellList->AppendItem(spellLevelId[8], it->getName());
+			break;
+		case 9:
+			spellList->AppendItem(spellLevelId[9], it->getName());
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void MainFrame::calcCheckedSpells()
@@ -2317,29 +2331,46 @@ void MainFrame::onTest(wxCommandEvent& event)
 /// ACTUAL HANDLERS
 void MainFrame::onSpellSearchType(wxCommandEvent& event)
 {
-	/*wxObject* eventObject = event.GetEventObject();
+	wxObject* obj = event.GetEventObject();
 
-	spellDesc.curatedSpellList = new wxTreeCtrl(spellList);
+	//spellDesc.curatedSpellList = new wxTreeCtrl(spellList);
 
-	if (eventObject == spellSearch)
+	if (obj == spellDesc.spellSearch)
 	{
-		wxTreeItemId rootID = spellDesc.curatedSpellList->GetRootItem();
-		std::string str = spellSearch->GetLabel().ToStdString();
+		std::string str = spellDesc.spellSearch->GetValue().ToStdString();
+		auto& list = spellDesc.spellList;
+		auto& spellLevelId = spellDesc.spellLevelId;
 
-		for (auto it = allSpells.begin(); it != allSpells.end(); ++it)
+
+		for (int i = 0; i < 10; ++i)
+			list->DeleteChildren(spellLevelId[i]);
+
+		if (str == "")
+			spellDesc.fillAllSpellTree(allSpells);
+
+		else
 		{
-			std::string name = it->getName();
-
-			for (int i = 0; i < str.length(); ++i)
+			for (auto it = str.begin(); it != str.end(); ++it)
+				*it = std::tolower(*it);
+			
+			for (auto it = allSpells.begin(); it != allSpells.end(); ++it)
 			{
-				if (str[i] == name[i])
-				{
+				std::string spellName = it->getName();
 
+				for (auto strN = spellName.begin(); strN != spellName.end(); ++strN)
+					*strN = std::tolower(*strN);
+
+				if (spellName.find(str) != std::string::npos)
+				{
+					int level = it->getLevel();
+
+					list->AppendItem(spellLevelId[level], it->getName());
 				}
 			}
-		}
 
-	}*/
+			list->ExpandAll();
+		}
+	}
 }
 
 void MainFrame::onSpellSearch(wxCommandEvent& event)
@@ -2740,7 +2771,7 @@ void MainFrame::onFeatureSelect(wxCommandEvent& event)
 			{
 				if (i.title == str)
 				{
-					title->SetLabel(i.title);
+					title->SetLabel("  " + i.title);
 					desc->SetPage("<b>" + i.description + "</b>");
 					desc->SetBackgroundColour(descColour.first);
 					return;
@@ -2776,6 +2807,27 @@ void MainFrame::onKnownSpellsEvents(wxCommandEvent& event)
 	{
 		updateKnownSpellMods();
 	}
+}
+
+void MainFrame::onKnownSpellsSelectSpell(wxCommandEvent& event)
+{
+	wxObject* obj = event.GetEventObject();
+	for (int i = 0; i < knownPagePanels.SpellSlotLevelList.size(); ++i)
+	{
+		auto& list = std::get<3>(knownPagePanels.SpellSlotLevelList[i]);
+
+		if (obj != list)
+			list->DeselectAll();
+
+		if (obj == list)
+		{
+			std::string tempStr = list->GetString(list->GetSelection()).ToStdString();
+			updateKnownDispSpell(tempStr);
+			updateKnownSpellDesc();
+		}
+
+	}
+
 }
 
 void MainFrame::onKnownSpellsAddRemSpell(wxCommandEvent& event)

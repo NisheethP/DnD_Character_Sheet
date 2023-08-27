@@ -78,10 +78,13 @@ class MainFrame : public wxFrame
 		wxTreeCtrl* curatedSpellList = nullptr;
 		wxTreeCtrl* fullSpellList = nullptr;
 		wxTreeCtrl* spellList = nullptr;
+		wxTreeItemId spellLevelId[10] = {};
 		
 		wxSearchCtrl* spellSearch = nullptr;
 
 		wxSplitterWindow* spellSplitter = nullptr;
+
+		void fillAllSpellTree(std::vector<Spell>& allSpells);
 
 	} spellDesc;
 
@@ -289,6 +292,7 @@ public:
 	void onSpellSplitterResize(wxSplitterEvent& event);
 
 	void onKnownSpellsEvents(wxCommandEvent& event);
+	void onKnownSpellsSelectSpell(wxCommandEvent& event);
 	void onKnownSpellsAddRemSpell(wxCommandEvent& event);
 	void onTickSpellKnownSpells(wxCommandEvent& event);
 	void onKnownSpellsUseSpell(wxCommandEvent& event);

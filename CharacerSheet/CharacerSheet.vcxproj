@@ -162,11 +162,15 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MoneyDialog.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SliderDialog.h" />
     <ClInclude Include="SliderRemDialog.h" />
     <ClInclude Include="Spells.h" />
     <ClInclude Include="SpellSelectDialog.h" />
     <ClInclude Include="SpellSlot.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CharacerSheet.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
