@@ -27,8 +27,8 @@ void DeathSavesControl::OnPaint(wxPaintEvent& event)
 		wxPoint rectOrigin = {};
 
 
-		wxColor fg = this->GetForegroundColour();
-		wxColor bg = this->GetBackgroundColour();
+		wxColour fg = this->GetForegroundColour();
+		wxColour bg = this->GetBackgroundColour();
 
 
 		gc->SetBrush(fg);

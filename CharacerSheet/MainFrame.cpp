@@ -54,17 +54,28 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	ctrlColour.first = *wxBLACK;
 	ctrlColour.second = *wxWHITE;
 
-	descColour.first = wxColor(0xBB, 0xBB, 0xBB);
-	descColour.second = wxColor(0x00, 0x00, 0x00);
+	descColour.first = wxColour(0xBB, 0xBB, 0xBB);
+	descColour.second = wxColour(0x10, 0x10, 0x10);
 
-	listColour.first = wxColor(0xBB, 0xBB, 0xBB);
-	listColour.second = wxColor(0x00, 0x00, 0x00);
+	listColour.first = wxColour(0xBB, 0xBB, 0xBB);
+	listColour.second = wxColour(0x10, 0x10, 0x10);
 
-	mainColour.first = wxColor(0x28, 0x28, 0x28);
-	mainColour.second = wxColor(0xDD, 0xDD, 0xDD);
+	mainColour.first = wxColour(0x28, 0x28, 0x2c);
+	mainColour.second = wxColour(0xDD, 0xDD, 0xDD);
+	
+	panelColour.first = wxColour(0x3a, 0x3a, 0x3d);
+	panelColour.second = wxColour(0xE1, 0xE1, 0xE1);
+
+	ctrlColour.first = mainColour.second;
+	ctrlColour.second = mainColour.first;
+
+	listColour = ctrlColour;
+
+	slotsColour.first = wxColour(0x22, 0x19, 0x19);
+	slotsColour.second = wxColour(0xFF, 0xFF, 0xFF);
 
 	//SETTING UP THE WINDOW
-	this->SetBackgroundColour(mainColour.first);
+	setWindowColour(this, mainColour);
 	BigFont1.MakeBold();
 	BigFont2.MakeBold();
 
@@ -208,52 +219,51 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 	std::pair<wxGBPosition, wxGBSpan> curItem;
 
 	wxSize initSize(120, -1);
-	wxColor headPlateColor(wxColor(200, 100, 100));
-
+	wxColour panelBGColour(panelColour.first);
 
 	curItem = items[0];
 	p = CreateNamePanel(panel);
-	p->SetBackgroundColour(wxColor(185, 185, 255));
+	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 	
 	curItem = items[1];
 	p = CreateACPanel(panel);
-	//p->SetBackgroundColour(headPlateColor);
+	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[2];
 	p = CreateSpeedPanel(panel);
-	p->SetBackgroundColour(headPlateColor);
+	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[3];
 	p = CreateHPPanel(panel);
-	p->SetBackgroundColour(headPlateColor);
+	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[4];
 	p = CreateTempHPPanel(panel);
-	p->SetBackgroundColour(headPlateColor);
+	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[5];
 	p = CreateStats(panel);
-	p->SetBackgroundColour(wxColor(200,150,200));
+	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[6];
 	p = CreateSavingThrows(panel);
-	p->SetBackgroundColour(wxColor(50, 100, 100));
+	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[7];
 	p = CreateSkillProf(panel);
-	p->SetBackgroundColour(wxColor(25, 100, 25));
+	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[8];
 	p = CreateFeaturesPanel(panel);
-	//p->SetBackgroundColour(wxColor(50,50,150));
+	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[9];
@@ -266,22 +276,22 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 
 	curItem = items[11];
 	p = CreateInitiativePanel(panel);
-	p->SetBackgroundColour(headPlateColor);
+	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[12];
 	p = CreateSubHPPanel(panel);
-	p->SetBackgroundColour(headPlateColor);
+	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[13];
 	auto p1 = CreateHitDiePanel(panel);
-	p1->SetBackgroundColour(headPlateColor);
+	p1->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p1, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[14];
-	p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, baseColSize);
-	p->SetBackgroundColour(wxColor(0x22, 0x33, 0x33));
+	p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, wxSize(mainPagePanels.AC->GetParent()->GetSize().x, -1));
+	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[15];
@@ -321,14 +331,14 @@ wxScrolled<wxPanel>* MainFrame::CreateSpellsPage(wxNotebook* parent)
 
 	wxPanel *left, *right;
 
-	wxColor headPlateColor(*wxBLACK);
+	//wxColour headPlateColor(*wxBLACK);
 
 	left = CreateSpellsDescPanel(static_cast<wxWindow*>(spellDesc.spellSplitter));
-	left->SetBackgroundColour(*wxBLACK);
+	setWindowColour(left, mainColour);
 	//mainSizer->Add(p, 1, wxEXPAND);
 
 	right = CreateSpellTreeList(static_cast<wxWindow*>(spellDesc.spellSplitter));
-	right->SetBackgroundColour(*wxBLACK);
+	setWindowColour(right, mainColour);
 	///mainSizer->Add(p, 0, wxEXPAND);
 
 	spellDesc.spellSplitter->SplitVertically(left, right);
@@ -385,7 +395,8 @@ wxScrolled<wxPanel>* MainFrame::CreateKnownSpellsPage(wxNotebook* parent)
 	auto box = new wxStaticBoxSizer(wxVERTICAL, panel, "SELECTED SPELL");
 
 	knownPagePanels.Description->SetMaxSize(maxSize);
-	box->GetStaticBox()->SetForegroundColour(*wxWHITE);
+	box->GetStaticBox()->SetForegroundColour(mainColour.second);
+	box->GetStaticBox()->SetFont(box->GetStaticBox()->GetFont().MakeBold().MakeLarger());
 	box->Add(p, 1, wxEXPAND | wxALL, 5);
 	
 	subSizer->Add(box, 0, wxEXPAND);
@@ -411,14 +422,14 @@ wxScrolled<wxPanel>* MainFrame::CreateKnownSpellsPage(wxNotebook* parent)
 wxScrolled<wxPanel>* MainFrame::CreateSpellSlotsTable(wxNotebook* parent)
 {
 	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY);
+	panel->SetBackgroundColour(mainColour.first);
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 
 	wxListView* SlotsTable = new wxListView(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES);
 
 	SlotsTable->SetFont(BigFont1);
-	SlotsTable->SetBackgroundColour(mainColour.first);
-	SlotsTable->SetForegroundColour(mainColour.second);
-	
+	setWindowColour(SlotsTable, mainColour);
+
 	SlotsTable->AppendColumn("Level");
 	SlotsTable->SetColumnWidth(0, 100);
 	for (int i = 1; i < 10; ++i)
@@ -453,9 +464,10 @@ wxScrolled<wxPanel>* MainFrame::CreateSpellSlotsTable(wxNotebook* parent)
 wxScrolled<wxPanel>* MainFrame::CreateTestPanel(wxNotebook* parent)
 {
 	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY);
+	panel->SetBackgroundColour(mainColour.first);
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 
-	panel->SetBackgroundColour(wxColor(0x30,0x30,0x40));
+	panel->SetBackgroundColour(wxColour(0x30,0x30,0x40));
 	//DeathSavesControl *deathSaves = new DeathSavesControl(panel, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(300,200)));
 	//setWindowColour(deathSaves, { *wxBLACK, *wxWHITE });
 
@@ -476,7 +488,8 @@ wxScrolled<wxPanel>* MainFrame::CreateTestPanel(wxNotebook* parent)
 wxPanel* MainFrame::CreateNamePanel(wxPanel* parent)
 {
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
-	
+	setWindowColour(panel, mainColour);
+
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
 	wxStaticText* charName = new wxStaticText(panel, wxID_ANY, character.getName());
@@ -505,9 +518,9 @@ wxPanel* MainFrame::CreateNamePanel(wxPanel* parent)
 wxPanel* MainFrame::CreateACPanel(wxPanel* parent)
 {
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize*1.3);
-	wxColor headPlateColor(wxColor(200, 100, 100));
+	wxColour headPlateColor(wxColour(200, 100, 100));
+	setWindowColour(panel, mainColour);
 
-	panel->SetBackgroundColour(headPlateColor);
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer* subSizer1 = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer* subSizer2 = new wxBoxSizer(wxVERTICAL);
@@ -521,9 +534,7 @@ wxPanel* MainFrame::CreateACPanel(wxPanel* parent)
 	mainPagePanels.AC_MageArmor = new wxCheckBox(panel, wxID_ANY, "Mage Armor");
 	//mainPagePanels.AC_AddArmor = new wxButton(panel, wxID_ANY, "Set Armor");
 
-
-	mainPagePanels.AC->SetBackgroundColour(ctrlColour.first);
-	mainPagePanels.AC->SetForegroundColour(ctrlColour.second);
+	setWindowColour(mainPagePanels.AC, ctrlColour);
 
 	mainSizer->Add(AC_Label, 1, wxEXPAND | wxTOP, 5);
 	mainSizer->Add(horLine, 0, wxEXPAND | wxTOP | wxBOTTOM, 1);
@@ -553,6 +564,7 @@ wxPanel* MainFrame::CreateACPanel(wxPanel* parent)
 wxPanel* MainFrame::CreateHPPanel(wxPanel* parent)
 {
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	setWindowColour(panel, mainColour);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -574,8 +586,7 @@ wxPanel* MainFrame::CreateHPPanel(wxPanel* parent)
 	mainPagePanels.HP->SetMin(0);
 	mainPagePanels.HP->SetMax(character.getTotHP());
 
-	mainPagePanels.HP->SetBackgroundColour(ctrlColour.first);
-	mainPagePanels.HP->SetForegroundColour(ctrlColour.second);
+	setWindowColour(mainPagePanels.HP, ctrlColour);
 
 	headHP->SetFont(BigFont1);
 	mainPagePanels.HP->SetFont(BigFont1);
@@ -588,6 +599,7 @@ wxPanel* MainFrame::CreateHPPanel(wxPanel* parent)
 wxPanel* MainFrame::CreateTempHPPanel(wxPanel* parent)
 {
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	setWindowColour(panel, mainColour);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer* subSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -611,8 +623,7 @@ wxPanel* MainFrame::CreateTempHPPanel(wxPanel* parent)
 	mainPagePanels.TempHP->SetValue(0);
 	mainPagePanels.TempHP->SetMin(0);
 
-	mainPagePanels.TempHP->SetBackgroundColour(ctrlColour.first);
-	mainPagePanels.TempHP->SetForegroundColour(ctrlColour.second);
+	setWindowColour(mainPagePanels.TempHP, ctrlColour);
 
 	headHP->SetFont(BigFont1);
 	mainPagePanels.TempHP->SetFont(BigFont1);
@@ -625,6 +636,7 @@ wxPanel* MainFrame::CreateTempHPPanel(wxPanel* parent)
 wxPanel* MainFrame::CreateSpeedPanel(wxPanel* parent)
 {
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	setWindowColour(panel, mainColour);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -641,8 +653,7 @@ wxPanel* MainFrame::CreateSpeedPanel(wxPanel* parent)
 	sizer->Add(mainPagePanels.Speed, 2, wxEXPAND | wxLEFT | wxRIGHT, 13);
 	sizer->Add(-1, 5);
 
-	mainPagePanels.Speed->SetBackgroundColour(ctrlColour.first);
-	mainPagePanels.Speed->SetForegroundColour(ctrlColour.second);
+	setWindowColour(mainPagePanels.Speed, ctrlColour);
 
 	mainPagePanels.Speed->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 	
@@ -660,6 +671,7 @@ wxPanel* MainFrame::CreateStats(wxPanel* parent)
 	using std::to_string;
 
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	setWindowColour(panel, mainColour);
 
 	//wxStaticText* profBonus = new wxStaticText(panel, wxID_ANY, "Profeciency: " + std::to_string(character.getProfBonus()));
 
@@ -720,6 +732,9 @@ wxPanel* MainFrame::CreateStats(wxPanel* parent)
 	wxTextCtrl* profVal = new wxTextCtrl(panel, wxID_ANY, to_string(character.getProfBonus()), wxDefaultPosition, 
 		wxSize(30, -1), wxTE_READONLY | wxTE_CENTER);
 
+	profBox->GetStaticBox()->SetForegroundColour(mainColour.second);
+	profBox->GetStaticBox()->SetFont(profBox->GetStaticBox()->GetFont().MakeBold().MakeLarger().MakeUnderlined());
+
 	profBox->Add(profVal, 1, wxEXPAND | wxLEFT | wxRIGHT, margin);
 	profVal->SetMaxSize(wxSize(-1,30));
 	profVal->SetFont(titleFont);
@@ -743,7 +758,8 @@ wxPanel* MainFrame::CreateSavingThrows(wxPanel* parent)
 	wxSize tempSize = mainPagePanels.HP->GetParent()->GetSize();
 	tempSize.y = -1;
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize);
-	
+	setWindowColour(panel, mainColour);
+
 	wxStaticBoxSizer* stSizer = new wxStaticBoxSizer(wxVERTICAL, panel, "Saving Throws");
 	
 	//std::wstring profMarker = std::wstring(1, char(159));
@@ -760,8 +776,8 @@ wxPanel* MainFrame::CreateSavingThrows(wxPanel* parent)
 		savingThrowName = new wxStaticText(panel, wxID_ANY, "");
 		savingThrowValue = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 		savingThrowValue->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
-		savingThrowValue->SetBackgroundColour(ctrlColour.first);
-		savingThrowValue->SetForegroundColour(ctrlColour.second);
+
+		setWindowColour(savingThrowValue, ctrlColour);
 
 		makeSavingThrowPair(savingThrowName, savingThrowValue, tempSkills[i]);
 		mainPagePanels.SavingThrows.push_back({ savingThrowName, savingThrowValue });
@@ -793,7 +809,8 @@ wxPanel* MainFrame::CreateSkillProf(wxPanel* parent)
 	wxSize tempSize = mainPagePanels.HP->GetParent()->GetSize();
 	tempSize.y = -1;
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize);
-	
+	setWindowColour(panel, mainColour);
+
 	wxStaticBoxSizer* skillSizer = new wxStaticBoxSizer(wxVERTICAL, panel, "Skills");
 	
 	std::wstring profMarker = std::wstring(1, char(159));
@@ -835,8 +852,7 @@ wxPanel* MainFrame::CreateSkillProf(wxPanel* parent)
 		skillName = new wxStaticText(panel, wxID_ANY, "");
 		skillValue = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 		skillValue->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
-		skillValue->SetBackgroundColour(ctrlColour.first);
-		skillValue->SetForegroundColour(ctrlColour.second);
+		setWindowColour(skillValue, ctrlColour);
 
 		makeSkillPair(skillName, skillValue, curSkill[i]);
 		mainPagePanels.Skills.push_back({skillName, skillValue});
@@ -869,11 +885,14 @@ wxPanel* MainFrame::CreateFeaturesPanel(wxPanel* parent)
 	wxSize tempSize;
 	tempSize.x = baseColSize.x * 2;
 	tempSize.y = -1;
+
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize);
+	setWindowColour(panel, mainColour);
 	auto mainSizer = new wxStaticBoxSizer(wxVERTICAL, panel, "Features");
 	wxBoxSizer* subSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	mainSizer->GetStaticBox()->SetForegroundColour(*wxWHITE);
+	mainSizer->GetStaticBox()->SetForegroundColour(mainColour.second);
+	mainSizer->GetStaticBox()->SetFont(mainSizer->GetStaticBox()->GetFont().MakeBold().MakeLarger());
 
 	wxFont curFont(wxFont(wxFontInfo(wxSize(0, 13))));
 	curFont.SetWeight(wxFontWeight::wxFONTWEIGHT_BOLD);
@@ -900,16 +919,9 @@ wxPanel* MainFrame::CreateFeaturesPanel(wxPanel* parent)
 	subSizer->Add(10, -1);
 	subSizer->Add(mainPagePanels.Feature_AddButton, 0 , wxALIGN_CENTER);
 
-
-	mainPagePanels.Feature_Title->SetBackgroundColour(descColour.first);
-	mainPagePanels.Feature_Desc->SetBackgroundColour(descColour.first);
-
-	mainPagePanels.Feature_Title->SetForegroundColour(descColour.second);
-	mainPagePanels.Feature_Desc->SetForegroundColour(descColour.second);
-
-	mainPagePanels.Feature_FullList->SetBackgroundColour(listColour.first);
-	mainPagePanels.Feature_FullList->SetForegroundColour(listColour.second);
-
+	setWindowColour(mainPagePanels.Feature_Title, descColour);
+	setWindowColour(mainPagePanels.Feature_Desc, descColour);
+	setWindowColour(mainPagePanels.Feature_FullList, listColour);
 
 
 	mainSizer->Add(mainPagePanels.Feature_Title, 0, wxEXPAND);
@@ -971,8 +983,6 @@ wxPanel* MainFrame::CreateLangProfeciencies(wxPanel* parent)
 	mainPagePanels.EL_LangProf->SetupColours();
 	mainPagePanels.EL_LangProf->SetMaxSize(FromDIP(wxSize(-1,120)));
 	
-
-
 	sizer->Add(mainPagePanels.EL_LangProf, 1, wxEXPAND);
 
 	panel->SetSizer(sizer);
@@ -985,7 +995,7 @@ wxPanel* MainFrame::CreateMoney(wxPanel* parent)
 {
 	wxSize curSize = baseColSize;
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, curSize);
-	panel->SetBackgroundColour(wxColor(0x44,0x44,0x4C));
+	setWindowColour(panel, panelColour);
 	std::string tempStr[4] = { "Platinum", "Gold", "Silver", "Copper" };
 	wxFont curFont(wxFont(wxFontInfo(wxSize(0, 13))));
 	curFont.MakeBold();
@@ -1013,7 +1023,8 @@ wxPanel* MainFrame::CreateMoney(wxPanel* parent)
 		mainPagePanels.moneyVals.push_back(tempSpin);
 
 		box[i]->Add(mainPagePanels.moneyVals[i], 0, wxEXPAND);
-		box[i]->GetStaticBox()->SetForegroundColour(ctrlColour.second);
+		box[i]->GetStaticBox()->SetForegroundColour(mainColour.second);
+		box[i]->GetStaticBox()->SetFont(box[i]->GetStaticBox()->GetFont().MakeBold().MakeLarger());
 
 		mainPagePanels.moneyVals[i]->SetMax(1e5);
 		mainPagePanels.moneyVals[i]->SetFont(curFont);
@@ -1076,6 +1087,8 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 
 	setWindowColour(healSpin, ctrlColour);
 	setWindowColour(hpSpin, ctrlColour);
+	setWindowColour(hpText, panelColour);
+	setWindowColour(healText, panelColour);
 
 	panel->SetSizer(sizer);
 	return panel;
@@ -1114,9 +1127,13 @@ wxPanel* MainFrame::CreateInitiativePanel(wxPanel* parent)
 	sizer->Add(subSizer, 0, wxEXPAND | wxLEFT | wxRIGHT, 20);
 	sizer->Add(-1, 5);
 
+	InitBox->GetStaticBox()->SetForegroundColour(panelColour.second);
+	InitBox->GetStaticBox()->SetFont(InitBox->GetStaticBox()->GetFont().MakeBold().MakeLarger().MakeLarger());
+	
 	setWindowColour(Init, ctrlColour);
 	setWindowColour(initMod, ctrlColour);
-
+	initModText->SetForegroundColour(panelColour.second);
+	initModText->SetFont(initModText->GetFont().MakeBold());
 	panel->SetSizer(sizer);
 	return panel;
 }
@@ -1124,6 +1141,7 @@ wxPanel* MainFrame::CreateInitiativePanel(wxPanel* parent)
 wxScrolled<wxPanel>* MainFrame::CreateSliderPanel(wxPanel* parent)
 {
 	auto panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, 2*baseColSize, wxVSCROLL);
+	panel->SetBackgroundColour(mainColour.first);
 	auto sizer = new wxStaticBoxSizer(wxVERTICAL, panel, "Sliders");
 	wxBoxSizer* buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -1135,7 +1153,7 @@ wxScrolled<wxPanel>* MainFrame::CreateSliderPanel(wxPanel* parent)
 	buttonSizer->Add(remButton, 0, wxALL, 2);
 	buttonSizer->Add(addButton, 0, wxALL, 2);
 
-	setWindowColour(sizer->GetStaticBox(), ctrlColour);
+	setWindowColour(sizer->GetStaticBox(), mainColour);
 
 	sizer->Add(buttonSizer, 0, wxALIGN_RIGHT);
 	auto horLine = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, wxSize(1.5*baseColSize.x, -1));
@@ -1182,6 +1200,9 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 		auto text = new wxStaticText(panel, wxID_ANY, "");
 		auto spin = new wxSpinCtrl(panel, wxID_ANY, "0", wxDefaultPosition, FromDIP(wxSize(40,-1)), wxALIGN_CENTER_HORIZONTAL);
 		
+		setWindowColour(text, panelColour);
+		setWindowColour(spin, ctrlColour);
+
 		auto subSizer = new wxBoxSizer(wxHORIZONTAL);
 
 		std::string name = it->getClassName();
@@ -1280,6 +1301,8 @@ wxPanel* MainFrame::CreateSpellTreeList(wxWindow* parent)
 	spellDesc.spellList->SetBackgroundColour(listColour.first);
 	spellDesc.spellList->SetForegroundColour(listColour.second);
 
+	setWindowColour(spellDesc.spellList, listColour);
+
 	spellDesc.spellList->SetMinSize(wxSize(200, 100));
 	spellDesc.spellList->SetFont(spellDesc.spellList->GetFont().MakeLarger());
 	
@@ -1312,8 +1335,7 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	curFont.MakeBold();
 
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
-	panel->SetBackgroundColour(*wxBLACK);
-	panel->SetForegroundColour(*wxWHITE);
+	setWindowColour(panel, mainColour);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	wxStaticLine* verBar = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
@@ -1337,7 +1359,7 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	knownPagePanels.SelectedSpells_Val = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 	
 	auto SpellPoints_Text = new wxStaticText(panel, wxID_ANY, "Spell\nPoints", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
-	knownPagePanels.SpellPoints_Val = new wxTextCtrl(panel, wxID_ANY, "100", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
+	knownPagePanels.SpellPoints_Val = new wxTextCtrl(panel, wxID_ANY, std::to_string(character.getTotalSpellPoints()), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 
 	ProfBonus_Text->SetFont(curFont);
 	SpellCastMod_Text->SetFont(curFont);
@@ -1393,14 +1415,17 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	sizer->Add(verBar, 0, wxEXPAND);
 	sizer->Add(gapBig, -1);
 
-	sizer->Add(SpellPoints_Text, 0, wxALIGN_CENTER);
-	sizer->Add(gapSmall, -1);
-	sizer->Add(knownPagePanels.SpellPoints_Val, 0, wxALIGN_CENTER);
+	if (uses.SpellPoints)
+	{
+		sizer->Add(SpellPoints_Text, 0, wxALIGN_CENTER);
+		sizer->Add(gapSmall, -1);
+		sizer->Add(knownPagePanels.SpellPoints_Val, 0, wxALIGN_CENTER);
 
-	sizer->Add(gapBig, -1);
-	verBar = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
-	sizer->Add(verBar, 0, wxEXPAND);
-	sizer->Add(gapBig, -1);
+		sizer->Add(gapBig, -1);
+		verBar = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
+		sizer->Add(verBar, 0, wxEXPAND);
+		sizer->Add(gapBig, -1);
+	}	
 
 	knownPagePanels.ProfBonus_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 	knownPagePanels.SpellCastMod_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
@@ -1409,6 +1434,12 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	knownPagePanels.SpellPoints_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
 	knownPagePanels.SelectedSpells_Val->SetLabel(knownPagePanels.selectedSpells);
+
+	if (!uses.SpellPoints)
+	{
+		knownPagePanels.SpellPoints_Val->Hide();
+		verBar->Hide();
+	}
 
 	calcCheckedSpells();
 	
@@ -1439,6 +1470,7 @@ wxPanel* MainFrame::CreateKnownSpellsAllLevels(wxPanel* parent)
 {
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
 	//panel->SetBackgroundColour(DescColor.first);
+	setWindowColour(panel, mainColour);
 
 	int gridLineThickness = 2;
 
@@ -1504,7 +1536,7 @@ wxPanel* MainFrame::CreateKnownSpellsAllLevels(wxPanel* parent)
 wxPanel* MainFrame::CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel)
 {
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
-	panel->SetBackgroundColour(*wxBLACK);
+	panel->SetBackgroundColour(mainColour.first);
 
 	wxSize baseSize(250, -1);
 	wxSize curSize = baseSize;
@@ -1644,7 +1676,6 @@ wxPanel* MainFrame::CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel)
 	return panel;
 }
 
-
 //------------------------------
 ///KNOWN SPELLS PAGE PANELS
 //------------------------------
@@ -1654,7 +1685,7 @@ wxPanel* MainFrame::CreateSpellDescription(wxPanel* parent, Spell& dispSpell, wx
 {
 	wxSize DescColWidth = size;
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, DescColWidth);
-	panel->SetBackgroundColour(*wxBLACK);
+	panel->SetBackgroundColour(mainColour.first);
 	//wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 
 	int borderSize = 5;
@@ -1673,11 +1704,9 @@ wxPanel* MainFrame::CreateSpellDescription(wxPanel* parent, Spell& dispSpell, wx
 	wxFont curFont(wxFont(wxFontInfo(wxSize(0, 13))));
 	curFont.SetWeight(wxFontWeight::wxFONTWEIGHT_BOLD);
 
-	wxColor panelColor(descColour.first);
-
 	//SPELL TITLE
 	p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, DescColWidth);
-	p->SetBackgroundColour(panelColor);
+	setWindowColour(p, descColour);
 	tempStr = curSpell.getName();
 	Title = new wxStaticText(p, wxID_ANY, tempStr);
 	Title->SetFont(titleFont);
@@ -1686,7 +1715,7 @@ wxPanel* MainFrame::CreateSpellDescription(wxPanel* parent, Spell& dispSpell, wx
 
 	//SPELL LEVEL
 	p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, DescColWidth);
-	p->SetBackgroundColour(panelColor);
+	setWindowColour(p, descColour);
 	tempStr = std::to_string(curSpell.getLevel());
 	Level = new wxStaticText(p, wxID_ANY, spacerStr + "Level: " + tempStr);
 	Level->SetFont(curFont);
@@ -1695,7 +1724,7 @@ wxPanel* MainFrame::CreateSpellDescription(wxPanel* parent, Spell& dispSpell, wx
 
 	//CASTING TIME
 	p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, DescColWidth);
-	p->SetBackgroundColour(panelColor);
+	setWindowColour(p, descColour);
 	tempStr = curSpell.getCastingTime();
 	CastingTime = new wxStaticText(p, wxID_ANY, spacerStr + "Casting Time: " + tempStr);
 	CastingTime->SetFont(curFont);
@@ -1704,7 +1733,7 @@ wxPanel* MainFrame::CreateSpellDescription(wxPanel* parent, Spell& dispSpell, wx
 
 	//RANGE
 	p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, DescColWidth);
-	p->SetBackgroundColour(panelColor);
+	setWindowColour(p, descColour);
 	tempStr = curSpell.getRange();
 	Range = new wxStaticText(p, wxID_ANY, spacerStr + "Range: " + tempStr);
 	Range->SetFont(curFont);
@@ -1713,7 +1742,7 @@ wxPanel* MainFrame::CreateSpellDescription(wxPanel* parent, Spell& dispSpell, wx
 
 	//DURATION
 	p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, DescColWidth);
-	p->SetBackgroundColour(panelColor);
+	setWindowColour(p, descColour);
 	tempStr = curSpell.getDuration();
 	Duration = new wxStaticText(p, wxID_ANY, spacerStr + "Duration: " + tempStr);
 	Duration->SetFont(curFont);
@@ -1722,7 +1751,7 @@ wxPanel* MainFrame::CreateSpellDescription(wxPanel* parent, Spell& dispSpell, wx
 
 	//COMPONENTS
 	p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, DescColWidth);
-	p->SetBackgroundColour(panelColor);
+	setWindowColour(p, descColour);
 	tempStr = comp_to_str(curSpell.getComps()) + curSpell.getMaterialsFromDesc();
 	Components = new wxStaticText(p, wxID_ANY, spacerStr + "Components: " + tempStr);
 	Components->SetFont(curFont);
@@ -1731,7 +1760,7 @@ wxPanel* MainFrame::CreateSpellDescription(wxPanel* parent, Spell& dispSpell, wx
 
 	//SPELL TYPE
 	p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, DescColWidth);
-	p->SetBackgroundColour(panelColor);
+	setWindowColour(p, descColour);
 	tempStr = curSpell.getSpellType();
 	Type = new wxStaticText(p, wxID_ANY, spacerStr + "Type: " + tempStr);
 	Type->SetFont(curFont);
@@ -1740,7 +1769,7 @@ wxPanel* MainFrame::CreateSpellDescription(wxPanel* parent, Spell& dispSpell, wx
 
 	//APPLICABLE CLASSES
 	p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, DescColWidth);
-	p->SetBackgroundColour(panelColor);
+	setWindowColour(p, descColour);
 	tempStr = curSpell.getAppClasses();
 	AppClasses = new wxStaticText(p, wxID_ANY, spacerStr + "Classes: " + tempStr);
 	AppClasses->SetFont(curFont);
@@ -1749,12 +1778,12 @@ wxPanel* MainFrame::CreateSpellDescription(wxPanel* parent, Spell& dispSpell, wx
 
 	//DESCRIPTION
 	tempStr = curSpell.getDescription();
-	std::string htmlFormatOpen = "<body><b>";
-	std::string htmlFormatClose = "</b></body>";
+	std::string htmlFormatOpen = "<body><b><span style:'color:white;'>";
+	std::string htmlFormatClose = "</span></b></body>";
 	Description = new wxHtmlWindow(panel, wxID_ANY, wxDefaultPosition, wxSize(DescColWidth.x, 100), wxHW_SCROLLBAR_AUTO);
 	Description->SetPage(htmlFormatOpen + tempStr + htmlFormatClose);
 	mainSizer->Add(Description, 1, sizerFlag, margin);
-
+	
 	setWindowColour(Description, descColour);
 
 	panel->SetSizer(mainSizer);
@@ -1775,16 +1804,16 @@ void MainFrame::CreatePages(wxNotebook* parent)
 	parent->AddPage(allSpellsPage, "All Spells");
 
 	wxWindow* knownSpellsPage = CreateKnownSpellsPage(parent);
-	//knownSpellsPage->SetBackgroundColour(wxColor(0x99,0x77,0x77));
+	//knownSpellsPage->SetBackgroundColour(wxColour(0x99,0x77,0x77));
 	parent->AddPage(knownSpellsPage, "Known Spells", true);
 
 	wxWindow* SlotsTablePage = CreateSpellSlotsTable(parent);
-	SlotsTablePage->SetBackgroundColour(wxColor(0x22,0x19,0x19));
-	SlotsTablePage->SetForegroundColour(wxColor(0xFF,0xFF,0xFF));
+	SlotsTablePage->SetBackgroundColour(slotsColour.first);
+	SlotsTablePage->SetForegroundColour(slotsColour.second);
 	parent->AddPage(SlotsTablePage, "SpellSlotTable");
 
 	wxWindow* TestPage = CreateTestPanel(parent);
-	TestPage->SetBackgroundColour(wxColor(0x19, 0x19, 0x22));
+	TestPage->SetBackgroundColour(wxColour(0x19, 0x19, 0x22));
 	parent->AddPage(TestPage, "Test");
 
 }
@@ -2317,7 +2346,9 @@ void MainFrame::onTest(wxCommandEvent& event)
 	dialog.ShowModal();
 }
 
+
 /// ACTUAL HANDLERS
+
 void MainFrame::onSpellSearchType(wxCommandEvent& event)
 {
 	wxObject* obj = event.GetEventObject();
@@ -2339,15 +2370,12 @@ void MainFrame::onSpellSearchType(wxCommandEvent& event)
 
 		else
 		{
-			for (auto it = str.begin(); it != str.end(); ++it)
-				*it = std::tolower(*it);
-			
+			toLowerString(str);
+						
 			for (auto it = allSpells.begin(); it != allSpells.end(); ++it)
 			{
 				std::string spellName = it->getName();
-
-				for (auto strN = spellName.begin(); strN != spellName.end(); ++strN)
-					*strN = std::tolower(*strN);
+				toLowerString(spellName);
 
 				if (spellName.find(str) != std::string::npos)
 				{
@@ -2712,8 +2740,7 @@ void MainFrame::onFeatureButton(wxCommandEvent& event)
 
 		mainPagePanels.Feature_Title->SetLabel("");
 		mainPagePanels.Feature_Desc->SetPage("");
-		mainPagePanels.Feature_Desc->SetBackgroundColour(descColour.first);
-
+		setWindowColour(mainPagePanels.Feature_Desc, descColour);
 		updateFeaturesList();
 		return;
 	}
@@ -2749,7 +2776,7 @@ void MainFrame::onFeatureSelect(wxCommandEvent& event)
 		{
 			title->SetLabel("Feature Title");
 			desc->SetPage("Feature Description");
-			desc->SetBackgroundColour(descColour.first);
+			setWindowColour(desc, descColour);
 		}
 		else
 		{
@@ -2763,6 +2790,7 @@ void MainFrame::onFeatureSelect(wxCommandEvent& event)
 					title->SetLabel("  " + i.title);
 					desc->SetPage("<b>" + i.description + "</b>");
 					desc->SetBackgroundColour(descColour.first);
+					setWindowColour(desc, descColour);
 					return;
 				}
 			}
@@ -3165,4 +3193,10 @@ void MainFrame::setWindowColour(wxWindow* window, ColourPair colour)
 {
 	window->SetBackgroundColour(colour.first);
 	window->SetForegroundColour(colour.second);
+}
+
+void toLowerString(std::string& str)
+{
+	for (auto it = str.begin(); it != str.end(); ++it)
+		*it = std::tolower(*it);
 }

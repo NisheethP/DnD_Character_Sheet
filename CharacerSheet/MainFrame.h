@@ -18,7 +18,7 @@
 #include "Spells.h"
 
 
-using ColourPair = std::pair<wxColor, wxColor>;
+using ColourPair = std::pair<wxColour, wxColour>;
 
 class MainFrame : public wxFrame
 {
@@ -36,6 +36,8 @@ class MainFrame : public wxFrame
 	ColourPair descColour;
 	ColourPair listColour;
 	ColourPair mainColour;
+	ColourPair panelColour;
+	ColourPair slotsColour;
 
 	wxSize baseColSize;
 
@@ -303,3 +305,4 @@ public:
 	void setWindowColour(wxWindow* window, ColourPair colour);
 };
 
+void toLowerString(std::string& str);
