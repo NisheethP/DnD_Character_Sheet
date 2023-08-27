@@ -134,7 +134,9 @@ private:
 	unsigned int skillExpertises;
 
 	SpellSlot charSlots;
+	SpellSlot curCharSlots;
 	int SpellPoints;
+	int curSpellPoints;
 
 	int AC;
 	int initMod;

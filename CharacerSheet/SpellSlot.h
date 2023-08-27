@@ -47,5 +47,5 @@ public:
 };
 
 int convSlotToPoint(int spell_Level);
-
+int convPointToSlot(int points);
 

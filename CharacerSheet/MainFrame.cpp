@@ -135,6 +135,7 @@ void MainFrame::BindControls()
 	knownPagePanels.Combo_SpellCastSkill->Bind(wxEVT_COMBOBOX, &MainFrame::onKnownSpellsEvents, this);
 
 	get<0>(knownPagePanels.SpellSlotLevelList[0])->GetParent()->GetParent()->Bind(wxEVT_BUTTON, &MainFrame::onKnownSpellsUseSpell, this);
+	get<0>(knownPagePanels.SpellSlotLevelList[0])->GetParent()->GetParent()->Bind(wxEVT_BUTTON, &MainFrame::onKnownSpellsUseSpellPoint, this);
 	get<3>(knownPagePanels.SpellSlotLevelList[0])->GetParent()->GetParent()->Bind(wxEVT_CHECKLISTBOX, &MainFrame::onTickSpellKnownSpells, this);
 	get<3>(knownPagePanels.SpellSlotLevelList[0])->GetParent()->GetParent()->Bind(wxEVT_LISTBOX, &MainFrame::onKnownSpellsSelectSpell, this);
 	knownPagePanels.AddSpellSlot_Button[0]->GetParent()->GetParent()->Bind(wxEVT_BUTTON, &MainFrame::onKnownSpellsAddRemSpell, this);
@@ -1322,23 +1323,27 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 
 	knownPagePanels.Combo_SpellCastSkill = new wxComboBox(panel, wxID_ANY, "Intelligence", wxDefaultPosition, wxDefaultSize, 3, choices, wxCB_READONLY);
 
-	knownPagePanels.ProfBonus_Text = new wxStaticText(panel, wxID_ANY, "Profeciency\nBonus", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+	auto ProfBonus_Text = new wxStaticText(panel, wxID_ANY, "Profeciency\nBonus", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
 	knownPagePanels.ProfBonus_Val = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 	knownPagePanels.ProfBonus_Val->SetLabel(std::to_string(character.getProfBonus()));
 
-	knownPagePanels.SpellCastMod_Text = new wxStaticText(panel, wxID_ANY, "Spell Attack\nMod", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+	auto SpellCastMod_Text = new wxStaticText(panel, wxID_ANY, "Spell Attack\nMod", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
 	knownPagePanels.SpellCastMod_Val = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 
-	knownPagePanels.SpellSaveMod_Text = new wxStaticText(panel, wxID_ANY, "Spell Save\nMod", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+	auto SpellSaveMod_Text = new wxStaticText(panel, wxID_ANY, "Spell Save\nMod", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
 	knownPagePanels.SpellSaveMod_Val = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 
-	knownPagePanels.SelectedSpells_Text = new wxStaticText(panel, wxID_ANY, "Spells\nTicked", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+	auto SelectedSpells_Text = new wxStaticText(panel, wxID_ANY, "Spells\nTicked", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
 	knownPagePanels.SelectedSpells_Val = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
+	
+	auto SpellPoints_Text = new wxStaticText(panel, wxID_ANY, "Spell\nPoints", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+	knownPagePanels.SpellPoints_Val = new wxTextCtrl(panel, wxID_ANY, "100", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 
-	knownPagePanels.ProfBonus_Text->SetFont(curFont);
-	knownPagePanels.SpellCastMod_Text->SetFont(curFont);
-	knownPagePanels.SpellSaveMod_Text->SetFont(curFont);
-	knownPagePanels.SelectedSpells_Text->SetFont(curFont);
+	ProfBonus_Text->SetFont(curFont);
+	SpellCastMod_Text->SetFont(curFont);
+	SpellSaveMod_Text->SetFont(curFont);
+	SelectedSpells_Text->SetFont(curFont);
+	SpellPoints_Text->SetFont(curFont);
 
 	updateKnownSpellMods();
 
@@ -1351,7 +1356,7 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	sizer->Add(verBar, 0, wxEXPAND);
 	sizer->Add(gapBig, -1);
 	
-	sizer->Add(knownPagePanels.ProfBonus_Text, 0, wxALIGN_CENTER);
+	sizer->Add(ProfBonus_Text, 0, wxALIGN_CENTER);
 	sizer->Add(gapSmall, -1);
 	sizer->Add(knownPagePanels.ProfBonus_Val, 0, wxALIGN_CENTER);
 	
@@ -1361,7 +1366,7 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	sizer->Add(gapBig, -1);
 
 
-	sizer->Add(knownPagePanels.SpellCastMod_Text, 0, wxALIGN_CENTER);
+	sizer->Add(SpellCastMod_Text, 0, wxALIGN_CENTER);
 	sizer->Add(gapSmall, -1);
 	sizer->Add(knownPagePanels.SpellCastMod_Val, 0, wxALIGN_CENTER);
 	
@@ -1370,7 +1375,7 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	sizer->Add(verBar, 0, wxEXPAND);
 	sizer->Add(gapBig, -1);
 	
-	sizer->Add(knownPagePanels.SpellSaveMod_Text, 0, wxALIGN_CENTER);
+	sizer->Add(SpellSaveMod_Text, 0, wxALIGN_CENTER);
 	sizer->Add(gapSmall, -1);
 	sizer->Add(knownPagePanels.SpellSaveMod_Val, 0, wxALIGN_CENTER);
 
@@ -1379,9 +1384,18 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	sizer->Add(verBar, 0, wxEXPAND);
 	sizer->Add(gapBig, -1);
 
-	sizer->Add(knownPagePanels.SelectedSpells_Text, 0, wxALIGN_CENTER);
+	sizer->Add(SelectedSpells_Text, 0, wxALIGN_CENTER);
 	sizer->Add(gapSmall, -1);
 	sizer->Add(knownPagePanels.SelectedSpells_Val, 0, wxALIGN_CENTER);
+
+	sizer->Add(gapBig, -1);
+	verBar = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
+	sizer->Add(verBar, 0, wxEXPAND);
+	sizer->Add(gapBig, -1);
+
+	sizer->Add(SpellPoints_Text, 0, wxALIGN_CENTER);
+	sizer->Add(gapSmall, -1);
+	sizer->Add(knownPagePanels.SpellPoints_Val, 0, wxALIGN_CENTER);
 
 	sizer->Add(gapBig, -1);
 	verBar = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
@@ -1392,6 +1406,7 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	knownPagePanels.SpellCastMod_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 	knownPagePanels.SpellSaveMod_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 	knownPagePanels.SelectedSpells_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC, &knownPagePanels.selectedSpells));
+	knownPagePanels.SpellPoints_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
 	knownPagePanels.SelectedSpells_Val->SetLabel(knownPagePanels.selectedSpells);
 
@@ -1402,6 +1417,7 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	setWindowColour(knownPagePanels.SpellCastMod_Val, ctrlColour);
 	setWindowColour(knownPagePanels.SpellSaveMod_Val, ctrlColour);
 	setWindowColour(knownPagePanels.SelectedSpells_Val, ctrlColour);
+	setWindowColour(knownPagePanels.SpellPoints_Val, ctrlColour);
 
 	panel->SetSizerAndFit(sizer);
 	panel->Layout();
@@ -1512,42 +1528,14 @@ wxPanel* MainFrame::CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel)
 
 	std::string LevelTitle = "";
 
-	switch (spellLevel)
-	{
-	case 0:
+	if (spellLevel == 0)
 		LevelTitle = "Cantrips";
-		break;
-	case 1:
-		LevelTitle = "Level 1";
-		break;
-	case 2:
-		LevelTitle = "Level 2";
-		break;
-	case 3:
-		LevelTitle = "Level 3";
-		break;
-	case 4:
-		LevelTitle = "Level 4";
-		break;
-	case 5:
-		LevelTitle = "Level 5";
-		break;
-	case 6:
-		LevelTitle = "Level 6";
-		break;
-	case 7:
-		LevelTitle = "Level 7";
-		break;
-	case 8:
-		LevelTitle = "Level 8";
-		break;
-	case 9:
-		LevelTitle = "Level 9";
-		break;
-	default:
+	else if (spellLevel > 0 || spellLevel < 10)
+		LevelTitle = "Level " + std::to_string(spellLevel);
+	else
+	{
 		LevelTitle = "Level Error";
 		return panel;
-		break;
 	}
 
 	wxStaticLine* verBar = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
@@ -1555,7 +1543,8 @@ wxPanel* MainFrame::CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel)
 	text = new wxStaticText(panel, wxID_ANY, LevelTitle, wxDefaultPosition, baseSize, wxALIGN_CENTER_HORIZONTAL);
 	slots = new wxSpinCtrl(panel, wxID_ANY, "0", wxDefaultPosition, curSize, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
 	useButton = new wxButton(panel, wxID_ANY, "Use", wxDefaultPosition, curSize);
-	useSpellPoint = new wxButton(panel, wxID_ANY, "By SP", wxDefaultPosition, curSize);
+	std::string SP_String = "Use " + std::to_string(convSlotToPoint(spellLevel)) + " SP";
+	useSpellPoint = new wxButton(panel, wxID_ANY, SP_String, wxDefaultPosition, wxSize(curSize.x*1.5, curSize.y));
 	list = new wxCheckListBox(panel, wxID_ANY, wxDefaultPosition, baseSize);
 
 	AddSpell = new wxButton(panel, wxID_ANY, "+", wxDefaultPosition, curSize);
@@ -2925,8 +2914,34 @@ void MainFrame::onKnownSpellsUseSpell(wxCommandEvent& event)
 			int curVal = spin->GetValue();
 			if (curVal != 0)
 				spin->SetValue(curVal - 1);
+			
+			return;
 		}
 	}
+
+	event.Skip();
+}
+
+void MainFrame::onKnownSpellsUseSpellPoint(wxCommandEvent& event)
+{
+	wxObject* obj = event.GetEventObject();
+
+	for (int i = 0; i < knownPagePanels.AddSpellSlot_Button.size(); ++i)
+	{
+		auto& curButton = knownPagePanels.spellPointButton[i];
+		auto& val = knownPagePanels.SpellPoints_Val;
+		if (obj == curButton)
+		{
+			int curVal = std::stoi(val->GetValue().ToStdString());
+			int newVal = curVal - convSlotToPoint(i);
+			if (newVal >= 0)
+				val->SetValue(std::to_string(newVal));
+
+			return;
+		}
+	}
+
+	event.Skip();
 }
 
 void MainFrame::onToolProfecsSelect(wxListEvent& event)

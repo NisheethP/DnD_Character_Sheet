@@ -7,6 +7,5 @@ Features to Add
 	Death Saves
 	Inventory (with images?)
 	Long Rest and Short Rest
-	Dynamic Search in all spells
 	Level Up Options
 	Change Name and other read-only

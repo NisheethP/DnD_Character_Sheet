@@ -152,17 +152,11 @@ class MainFrame : public wxFrame
 
 		wxComboBox* Combo_SpellCastSkill = nullptr;
 		
-		wxStaticText* ProfBonus_Text = nullptr;
 		wxTextCtrl* ProfBonus_Val = nullptr;
-
-		wxStaticText* SpellCastMod_Text = nullptr;
 		wxTextCtrl* SpellCastMod_Val = nullptr;
-
-		wxStaticText* SpellSaveMod_Text = nullptr;
 		wxTextCtrl* SpellSaveMod_Val = nullptr;
-
-		wxStaticText* SelectedSpells_Text = nullptr;
 		wxTextCtrl* SelectedSpells_Val = nullptr;
+		wxTextCtrl* SpellPoints_Val = nullptr;
 
 		wxTextCtrl* spellPoints;
 		std::vector<wxButton*> spellPointButton;
@@ -296,6 +290,7 @@ public:
 	void onKnownSpellsAddRemSpell(wxCommandEvent& event);
 	void onTickSpellKnownSpells(wxCommandEvent& event);
 	void onKnownSpellsUseSpell(wxCommandEvent& event);
+	void onKnownSpellsUseSpellPoint(wxCommandEvent& event);
 	
 	void onTest(wxCommandEvent& event);
 
