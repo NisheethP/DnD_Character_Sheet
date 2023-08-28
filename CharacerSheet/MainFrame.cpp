@@ -461,6 +461,15 @@ wxScrolled<wxPanel>* MainFrame::CreateSpellSlotsTable(wxNotebook* parent)
 	return panel;
 }
 
+wxScrolled<wxPanel>* MainFrame::CreateInveontoryPage(wxNotebook* parent)
+{
+	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxVSCROLL);
+	panel->SetBackgroundColour(mainColour.first);
+	panel->SetScrollRate(0, FromDIP(10));
+
+	return panel;
+}
+
 wxScrolled<wxPanel>* MainFrame::CreateTestPanel(wxNotebook* parent)
 {
 	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY);
@@ -1812,6 +1821,10 @@ void MainFrame::CreatePages(wxNotebook* parent)
 	SlotsTablePage->SetForegroundColour(slotsColour.second);
 	parent->AddPage(SlotsTablePage, "SpellSlotTable");
 
+	wxWindow* Inventory = CreateInveontoryPage(parent);
+	Inventory->SetBackgroundColour(wxColour(0x19, 0x19, 0x22));
+	parent->AddPage(Inventory, "Inventory");
+
 	wxWindow* TestPage = CreateTestPanel(parent);
 	TestPage->SetBackgroundColour(wxColour(0x19, 0x19, 0x22));
 	parent->AddPage(TestPage, "Test");
@@ -2361,6 +2374,8 @@ void MainFrame::onSpellSearchType(wxCommandEvent& event)
 		auto& list = spellDesc.spellList;
 		auto& spellLevelId = spellDesc.spellLevelId;
 
+		SetEvtHandlerEnabled(false);
+		list->Freeze();
 
 		for (int i = 0; i < 10; ++i)
 			list->DeleteChildren(spellLevelId[i]);
@@ -2384,9 +2399,11 @@ void MainFrame::onSpellSearchType(wxCommandEvent& event)
 					list->AppendItem(spellLevelId[level], it->getName());
 				}
 			}
-
 			list->ExpandAll();
 		}
+
+		list->Thaw();
+		SetEvtHandlerEnabled(true);
 	}
 }
 

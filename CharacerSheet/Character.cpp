@@ -157,28 +157,6 @@ std::string Character::getClass()
 	return characterClassStr;
 }
 
-/*Character::Character() :
-	characterName(""),
-	characterClassStr(""),
-	totalLevel(0),
-	charStats({ 0,0,0,0,0,0 }),
-	skillProficiencies(none),
-	skillExpertises(none),
-	HP(0),
-	speed(0),
-	AC(0),
-	profBonus(getProficiency(totalLevel)),
-	tempHP(0),
-	charClass(),
-	copper(0),
-	silver(0),
-	gold(0),
-	platinum(0),
-	usesSpellPoint(false)
-{
-}
-*/
-
 bool Character::checkProf(const Skills& skill)
 {
 	return skillProficiencies & skill;
@@ -203,10 +181,12 @@ void Character::initSlots()
 	for (int i = 0; i <= 9; ++i)
 	{
 		int reg = charSlots.getNumSlots(castLevel, i);
-		; int war = charSlots.getNumWarlockSlots(totWarlock, i);
+		int war = charSlots.getNumWarlockSlots(totWarlock, i);
 		
 		charSlots.slots.push_back({ reg, war });
 	}
+
+	curCharSlots = charSlots;
 }
 
 void Character::calcTotLevel()

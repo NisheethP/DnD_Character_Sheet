@@ -45,6 +45,14 @@ class MainFrame : public wxFrame
 	wxPanel* masterPanel;
 	wxNotebook* mainNotebook;
 
+	enum MenuItems
+	{
+		ID_FILE_NEW = 10000,
+		ID_FILE_OPEN,
+		ID_FILE_SAVE,
+		ID_FILE_SAVEAS		
+	};
+
 	struct Uses
 	{
 		bool SpellPoints = true;
@@ -190,7 +198,7 @@ public:
 	wxScrolled<wxPanel>* CreateSpellsPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateKnownSpellsPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateSpellSlotsTable(wxNotebook* parent);
-
+	wxScrolled<wxPanel>* CreateInveontoryPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateTestPanel(wxNotebook* parent);
 
 
