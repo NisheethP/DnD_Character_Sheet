@@ -776,7 +776,10 @@ wxPanel* MainFrame::CreateSavingThrows(wxPanel* parent)
 	setWindowColour(panel, mainColour);
 
 	wxStaticBoxSizer* stSizer = new wxStaticBoxSizer(wxVERTICAL, panel, "Saving Throws");
-	
+
+	stSizer->GetStaticBox()->SetForegroundColour(mainColour.second);
+	stSizer->GetStaticBox()->SetFont(stSizer->GetStaticBox()->GetFont().MakeBold().MakeLarger());
+
 	//std::wstring profMarker = std::wstring(1, char(159));
 	std::vector<Skills> tempSkills =
 	{
@@ -828,6 +831,9 @@ wxPanel* MainFrame::CreateSkillProf(wxPanel* parent)
 
 	wxStaticBoxSizer* skillSizer = new wxStaticBoxSizer(wxVERTICAL, panel, "Skills");
 	
+	skillSizer->GetStaticBox()->SetForegroundColour(mainColour.second);
+	skillSizer->GetStaticBox()->SetFont(skillSizer->GetStaticBox()->GetFont().MakeBold().MakeLarger());
+
 	std::wstring profMarker = std::wstring(1, char(159));
 	//std::wstring profMarker = L"\t*";
 	std::wstring totalString = L"";
@@ -918,18 +924,26 @@ wxPanel* MainFrame::CreateFeaturesPanel(wxPanel* parent)
 	mainPagePanels.Feature_FullList = new wxListBox(panel, wxID_ANY, wxDefaultPosition, tempSize, 0, {},wxLB_SINGLE);
 
 	wxSize buttonSize(40,-1);
-	mainPagePanels.Feature_AddButton = new wxButton(panel, wxID_ANY, "  +  ", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
-	mainPagePanels.Feature_RemoveButton = new wxButton(panel, wxID_ANY, "  x  ", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
-	//mainPagePanels.Feature_MoveUpButton= new wxButton(panel, wxID_ANY, "^");
-	//mainPagePanels.Feature_MoveDownButton= new wxButton(panel, wxID_ANY, "v");
+	mainPagePanels.Feature_AddButton = new wxButton(panel, wxID_ANY, "   +   ", wxDefaultPosition, buttonSize, wxBU_EXACTFIT);
+	mainPagePanels.Feature_RemoveButton = new wxButton(panel, wxID_ANY, "   x   ", wxDefaultPosition, buttonSize, wxBU_EXACTFIT);
 
 	mainPagePanels.Feature_Title->SetFont(curFont);
-	//mainPagePanels.Feature_MoveUpButton->SetFont(curFont);
-	//mainPagePanels.Feature_MoveDownButton->SetFont(curFont);
-	mainPagePanels.Feature_AddButton->SetFont(curFont);
-	mainPagePanels.Feature_RemoveButton->SetFont(curFont);
+	mainPagePanels.Feature_AddButton->SetFont(curFont.Bold());
+	mainPagePanels.Feature_RemoveButton->SetFont(curFont.Bold());
 	mainPagePanels.Feature_FullList->SetFont(curFont);
 
+	auto listTitle = new wxStaticText(panel, wxID_ANY, "Features List", wxDefaultPosition, wxDefaultSize, wxALIGN_BOTTOM);
+	listTitle->SetFont(listTitle->GetFont().Bold().Larger());
+
+	wxSize titleSpacing = mainPagePanels.Feature_Desc->GetSize();
+	titleSpacing.y = -1;
+	titleSpacing.x -= mainPagePanels.Feature_AddButton->GetSize().x;
+	titleSpacing.x -= mainPagePanels.Feature_RemoveButton->GetSize().x;
+	titleSpacing.x -= listTitle->GetSize().x;
+	titleSpacing.x -= 10;
+
+	subSizer->Add(listTitle,0);
+	subSizer->Add(titleSpacing.x, -1);
 	subSizer->Add(mainPagePanels.Feature_RemoveButton, 0, wxALIGN_CENTER);
 	subSizer->Add(10, -1);
 	subSizer->Add(mainPagePanels.Feature_AddButton, 0 , wxALIGN_CENTER);
@@ -943,7 +957,7 @@ wxPanel* MainFrame::CreateFeaturesPanel(wxPanel* parent)
 	mainSizer->Add(-1, 5);
 	mainSizer->Add(mainPagePanels.Feature_Desc, 4, wxEXPAND);
 	mainSizer->Add(-1, 5);
-	mainSizer->Add(subSizer, 0, wxALIGN_RIGHT);
+	mainSizer->Add(subSizer, 0, wxALIGN_LEFT);
 	mainSizer->Add(-1, 5);
 	mainSizer->Add(mainPagePanels.Feature_FullList, 3, wxEXPAND);
 
@@ -1012,12 +1026,15 @@ wxPanel* MainFrame::CreateMoney(wxPanel* parent)
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, curSize);
 	setWindowColour(panel, panelColour);
 	std::string tempStr[4] = { "Platinum", "Gold", "Silver", "Copper" };
-	wxFont curFont(wxFont(wxFontInfo(wxSize(0, 13))));
+	wxFont curFont(wxFont(wxFontInfo(wxSize(0, 16))));
 	curFont.MakeBold();
 
 	int gap = 5;
 
-	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	wxStaticBoxSizer* sizer = new wxStaticBoxSizer(wxVERTICAL, panel, "Money");
+
+	sizer->GetStaticBox()->SetForegroundColour(mainColour.second);
+	sizer->GetStaticBox()->SetFont(sizer->GetStaticBox()->GetFont().MakeBold().MakeLarger());
 
 	std::vector<wxStaticBoxSizer*> box;
 	wxBoxSizer* buttonSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -1025,16 +1042,24 @@ wxPanel* MainFrame::CreateMoney(wxPanel* parent)
 	mainPagePanels.moneyButtons.first = new wxButton(panel, wxID_ANY, "-", wxDefaultPosition, wxSize(0.5*curSize.x-25, -1));
 	mainPagePanels.moneyButtons.second = new wxButton(panel, wxID_ADD, "+");
 
+	mainPagePanels.moneyButtons.first->SetFont(curFont);
+	mainPagePanels.moneyButtons.second->SetFont(curFont.Smaller());
+
 	buttonSizer->Add(mainPagePanels.moneyButtons.first, 1, wxALIGN_CENTER | wxRIGHT, 2);
 	buttonSizer->Add(mainPagePanels.moneyButtons.second, 1, wxALIGN_CENTER | wxLEFT, 2);
 
 	sizer->Add(curSize.x, 5);
 	sizer->Add(buttonSizer, 0, wxALIGN_CENTER | wxLEFT | wxRIGHT, 25);
 	sizer->Add(curSize.x, 10);
+
 	for (int i = 0; i < 4; ++i)
 	{
 		box.push_back(new wxStaticBoxSizer(wxVERTICAL, panel, tempStr[i]));
 		wxSpinCtrl* tempSpin = new wxSpinCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL | wxSP_ARROW_KEYS);
+		wxSize spinSize = tempSpin->GetSize();
+		spinSize.y *= 1.33;
+		tempSpin->SetMinSize(spinSize);
+		
 		mainPagePanels.moneyVals.push_back(tempSpin);
 
 		box[i]->Add(mainPagePanels.moneyVals[i], 0, wxEXPAND);
