@@ -106,6 +106,7 @@ void MainFrame::CreateMenuBar()
 	wxMenuBar* menuBar = new wxMenuBar();
 	wxMenu* fileMenu = new wxMenu();
 	wxMenu* conditionsMenu = new wxMenu();
+	wxMenu* tempMenu= new wxMenu();
 
 	fileMenu->Append(wxID_NEW);
 	fileMenu->Append(wxID_OPEN);
@@ -113,9 +114,11 @@ void MainFrame::CreateMenuBar()
 	fileMenu->Append(wxID_SAVE);
 	fileMenu->Append(wxID_SAVEAS);
 
-	
+	menuBarItems.menuTempResetSP = tempMenu->Append(wxID_ANY, "Reset Spell Points");
+	menuBarItems.menuTempSetSP = tempMenu->Append(wxID_ANY, "Set Spell Points");
 
 	menuBar->Append(fileMenu, "File");
+	menuBar->Append(tempMenu, "Temp");
 
 	SetMenuBar(menuBar);
 }
@@ -163,6 +166,9 @@ void MainFrame::BindControls()
 
 	mainPagePanels.SlidersButtons.first->Bind(wxEVT_BUTTON, &MainFrame::onAddRemSlider, this);
 	mainPagePanels.SlidersButtons.second->Bind(wxEVT_BUTTON, &MainFrame::onAddRemSlider, this);
+
+	this->Bind(wxEVT_MENU, &MainFrame::onResetSpellPoints, this, menuBarItems.menuTempResetSP->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetSpellPoints, this, menuBarItems.menuTempSetSP->GetId());
 }
 
 wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
@@ -2470,7 +2476,7 @@ void MainFrame::onHealToButton(wxCommandEvent& event)
 	auto& HP = mainPagePanels.HP;
 	float perc = static_cast<float>(spin->GetValue()) / 100.f;
 
-	int healedHP = perc * character.getTotHP();
+	int healedHP = perc * (character.getModTotHP());
 	int curHP = character.getCurHP();
 
 	if (curHP < healedHP)
@@ -2987,6 +2993,21 @@ void MainFrame::onKnownSpellsUseSpellPoint(wxCommandEvent& event)
 	}
 
 	event.Skip();
+}
+
+void MainFrame::onResetSpellPoints(wxCommandEvent& event)
+{
+	knownPagePanels.SpellPoints_Val->SetLabel(std::to_string(character.getTotalSpellPoints()));
+}
+
+void MainFrame::onSetSpellPoints(wxCommandEvent& event)
+{
+	std::string title = "Enter number of Spell Points (max ";
+	title += std::to_string(character.getTotalSpellPoints());
+	title += ")";
+	int max = character.getTotalSpellPoints();
+	int x = wxGetNumberFromUser(title, "", "Spell Points", max, 0, max);
+	knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
 }
 
 void MainFrame::onToolProfecsSelect(wxListEvent& event)

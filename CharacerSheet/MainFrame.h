@@ -50,7 +50,9 @@ class MainFrame : public wxFrame
 		ID_FILE_NEW = 10000,
 		ID_FILE_OPEN,
 		ID_FILE_SAVE,
-		ID_FILE_SAVEAS		
+		ID_FILE_SAVEAS,
+
+		ID_TEMP_SP = 20000
 	};
 
 	struct Uses
@@ -65,6 +67,12 @@ class MainFrame : public wxFrame
 		bool spellPoint = false;
 	} overrides;
 	
+	//
+	struct MenuBarItems
+	{
+		wxMenuItem* menuTempResetSP;
+		wxMenuItem* menuTempSetSP;
+	}menuBarItems;
 
 	//CONTROLS IN SPELLS PAGE
 	struct SpellDesc
@@ -302,6 +310,9 @@ public:
 	void onKnownSpellsUseSpell(wxCommandEvent& event);
 	void onKnownSpellsUseSpellPoint(wxCommandEvent& event);
 	
+	void onResetSpellPoints(wxCommandEvent& event);
+	void onSetSpellPoints(wxCommandEvent& event);
+
 	void onTest(wxCommandEvent& event);
 
 	void loadSpells();
