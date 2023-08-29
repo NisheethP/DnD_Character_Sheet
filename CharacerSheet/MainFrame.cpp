@@ -2822,7 +2822,7 @@ void MainFrame::onFeatureSelect(wxCommandEvent& event)
 		int i = list->GetSelection();
 		if (i == wxNOT_FOUND)
 		{
-			title->SetLabel("Feature Title");
+			title->SetLabel("Feature Name");
 			desc->SetPage("Feature Description");
 			setWindowColour(desc, descColour);
 		}
@@ -2837,7 +2837,6 @@ void MainFrame::onFeatureSelect(wxCommandEvent& event)
 				{
 					title->SetLabel("  " + i.title);
 					desc->SetPage("<b>" + i.description + "</b>");
-					desc->SetBackgroundColour(descColour.first);
 					setWindowColour(desc, descColour);
 					return;
 				}

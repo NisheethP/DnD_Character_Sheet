@@ -17,8 +17,8 @@ FeatureDialog::FeatureDialog(wxWindow* parent, wxWindowID id, const wxString& he
 	auto sizer = new wxFlexGridSizer(3, 2, gap, gap);
 
 
-	title = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize);
-	description = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+	title = new wxTextCtrl(this, wxID_ANY, "Feature", wxDefaultPosition, wxDefaultSize);
+	description = new wxTextCtrl(this, wxID_ANY, "Description", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 
 	sizer->Add(titleText,0, wxALIGN_RIGHT);
 	sizer->Add(title,0, wxALIGN_CENTER);
@@ -30,6 +30,7 @@ FeatureDialog::FeatureDialog(wxWindow* parent, wxWindowID id, const wxString& he
 
 	sizer->AddGrowableCol(1);
 	sizer->AddGrowableRow(1);
+	title->SetFocus();
 
 	title->SetMinSize(curSize);
 	description->SetMinSize(wxSize(curSize.x, 100));
