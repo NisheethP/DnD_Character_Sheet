@@ -38,6 +38,7 @@ class MainFrame : public wxFrame
 	ColourPair mainColour;
 	ColourPair panelColour;
 	ColourPair slotsColour;
+	wxColour profecientColour;
 
 	wxSize baseColSize;
 

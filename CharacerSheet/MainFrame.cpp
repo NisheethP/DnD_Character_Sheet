@@ -74,6 +74,8 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	slotsColour.first = wxColour(0x22, 0x19, 0x19);
 	slotsColour.second = wxColour(0xFF, 0xFF, 0xFF);
 
+	profecientColour = wxColour(0xAA, 0xFF, 0xFF);
+
 	//SETTING UP THE WINDOW
 	setWindowColour(this, mainColour);
 	BigFont1.MakeBold();
@@ -567,7 +569,8 @@ wxPanel* MainFrame::CreateACPanel(wxPanel* parent)
 	mainSizer->Add(-1, 5);
 
 	AC_Label->SetFont(BigFont1);
-	mainPagePanels.AC->SetFont(BigFont1);
+	mainPagePanels.AC->SetFont(BigFont1.Larger())
+		;
 	mainPagePanels.AC->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
 	panel->SetSizerAndFit(mainSizer);
@@ -604,7 +607,7 @@ wxPanel* MainFrame::CreateHPPanel(wxPanel* parent)
 	setWindowColour(mainPagePanels.HP, ctrlColour);
 
 	headHP->SetFont(BigFont1);
-	mainPagePanels.HP->SetFont(BigFont1);
+	mainPagePanels.HP->SetFont(BigFont1.Larger());
 
 	panel->SetSizer(sizer);
 
@@ -641,7 +644,7 @@ wxPanel* MainFrame::CreateTempHPPanel(wxPanel* parent)
 	setWindowColour(mainPagePanels.TempHP, ctrlColour);
 
 	headHP->SetFont(BigFont1);
-	mainPagePanels.TempHP->SetFont(BigFont1);
+	mainPagePanels.TempHP->SetFont(BigFont1.Larger());
 
 	panel->SetSizer(sizer);
 
@@ -673,7 +676,7 @@ wxPanel* MainFrame::CreateSpeedPanel(wxPanel* parent)
 	mainPagePanels.Speed->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 	
 	headSpeed->SetFont(BigFont1);	
-	mainPagePanels.Speed->SetFont(BigFont1);
+	mainPagePanels.Speed->SetFont(BigFont1.Larger());
 
 	panel->SetSizer(sizer);
 
@@ -1031,6 +1034,7 @@ wxPanel* MainFrame::CreateMoney(wxPanel* parent)
 
 	int gap = 5;
 
+	auto mainSizer = new wxBoxSizer(wxVERTICAL);
 	wxStaticBoxSizer* sizer = new wxStaticBoxSizer(wxVERTICAL, panel, "Money");
 
 	sizer->GetStaticBox()->SetForegroundColour(mainColour.second);
@@ -1074,7 +1078,9 @@ wxPanel* MainFrame::CreateMoney(wxPanel* parent)
 		sizer->Add(curSize.x, 5);
 	}
 
-	panel->SetSizer(sizer);
+	mainSizer->Add(sizer, 1, wxALIGN_CENTER_HORIZONTAL | wxLEFT | wxRIGHT, 10);
+
+	panel->SetSizer(mainSizer);
 	panel->Layout();
 
 	TransferDataToWindow();
@@ -1141,12 +1147,16 @@ wxPanel* MainFrame::CreateInitiativePanel(wxPanel* parent)
 	
 	auto& Init = mainPagePanels.InitMod.first = new wxTextCtrl(panel, wxID_ANY, std::to_string(character.getStats()->Dex), wxDefaultPosition, wxDefaultSize,
 		wxALIGN_CENTER_HORIZONTAL | wxTE_READONLY);
-	auto& initMod = mainPagePanels.InitMod.second = new wxTextCtrl(panel, wxID_ANY, "0");
+	auto& initMod = mainPagePanels.InitMod.second = new wxTextCtrl(panel, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize, 
+		wxALIGN_CENTER_HORIZONTAL | wxTE_READONLY);
 
 	auto initModText = new wxStaticText(panel, wxID_ANY, "Initiative Mod");
-
-	initMod->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+	
 	Init->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+	initMod->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+
+	Init->SetFont(Init->GetFont().Bold().Larger());
+	initMod->SetFont(initMod->GetFont().Bold());
 
 	int initiative = character.getInitiative();
 
@@ -2269,10 +2279,15 @@ void MainFrame::makeSavingThrowPair(wxStaticText* savingThrowName, wxTextCtrl* s
 	savingThrowValue->SetLabel(tempString);
 
 	isProficient = character.checkProf(curSkill);
-	if (isProficient)
-		savingThrowName->SetForegroundColour(*wxWHITE);
-
+	
 	savingThrowName->SetFont(tempFont);
+
+	if (isProficient)
+	{
+		savingThrowName->SetForegroundColour(profecientColour);
+		savingThrowName->SetFont(tempFont.Underlined());
+	}
+
 }
 
 void MainFrame::makeSkillPair(wxStaticText* skillName, wxTextCtrl* skillValue, Skills curSkill)
@@ -2369,11 +2384,15 @@ void MainFrame::makeSkillPair(wxStaticText* skillName, wxTextCtrl* skillValue, S
 	tempString = std::to_wstring(character.getSkillMod(curSkill));
 	skillValue->SetLabel(tempString);
 
+	skillName->SetFont(tempFont);
+
 	isProficient = character.checkProf(curSkill);
 	if (isProficient)
-		skillName->SetForegroundColour(*wxWHITE);
+	{
+		skillName->SetForegroundColour(profecientColour);
+		skillName->SetFont(tempFont.Underlined());
+	}
 
-	skillName->SetFont(tempFont);
 }
 
 
