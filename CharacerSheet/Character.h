@@ -174,6 +174,7 @@ public:
 	int& getProfBonus()	{ return profBonus; }
 	int& getSpeed()		{ return speed; }
 
+	unsigned int getConditions() {return charConditions;}
 	int getInitiative() { return initMod + getSkillMod(Dexterity); }
 	int getModTotHP()	{ return totHP + totHPMod; }
 
@@ -222,6 +223,8 @@ public:
 	bool updateSlider(std::string str, int val);
 	void remSlider(int index);
 
+	int addCondition(int cond);
+	int remCondition(int cond);
 	//-------------
 	//OTHER FUNCTIONS
 	//-------------

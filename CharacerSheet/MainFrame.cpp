@@ -27,6 +27,8 @@
 #include "SliderDialog.h"
 #include "SliderRemDialog.h"
 #include "ConditionDialog.h"
+#include "AddCondDialog.h"
+
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900,600)),
@@ -128,6 +130,9 @@ void MainFrame::CreateMenuBar()
 
 	menuBarItems.ConditionsAll = ConditionMenu->Append(wxID_ANY, "See All Conditions");
 	menuBarItems.ConditionsPlayer = ConditionMenu->Append(wxID_ANY, "See Character Condtions");
+	ConditionMenu->AppendSeparator();
+	menuBarItems.ConditionsAdd = ConditionMenu->Append(wxID_ANY, "Add Condtion to Player");
+	menuBarItems.ConditionsRemove = ConditionMenu->Append(wxID_ANY, "Remove Condtion from Player");
 
 	menuBarItems.ResetSP = ResetMenu->Append(wxID_ANY, "Reset Spell Points");
 
@@ -192,6 +197,8 @@ void MainFrame::BindControls()
 
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsAll->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsPlayer->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsAdd->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsRemove->GetId());
 }
 
 wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
@@ -3117,14 +3124,98 @@ void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
 
 	if (obj == menuBarItems.ConditionsAll->GetId())
 	{
-		ConditionDialog *dialog = new ConditionDialog(this, wxID_ANY, allConditions.size(), &allConditions, "Conditions", wxDefaultPosition, FromDIP(wxSize(300, -1)),
-			wxRESIZE_BORDER | wxCLOSE_BOX | wxMINIMIZE_BOX);
+		ConditionDialog* dialog = new ConditionDialog(this, wxID_ANY, allConditions.size(), &allConditions, "Conditions", wxDefaultPosition, FromDIP(wxSize(500, -1)), wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
 		dialog->Show();
 	}
 
 	if (obj == menuBarItems.ConditionsPlayer->GetId())
 	{
+		playerConditions.clear();
+		int cond = character.getConditions();
+		for (auto it = allConditions.begin(); it != allConditions.end(); ++it)
+		{
+			if (it->first == Conditions::NoCondition)
+				continue;
 
+			if (it->first == Conditions::Incapacitated)
+				continue;
+
+			if (it->first & cond)
+				playerConditions.push_back(*it);
+		}
+
+		ConditionDialog* dialog = new ConditionDialog(this, wxID_ANY, playerConditions.size(), &playerConditions, "Conditions", wxDefaultPosition, FromDIP(wxSize(500, -1)), wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+		dialog->Show();
+	}
+
+	if (obj == menuBarItems.ConditionsAdd->GetId())
+	{
+		not_playerConditions.clear();
+		int cond = character.getConditions();
+		for (auto it = allConditions.begin(); it != allConditions.end(); ++it)
+		{
+			if (it->first == Conditions::NoCondition)
+				continue;
+		
+			if (it->first == Conditions::Incapacitated)
+				continue;
+			
+			bool has = it->first & cond;
+			has = !has;
+			if (has)
+			{
+				not_playerConditions.push_back(*it);
+			}
+		}
+
+		AddCondDialog dialog(this, wxID_ANY, not_playerConditions.size(), &not_playerConditions);
+
+		auto release = dialog.ShowModal();
+
+		if (release != wxID_CANCEL)
+		{
+			auto list = dialog.getList();
+			for (int i = 0; i < not_playerConditions.size(); ++i)
+			{
+				if (list->IsChecked(i))
+				{
+					character.addCondition(not_playerConditions[i].first);
+				}
+			}
+		}
+	}
+
+	if (obj == menuBarItems.ConditionsRemove->GetId())
+	{
+		playerConditions.clear();
+		int cond = character.getConditions();
+		for (auto it = allConditions.begin(); it != allConditions.end(); ++it)
+		{
+			if (it->first == Conditions::NoCondition)
+				continue;
+
+			if (it->first == Conditions::Incapacitated)
+				continue;
+
+			if (it->first & cond)
+				playerConditions.push_back(*it);
+		}
+
+		AddCondDialog dialog(this, wxID_ANY, playerConditions.size(), &playerConditions);
+
+		auto release = dialog.ShowModal();
+
+		if (release != wxID_CANCEL)
+		{
+			auto list = dialog.getList();
+			for (int i = 0; i < playerConditions.size(); ++i)
+			{
+				if (list->IsChecked(i))
+				{
+					character.remCondition(playerConditions[i].first);
+				}
+			}
+		}
 	}
 }
 
@@ -3335,8 +3426,9 @@ void MainFrame::initConditions()
 
 	curCond = Conditions::Fatigued;
 	curFeature.title = "Fatigued";
-	curFeature.description = "Fatigue can have levels upto 10. Things that Add levels tell how many stages are added. A Long Rest removes all levels of fatigue while short rest removes 1\n\n";
-	curFeature.description += "For each level of fatigue, you have a -1 on all ability checks, saving throws and attack rolls";
+	curFeature.description = "Fatigue can have levels upto 10. Things that add levels tell how many are added. A Long Rest removes all levels of fatigue while short rest removes only one.\n\n";
+	curFeature.description += "Lesser Restoration can remove one level of Fatigue. Greater restoration removes all levels of Fatigue.\n\n";
+	curFeature.description += "For each level of fatigue, you have a -1 on all ability checks, saving throws and attack rolls.";
 	allConditions.push_back({ curCond, curFeature });
 }
 

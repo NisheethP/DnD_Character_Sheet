@@ -379,6 +379,59 @@ void Character::remSlider(int index)
 	sliders.erase(sliders.begin() + index);
 }
 
+/// <summary>
+/// Adds condition. Use only single condition for ease
+/// </summary>
+/// <param name="cond"></param>
+/// <returns>
+///  0 : Successful allocation |
+/// -1 : cond had NoCondition |
+/// -2 : cond overlap
+/// </returns>
+int Character::addCondition(int cond)
+{
+	if (cond & Conditions::NoCondition)
+	{
+		charConditions = Conditions::NoCondition;
+		return -1;
+	}
+
+	if (charConditions & cond)
+		return -2;
+	
+	if (charConditions == Conditions::NoCondition)
+	{
+		charConditions = cond;
+		return 0;
+	}
+	
+	charConditions |= cond;
+	return 0;
+}
+
+/// <summary>
+/// Removes Conditions. Use only single condition for ease
+/// </summary>
+/// <param name="cond"></param>
+/// <returns>
+/// -1 : cond has NoCondition |
+/// -2 : cond not part of charConditon |
+/// 0 : cond removed successfully
+/// </returns>
+int Character::remCondition(int cond)
+{
+	if (cond & Conditions::NoCondition)
+		return -1;
+
+	if (!(charConditions & cond))
+		return -2;
+
+	charConditions = charConditions & ~cond;
+	if (charConditions == 0)
+		charConditions = Conditions::NoCondition;
+	return 0;
+}
+
 int Character::getCasterLevel()
 {
 	float castLevel = 0.f, tempLevel = 0.f;

@@ -9,8 +9,7 @@ ConditionDialog::ConditionDialog(
 	const wxPoint& pos, 
 	const wxSize& size, 
 	long style, 
-	const wxString& name)
-	:
+	const wxString& name):
 	wxDialog(parent, id, heading, pos, size, style, name),
 	conditions(pCond),
 	number(n)
@@ -24,20 +23,21 @@ ConditionDialog::ConditionDialog(
 	
 	condList = new wxComboBox(this, wxID_ANY,"Conditions", wxDefaultPosition, wxDefaultSize, number, choices, wxCB_READONLY);
 	//title = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
-	desc = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
+	desc = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY | wxTE_BESTWRAP);
 
 	auto sizer = new wxBoxSizer(wxVERTICAL);
 	auto flag = wxEXPAND | wxLEFT | wxRIGHT;
-	sizer->Add(condList, 0, flag, 5);
+	sizer->Add(condList, 0, flag, 15);
 	sizer->Add(-1, 5);
 	//sizer->Add(title, 0, flag, 5);
 	//sizer->Add(-1, 5 );
-	sizer->Add(desc, 3, flag, 5);
+	sizer->Add(desc, 3, flag, 15);
 	sizer->Add(-1, 5);
-	sizer->Add(CreateButtonSizer(wxCLOSE), 0, wxALIGN_RIGHT);
+	sizer->Add(CreateButtonSizer(wxCLOSE), 0, wxALIGN_RIGHT | wxLEFT | wxRIGHT, 15);
+	sizer->Add(-1, 5);
 
-	condList->Select(0);
-
+	condList->Select(1);
+	desc->SetValue(conditions->at(1).second.description);
 	SetSizer(sizer);
 	Layout();
 

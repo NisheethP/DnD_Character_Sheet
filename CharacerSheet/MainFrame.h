@@ -25,6 +25,8 @@ class MainFrame : public wxFrame
 	int firstPage = 0;
 
 	std::vector<std::pair<Conditions, feature>> allConditions;
+	std::vector<std::pair<Conditions, feature>> playerConditions;
+	std::vector<std::pair<Conditions, feature>> not_playerConditions;
 
 	std::vector<Spell> allSpells;
 	std::vector<Spell*> allSpellsLevel[10];
@@ -73,7 +75,8 @@ class MainFrame : public wxFrame
 
 		wxMenuItem* ConditionsAll;
 		wxMenuItem* ConditionsPlayer;
-
+		wxMenuItem* ConditionsAdd;
+		wxMenuItem* ConditionsRemove;
 	}menuBarItems;
 
 	//CONTROLS IN SPELLS PAGE
