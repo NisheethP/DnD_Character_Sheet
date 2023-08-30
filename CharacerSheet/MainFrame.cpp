@@ -107,8 +107,9 @@ void MainFrame::CreateMenuBar()
 {
 	wxMenuBar* menuBar = new wxMenuBar();
 	wxMenu* fileMenu = new wxMenu();
-	wxMenu* conditionsMenu = new wxMenu();
-	wxMenu* tempMenu= new wxMenu();
+	wxMenu* SetMenu = new wxMenu();
+	wxMenu* ResetMenu = new wxMenu();
+	wxMenu* ConditionMenu = new wxMenu();
 
 	fileMenu->Append(wxID_NEW);
 	fileMenu->Append(wxID_OPEN);
@@ -116,8 +117,19 @@ void MainFrame::CreateMenuBar()
 	fileMenu->Append(wxID_SAVE);
 	fileMenu->Append(wxID_SAVEAS);
 
-	menuBarItems.menuTempResetSP = tempMenu->Append(wxID_ANY, "Reset Spell Points");
-	menuBarItems.menuTempSetSP = tempMenu->Append(wxID_ANY, "Set Spell Points");
+	menuBarItems.SetName = SetMenu->Append(wxID_ANY, "Set Name");
+	menuBarItems.SetMaxHP = SetMenu->Append(wxID_ANY, "Set Max HP");
+	menuBarItems.SetSpeed = SetMenu->Append(wxID_ANY, "Set Speed");
+	menuBarItems.SetStats = SetMenu->Append(wxID_ANY, "Set Stats");
+	menuBarItems.SetSavingThrows = SetMenu->Append(wxID_ANY, "Set Savint Throw Profeciencies");
+	menuBarItems.SetSkillProfs = SetMenu->Append(wxID_ANY, "Set Skill Profeciencies");
+	SetMenu->AppendSeparator();
+	menuBarItems.SetSP = SetMenu->Append(wxID_ANY, "Set Spell Points");
+
+	menuBarItems.ConditionsAll = ConditionMenu->Append(wxID_ANY, "See All Conditions");
+	menuBarItems.ConditionsPlayer = ConditionMenu->Append(wxID_ANY, "See Character Condtions");
+
+	menuBarItems.ResetSP = ResetMenu->Append(wxID_ANY, "Reset Spell Points");
 
 	menuBar->Append(fileMenu, "File");
 	menuBar->Append(tempMenu, "Temp");
@@ -169,8 +181,15 @@ void MainFrame::BindControls()
 	mainPagePanels.SlidersButtons.first->Bind(wxEVT_BUTTON, &MainFrame::onAddRemSlider, this);
 	mainPagePanels.SlidersButtons.second->Bind(wxEVT_BUTTON, &MainFrame::onAddRemSlider, this);
 
-	this->Bind(wxEVT_MENU, &MainFrame::onResetSpellPoints, this, menuBarItems.menuTempResetSP->GetId());
-	this->Bind(wxEVT_MENU, &MainFrame::onSetSpellPoints, this, menuBarItems.menuTempSetSP->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onResetSpellPoints, this, menuBarItems.ResetSP->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetSpellPoints, this, menuBarItems.SetSP->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetMaxHP->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetStats->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSpeed->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetName->GetId());
+
+	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsAll->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsPlayer->GetId());
 }
 
 wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
