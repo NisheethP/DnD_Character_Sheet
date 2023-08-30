@@ -147,7 +147,8 @@ class MainFrame : public wxFrame
 
 		wxEditableListBox* EL_ToolProf = nullptr;
 		wxEditableListBox* EL_LangProf = nullptr;
-		
+		wxEditableListBox* EL_Conditions = nullptr;
+
 		std::vector<std::pair<wxTextCtrl*, wxTextCtrl*>> Stat_TextCtrls;
 
 		std::vector<wxSpinCtrl*> moneyVals;
@@ -233,6 +234,7 @@ public:
 	wxPanel* CreateFeaturesPanel(wxPanel* parent);
 	wxPanel* CreateToolProfeciencies(wxPanel* parent);
 	wxPanel* CreateLangProfeciencies(wxPanel* parent);
+	wxPanel* CreatePlayerConditions(wxPanel* parent);
 	wxPanel* CreateMoney(wxPanel* parent);
 	wxPanel* CreateSubHPPanel(wxPanel* parent);
 	wxPanel* CreateInitiativePanel(wxPanel* parent);
@@ -273,6 +275,7 @@ public:
 	void updateKnownSpellMods();
 	void updateMoneyCtrls();
 	void updateHP();
+	void updatePlayerConds();
 
 	void calcCheckedSpells();
 
@@ -300,14 +303,13 @@ public:
 	void onAddRemSlider(wxCommandEvent& event);
 	void onSliderChange(wxCommandEvent& event);
 	void onSliderValChange(wxCommandEvent& event);
-
 	void onFeatureButton(wxCommandEvent& event);
 	void onFeatureSelect(wxCommandEvent& event);
-
 	void onToolProfecsSelect(wxListEvent& event);
 	void onToolProfecs(wxListEvent& event);
 	void onLangProfecs(wxListEvent& event);
 	void onAddRemMoney(wxCommandEvent& event);
+	void onConditionListDClick(wxCommandEvent& event);
 
 	void onSpellSplitterResize(wxSplitterEvent& event);
 

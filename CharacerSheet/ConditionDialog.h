@@ -24,5 +24,10 @@ public:
 		const wxString& name = wxDialogNameStr);
 
 	void onSelect(wxCommandEvent& event);
+	wxComboBox* getComboBox() { return condList; }
+	wxTextCtrl* getDesc() { return desc; }
+
+	int setSelection(int x);
+	int setSelection(std::string str);
 };
 

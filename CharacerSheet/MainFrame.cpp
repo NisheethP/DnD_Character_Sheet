@@ -87,6 +87,8 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	
 	this->SetSize(FromDIP(wxSize(1000,700)));
 	
+	updatePlayerConds();
+
 	CreatePages(mainNotebook);
 	
 	mainNotebook->SetSelection(firstPage);
@@ -188,6 +190,8 @@ void MainFrame::BindControls()
 	mainPagePanels.SlidersButtons.first->Bind(wxEVT_BUTTON, &MainFrame::onAddRemSlider, this);
 	mainPagePanels.SlidersButtons.second->Bind(wxEVT_BUTTON, &MainFrame::onAddRemSlider, this);
 
+	mainPagePanels.EL_Conditions->Bind(wxEVT_LIST_ITEM_ACTIVATED, &MainFrame::onConditionListDClick, this);
+
 	this->Bind(wxEVT_MENU, &MainFrame::onResetSpellPoints, this, menuBarItems.ResetSP->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetSpellPoints, this, menuBarItems.SetSP->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetMaxHP->GetId());
@@ -248,7 +252,10 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 		{{2,4}, {1,2}},		//15   LANG PROFS
 
 		//Sliders
-		{{7,2}, {4,2}}		//16   
+		{{7,2}, {4,2}},		//16   SLIDERS
+
+		//Condtions
+		{{5,4}, {1,2}}		//17   CONDITIONS
 	};
 
 	wxPanel* p;
@@ -336,6 +343,10 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 
 	curItem = items[16];
 	p = CreateSliderPanel(panel);
+	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
+
+	curItem = items[17];
+	p = CreatePlayerConditions(panel);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	//mainGridSizer->AddGrowableRow(0);
@@ -1044,6 +1055,40 @@ wxPanel* MainFrame::CreateLangProfeciencies(wxPanel* parent)
 	mainPagePanels.EL_LangProf->SetMaxSize(FromDIP(wxSize(-1,120)));
 	
 	sizer->Add(mainPagePanels.EL_LangProf, 1, wxEXPAND);
+
+	panel->SetSizer(sizer);
+	panel->Layout();
+
+	return panel;
+}
+
+wxPanel* MainFrame::CreatePlayerConditions(wxPanel* parent)
+{
+	wxSize tempSize;
+	//tempSize.x = baseColSize.x*1.3;
+	tempSize.x = mainPagePanels.AC->GetParent()->GetSize().x;
+
+	tempSize.y = -1;
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize);
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+
+	mainPagePanels.EL_Conditions = new wxEditableListBox(panel, wxID_ANY, "Player Conditions", wxDefaultPosition, wxDefaultSize, wxEL_NO_REORDER);
+
+	setWindowColour(mainPagePanels.EL_Conditions->GetListCtrl(), descColour);
+	setWindowColour(mainPagePanels.EL_Conditions->GetParent(), descColour);
+
+	mainPagePanels.EL_Conditions->SetupColours();
+	mainPagePanels.EL_Conditions->SetMaxSize(FromDIP(wxSize(-1, 120)));
+
+	auto list = mainPagePanels.EL_Conditions->GetListCtrl();
+
+	for (auto it = playerConditions.begin(); it != playerConditions.end(); ++it)
+	{
+		int count = list->GetItemCount();
+		list->InsertItem(count, it->second.title);
+	}
+
+	sizer->Add(mainPagePanels.EL_Conditions, 1, wxEXPAND);
 
 	panel->SetSizer(sizer);
 	panel->Layout();
@@ -2109,6 +2154,23 @@ void MainFrame::updateHP()
 	mainPagePanels.HP->SetMax(character.getModTotHP());
 }
 
+void MainFrame::updatePlayerConds()
+{
+	playerConditions.clear();
+	int cond = character.getConditions();
+	for (auto it = allConditions.begin(); it != allConditions.end(); ++it)
+	{
+		if (it->first == Conditions::NoCondition)
+			continue;
+
+		if (it->first == Conditions::Incapacitated)
+			continue;
+
+		if (it->first & cond)
+			playerConditions.push_back(*it);
+	}
+}
+
 void MainFrame::SpellDesc::fillAllSpellTree(std::vector<Spell>& allSpells)
 {
 	for (auto it = allSpells.begin(); it != allSpells.end(); ++it)
@@ -3130,19 +3192,7 @@ void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
 
 	if (obj == menuBarItems.ConditionsPlayer->GetId())
 	{
-		playerConditions.clear();
-		int cond = character.getConditions();
-		for (auto it = allConditions.begin(); it != allConditions.end(); ++it)
-		{
-			if (it->first == Conditions::NoCondition)
-				continue;
-
-			if (it->first == Conditions::Incapacitated)
-				continue;
-
-			if (it->first & cond)
-				playerConditions.push_back(*it);
-		}
+		updatePlayerConds();
 
 		ConditionDialog* dialog = new ConditionDialog(this, wxID_ANY, playerConditions.size(), &playerConditions, "Conditions", wxDefaultPosition, FromDIP(wxSize(500, -1)), wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
 		dialog->Show();
@@ -3180,6 +3230,8 @@ void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
 				if (list->IsChecked(i))
 				{
 					character.addCondition(not_playerConditions[i].first);
+					int count = mainPagePanels.EL_Conditions->GetListCtrl()->GetItemCount();
+					mainPagePanels.EL_Conditions->GetListCtrl()->InsertItem(count-1, not_playerConditions[i].second.title);
 				}
 			}
 		}
@@ -3187,19 +3239,7 @@ void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
 
 	if (obj == menuBarItems.ConditionsRemove->GetId())
 	{
-		playerConditions.clear();
-		int cond = character.getConditions();
-		for (auto it = allConditions.begin(); it != allConditions.end(); ++it)
-		{
-			if (it->first == Conditions::NoCondition)
-				continue;
-
-			if (it->first == Conditions::Incapacitated)
-				continue;
-
-			if (it->first & cond)
-				playerConditions.push_back(*it);
-		}
+		updatePlayerConds();
 
 		AddCondDialog dialog(this, wxID_ANY, playerConditions.size(), &playerConditions);
 
@@ -3299,6 +3339,30 @@ void MainFrame::onAddRemMoney(wxCommandEvent& event)
 	}
 
 	updateMoneyCtrls();
+}
+
+void MainFrame::onConditionListDClick(wxCommandEvent& event)
+{
+	updatePlayerConds();
+	
+	auto list = mainPagePanels.EL_Conditions->GetListCtrl();
+	int items = list->GetSelectedItemCount();
+	long item = -1;
+	
+	ConditionDialog* dialog = new ConditionDialog(this, wxID_ANY, playerConditions.size(), &playerConditions, "Conditions", wxDefaultPosition, FromDIP(wxSize(500, -1)), wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+
+	for (;; )
+	{
+		item = list->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+		if (item == -1)
+			break;
+
+		// this item is selected - do whatever is needed with it
+		std::string str = list->GetItemText(item).ToStdString();
+		dialog->setSelection(str);
+	}
+	
+	dialog->Show();
 }
 
 //------------------------------

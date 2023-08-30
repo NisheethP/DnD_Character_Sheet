@@ -54,8 +54,43 @@ void ConditionDialog::onSelect(wxCommandEvent& event)
 	{
 		if (str == it->second.title)
 		{
-			//title->SetValue(it->second.title);
 			desc->SetValue(it->second.description);
 		}
 	}
+}
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="x"></param>
+/// <returns>
+///  -1: x out of range |
+///  0 : success
+/// </returns>
+int ConditionDialog::setSelection(int x)
+{
+	int count = condList->GetCount();
+	if (x < 0 || x > count)
+		return -1;
+
+	condList->Select(x);
+	desc->SetValue(conditions->at(x).second.description);
+	return 0;
+}
+
+int ConditionDialog::setSelection(std::string str)
+{
+	int i = 0;
+	for (auto it = conditions->begin(); it != conditions->end(); ++it)
+	{
+		if (str == it->second.title)
+		{
+			condList->Select(i);
+			desc->SetValue(it->second.description);
+			return 0;
+		}
+		++i;
+	}
+
+	return -1;
 }
