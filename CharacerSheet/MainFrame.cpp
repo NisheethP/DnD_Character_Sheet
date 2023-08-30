@@ -3253,6 +3253,16 @@ void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
 				if (list->IsChecked(i))
 				{
 					character.remCondition(playerConditions[i].first);
+					int count = mainPagePanels.EL_Conditions->GetListCtrl()->GetItemCount();
+					for (int j = 0; j < count-1; ++j)
+					{
+						std::string str = mainPagePanels.EL_Conditions->GetListCtrl()->GetItemText(j).ToStdString();
+						if (str == playerConditions[i].second.title)
+						{
+							mainPagePanels.EL_Conditions->GetListCtrl()->DeleteItem(j);
+							break;
+						}
+					}
 				}
 			}
 		}
