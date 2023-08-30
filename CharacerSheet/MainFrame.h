@@ -46,16 +46,6 @@ class MainFrame : public wxFrame
 	wxPanel* masterPanel;
 	wxNotebook* mainNotebook;
 
-	enum MenuItems
-	{
-		ID_FILE_NEW = 10000,
-		ID_FILE_OPEN,
-		ID_FILE_SAVE,
-		ID_FILE_SAVEAS,
-
-		ID_TEMP_SP = 20000
-	};
-
 	struct Uses
 	{
 		bool SpellPoints = true;
@@ -71,8 +61,19 @@ class MainFrame : public wxFrame
 	//
 	struct MenuBarItems
 	{
-		wxMenuItem* menuTempResetSP;
-		wxMenuItem* menuTempSetSP;
+		wxMenuItem* SetName;
+		wxMenuItem* SetStats;
+		wxMenuItem* SetSkillProfs;
+		wxMenuItem* SetSavingThrows;
+		wxMenuItem* SetMaxHP;
+		wxMenuItem* SetSpeed;
+		wxMenuItem* SetSP;
+		
+		wxMenuItem* ResetSP;
+
+		wxMenuItem* ConditionsAll;
+		wxMenuItem* ConditionsPlayer;
+
 	}menuBarItems;
 
 	//CONTROLS IN SPELLS PAGE
@@ -111,7 +112,9 @@ class MainFrame : public wxFrame
 	//CONTROLS IN MAIN PAGE
 	struct MainPagePanels
 	{
-		wxTextCtrl* PlayerName = nullptr;
+		//wxTextCtrl* PlayerName = nullptr;
+		wxStaticText* PlayerName = nullptr;
+		wxStaticText* Classes = nullptr;
 
 		std::vector<std::pair<wxStaticText*, wxTextCtrl*>> SavingThrows;
 		std::vector<std::pair<wxStaticText*, wxTextCtrl*>> Skills;
@@ -266,6 +269,7 @@ public:
 	void updateFeaturesList();
 	void updateKnownSpellMods();
 	void updateMoneyCtrls();
+	void updateHP();
 
 	void calcCheckedSpells();
 
@@ -313,6 +317,8 @@ public:
 	
 	void onResetSpellPoints(wxCommandEvent& event);
 	void onSetSpellPoints(wxCommandEvent& event);
+	void onSetMenuEvents(wxCommandEvent& event);
+	void onConditionMenuEvents(wxCommandEvent& event);
 
 	void onTest(wxCommandEvent& event);
 

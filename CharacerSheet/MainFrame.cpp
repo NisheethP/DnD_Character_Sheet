@@ -26,7 +26,7 @@
 #include "DeathSavesControl.h"
 #include "SliderDialog.h"
 #include "SliderRemDialog.h"
-
+#include "ConditionDialog.h"
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900,600)),
@@ -132,7 +132,9 @@ void MainFrame::CreateMenuBar()
 	menuBarItems.ResetSP = ResetMenu->Append(wxID_ANY, "Reset Spell Points");
 
 	menuBar->Append(fileMenu, "File");
-	menuBar->Append(tempMenu, "Temp");
+	menuBar->Append(SetMenu, "Set Values");
+	menuBar->Append(ResetMenu, "Reset Values");
+	menuBar->Append(ConditionMenu, "Conditions");
 
 	SetMenuBar(menuBar);
 }
@@ -528,8 +530,8 @@ wxPanel* MainFrame::CreateNamePanel(wxPanel* parent)
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
-	wxStaticText* charName = new wxStaticText(panel, wxID_ANY, character.getName());
-	wxStaticText* charClass = new wxStaticText(panel, wxID_ANY, character.getClass());
+	auto& charName = mainPagePanels.PlayerName = new wxStaticText(panel, wxID_ANY, character.getName());
+	auto charClass = new wxStaticText(panel, wxID_ANY, character.getClass());
 
 	wxFont nameFont;
 	nameFont.SetPointSize(19);
@@ -2085,6 +2087,21 @@ void MainFrame::updateMoneyCtrls()
 		mainPagePanels.moneyVals[i]->SetValue(money[i]);
 }
 
+void MainFrame::updateHP()
+{
+	std::string str = "HP | " + std::to_string(character.getTotHP());
+	int x = std::get<1>(mainPagePanels.MaxHPBonus)->GetValue();
+
+	character.setTotHPBonus(x);
+
+	if (x != 0)
+		str += " (" + std::to_string(character.getModTotHP()) + ")";
+
+	mainPagePanels.HPText->SetLabel(str);
+	mainPagePanels.HPText->GetParent()->Layout();
+	mainPagePanels.HP->SetMax(character.getModTotHP());
+}
+
 void MainFrame::SpellDesc::fillAllSpellTree(std::vector<Spell>& allSpells)
 {
 	for (auto it = allSpells.begin(); it != allSpells.end(); ++it)
@@ -2579,19 +2596,7 @@ void MainFrame::onInitMod(wxCommandEvent& event)
 
 void MainFrame::onMaxHPChange(wxCommandEvent& event)
 {
-	int x = std::get<1>(mainPagePanels.MaxHPBonus)->GetValue();
-	character.setTotHPBonus(x);
-	mainPagePanels.HP->SetValue(character.getModTotHP());
-
-	std::string str = "HP | " + std::to_string(character.getTotHP());
-
-	if (x != 0)
-		str += " (" + std::to_string(character.getModTotHP()) + ")";
-
-	mainPagePanels.HPText->SetLabel(str);
-	mainPagePanels.HPText->GetParent()->Layout();
-
-	mainPagePanels.HP->SetMax(character.getModTotHP());
+	updateHP();
 }
 
 void MainFrame::onAddRemSlider(wxCommandEvent& event)
@@ -3072,6 +3077,57 @@ void MainFrame::onSetSpellPoints(wxCommandEvent& event)
 	knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
 }
 
+void MainFrame::onSetMenuEvents(wxCommandEvent& event)
+{
+	auto obj = event.GetId();
+
+	if (obj == menuBarItems.SetMaxHP->GetId())
+	{
+		std::string title = "Enter Max HP";
+		int x = wxGetNumberFromUser(title, "", "Max HP", 10, 6, 1e3);
+		character.setTotHP(x);
+		updateHP();
+	}
+
+	if (obj == menuBarItems.SetName->GetId())
+	{
+		auto name = wxGetTextFromUser("Enter character name");
+		character.setName(name.ToStdString());
+		mainPagePanels.PlayerName->SetLabel(name);
+	}
+
+	if (obj == menuBarItems.SetSpeed->GetId())
+	{
+		int x = wxGetNumberFromUser("Enter Speed", "", "Speed", 30, 0, 240);
+		character.setSpeed(x);
+		mainPagePanels.Speed->SetValue(std::to_string(x));
+	}
+
+	if (obj == menuBarItems.SetStats->GetId())
+	{
+		wxMessageBox("Stats");
+	}
+
+
+}
+
+void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
+{
+	auto obj = event.GetId();
+
+	if (obj == menuBarItems.ConditionsAll->GetId())
+	{
+		ConditionDialog *dialog = new ConditionDialog(this, wxID_ANY, allConditions.size(), &allConditions, "Conditions", wxDefaultPosition, FromDIP(wxSize(300, -1)),
+			wxRESIZE_BORDER | wxCLOSE_BOX | wxMINIMIZE_BOX);
+		dialog->Show();
+	}
+
+	if (obj == menuBarItems.ConditionsPlayer->GetId())
+	{
+
+	}
+}
+
 void MainFrame::onToolProfecsSelect(wxListEvent& event)
 {
 
@@ -3170,13 +3226,13 @@ void MainFrame::initConditions()
 
 	curCond = Conditions::Blinded;
 	curFeature.title = "Blinded";
-	curFeature.description = "A blinded creature canÅft see and automatically fails any ability check that requires sight.\n";
-	curFeature.description += "Attack rolls against the creature have advantage, and the creatureÅfs attack rolls have disadvantage.";
+	curFeature.description = "A blinded creature canÅft see and automatically fails any ability check that requires sight.\n\n";
+	curFeature.description += "Attack rolls against the creature have advantage, and the creatureÅfs attack rolls have disadvantage.\n\n";
 	allConditions.push_back({ curCond, curFeature });
 
 	curCond = Conditions::Charmed;
 	curFeature.title = "Charmed";
-	curFeature.description = "A charmed creature canÅft attack the charmer or target the charmer with harmful abilities or magical effects.\n";
+	curFeature.description = "A charmed creature canÅft attack the charmer or target the charmer with harmful abilities or magical effects.\n\n";
 	curFeature.description += "The charmer has advantage on any ability check to interact socially with the creature.";
 	allConditions.push_back({ curCond, curFeature });
 
@@ -3187,43 +3243,43 @@ void MainFrame::initConditions()
 
 	curCond = Conditions::Frightened;
 	curFeature.title = "Frightened";
-	curFeature.description = "A frightened creature has disadvantage on ability checks and attack rolls while the source of its fear is within line of sight.\n";
+	curFeature.description = "A frightened creature has disadvantage on ability checks and attack rolls while the source of its fear is within line of sight.\n\n";
 	curFeature.description += "The creature canÅft willingly move closer to the source of its fear.";
 	allConditions.push_back({ curCond, curFeature });
 
 	curCond = Conditions::Graplled;
 	curFeature.title = "Grappled";
-	curFeature.description = "A grappled creatureÅfs speed becomes 0, and it canÅft benefit from any bonus to its speed.\n";
-	curFeature.description += "The condition ends if the grappler is incapacitated\n.";
+	curFeature.description = "A grappled creatureÅfs speed becomes 0, and it canÅft benefit from any bonus to its speed.\n\n";
+	curFeature.description += "The condition ends if the grappler is incapacitated.\n\n";
 	curFeature.description += "The condition also ends if an effect removes the grappled creature from the reach of the grappler or grappling effect, such as when a creature is hurled away by the thunderwave spell.";
 	allConditions.push_back({ curCond, curFeature });
 
 	curCond = Conditions::Incapacitated;
 	curFeature.title = "Incapacitated";
-	curFeature.description += "An incapacitated creature canÅft take actions or reactions.";
+	curFeature.description = "An incapacitated creature canÅft take actions or reactions.";
 	allConditions.push_back({ curCond, curFeature });
 
 	curCond = Conditions::Invisible;
 	curFeature.title = "Invisible";
-	curFeature.description += "An invisible creature is impossible to see without the aid of magic or a special sense. For the purpose of hiding, the creature is heavily obscured. The creatureÅfs location can be detected by any noise it makes or any tracks it leaves.\n";
+	curFeature.description = "An invisible creature is impossible to see without the aid of magic or a special sense. For the purpose of hiding, the creature is heavily obscured. The creatureÅfs location can be detected by any noise it makes or any tracks it leaves.\n\n";
 	curFeature.description += "Attack rolls against the creature have disadvantage, and the creatureÅfs attack rolls have advantage.";
 	allConditions.push_back({ curCond, curFeature });
 
 	curCond = Conditions::Paralyzed;
 	curFeature.title = "Paralyzed";
-	curFeature.description = "A paralyzed creature is incapacitated and canÅft move or speak.\n";
-	curFeature.description += "The creature automatically fails Strength and Dexterity saving throws.\n";
-	curFeature.description += "Attack rolls against the creature have advantage.\n";
+	curFeature.description = "A paralyzed creature is incapacitated and canÅft move or speak.\n\n";
+	curFeature.description += "The creature automatically fails Strength and Dexterity saving throws.\n\n";
+	curFeature.description += "Attack rolls against the creature have advantage.\n\n";
 	curFeature.description += "Any attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature.";
 	allConditions.push_back({ curCond, curFeature });
 
 	curCond = Conditions::Petrified;
 	curFeature.title = "Petrified";
-	curFeature.description = "A petrified creature is transformed, along with any nonmagical object it is wearing or carrying, into a solid inanimate substance (usually stone). Its weight increases by a factor of ten, and it ceases aging.\n";
-	curFeature.description += "The creature is incapacitated (see the condition), canÅft move or speak, and is unaware of its surroundings.\n";
-	curFeature.description += "Attack rolls against the creature have advantage.\n";
-	curFeature.description += "The creature automatically fails Strength and Dexterity saving throws.\n";
-	curFeature.description += "The creature automatically fails Strength and Dexterity saving throws.\n";
+	curFeature.description = "A petrified creature is transformed, along with any nonmagical object it is wearing or carrying, into a solid inanimate substance (usually stone). Its weight increases by a factor of ten, and it ceases aging.\n\n";
+	curFeature.description += "The creature is incapacitated (see the condition), canÅft move or speak, and is unaware of its surroundings.\n\n";
+	curFeature.description += "Attack rolls against the creature have advantage.\n\n";
+	curFeature.description += "The creature automatically fails Strength and Dexterity saving throws.\n\n";
+	curFeature.description += "The creature automatically fails Strength and Dexterity saving throws.\n\n";
 	curFeature.description += "The creature is immune to poison and disease, although a poison or disease already in its system is suspended, not neutralized.";
 	allConditions.push_back({ curCond, curFeature });
 
@@ -3234,31 +3290,31 @@ void MainFrame::initConditions()
 
 	curCond = Conditions::Prone;
 	curFeature.title = "Prone";
-	curFeature.description = "A prone creatureÅfs only movement option is to crawl, unless it stands up and thereby ends the condition.\n";
-	curFeature.description += "The creature has disadvantage on attack rolls.\n";
-	curFeature.description += "An attack roll against the creature has advantage if the attacker is within 5 feet of the creature. Otherwise, the attack roll has disadvantage.\n";
+	curFeature.description = "A prone creatureÅfs only movement option is to crawl, unless it stands up and thereby ends the condition.\n\n";
+	curFeature.description += "The creature has disadvantage on attack rolls.\n\n";
+	curFeature.description += "An attack roll against the creature has advantage if the attacker is within 5 feet of the creature. Otherwise, the attack roll has disadvantage.\n\n";
 	allConditions.push_back({ curCond, curFeature });
 
 	curCond = Conditions::Restrained;
 	curFeature.title = "Restrained";
-	curFeature.description = "A restrained creatureÅfs speed becomes 0, and it canÅft benefit from any bonus to its speed.\n";
-	curFeature.description += "Attack rolls against the creature have advantage, and the creatureÅfs attack rolls have disadvantage.\n";
-	curFeature.description += "The creature has disadvantage on Dexterity saving throws.\n";
+	curFeature.description = "A restrained creatureÅfs speed becomes 0, and it canÅft benefit from any bonus to its speed.\n\n";
+	curFeature.description += "Attack rolls against the creature have advantage, and the creatureÅfs attack rolls have disadvantage.\n\n";
+	curFeature.description += "The creature has disadvantage on Dexterity saving throws.\n\n";
 	allConditions.push_back({ curCond, curFeature });
 
 	curCond = Conditions::Stunned;
 	curFeature.title = "Stunned";
-	curFeature.description = "A stunned creature is incapacitated (see the condition), canÅft move, and can speak only falteringly.\n";
-	curFeature.description += "The creature automatically fails Strength and Dexterity saving throws.\n";
-	curFeature.description += "Attack rolls against the creature have advantage.\n";
+	curFeature.description = "A stunned creature is incapacitated (see the condition), canÅft move, and can speak only falteringly.\n\n";
+	curFeature.description += "The creature automatically fails Strength and Dexterity saving throws.\n\n";
+	curFeature.description += "Attack rolls against the creature have advantage.\n\n";
 	allConditions.push_back({ curCond, curFeature });
 
 	curCond = Conditions::Unconscious;
 	curFeature.title = "Unconscious";
-	curFeature.description = "An unconscious creature is incapacitated (see the condition), canÅft move or speak, and is unaware of its surroundings\n";
-	curFeature.description += "The creature drops whatever itÅfs holding and falls prone.\n";
-	curFeature.description += "The creature automatically fails Strength and Dexterity saving throws.\n";
-	curFeature.description += "Attack rolls against the creature have advantage.\n";
+	curFeature.description = "An unconscious creature is incapacitated (see the condition), canÅft move or speak, and is unaware of its surroundings\n\n";
+	curFeature.description += "The creature drops whatever itÅfs holding and falls prone.\n\n";
+	curFeature.description += "The creature automatically fails Strength and Dexterity saving throws.\n\n";
+	curFeature.description += "Attack rolls against the creature have advantage.\n\n";
 	curFeature.description += "Any attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature.";
 	allConditions.push_back({ curCond, curFeature });
 
@@ -3279,7 +3335,7 @@ void MainFrame::initConditions()
 
 	curCond = Conditions::Fatigued;
 	curFeature.title = "Fatigued";
-	curFeature.description = "Fatigue can have levels upto 10. Things that Add levels tell how many stages are added. A Long Rest removes all levels of fatigue while short rest removes 1\n";
+	curFeature.description = "Fatigue can have levels upto 10. Things that Add levels tell how many stages are added. A Long Rest removes all levels of fatigue while short rest removes 1\n\n";
 	curFeature.description += "For each level of fatigue, you have a -1 on all ability checks, saving throws and attack rolls";
 	allConditions.push_back({ curCond, curFeature });
 }

@@ -258,6 +258,21 @@ int Character::multiclassGetSorcererSlots(int spellLevel)
 	return 0;
 }
 
+void Character::setStats(Stats stat)
+{
+	this->charStats = stat;
+}
+
+void Character::setStats(int str, int dex, int con, int pInt, int wis, int cha)
+{
+	charStats.Str = str;
+	charStats.Dex = dex;
+	charStats.Con = con;
+	charStats.Int = pInt;
+	charStats.Wis = wis;
+	charStats.Cha = cha;
+}
+
 void Character::setCurHP(int x)
 {
 	if (x > totHP)
