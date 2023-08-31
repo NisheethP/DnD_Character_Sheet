@@ -31,8 +31,10 @@ class MainFrame : public wxFrame
 	std::vector<Spell> allSpells;
 	std::vector<Spell*> allSpellsLevel[10];
 	Character character;
+	
 	wxFont BigFont1;
 	wxFont BigFont2;
+	wxFont SkillFont;
 
 	ColourPair ctrlColour;
 	ColourPair descColour;
@@ -41,6 +43,7 @@ class MainFrame : public wxFrame
 	ColourPair panelColour;
 	ColourPair slotsColour;
 	wxColour profecientColour;
+	wxColour expertiseColour;
 
 	wxSize baseColSize;
 
@@ -66,6 +69,7 @@ class MainFrame : public wxFrame
 		wxMenuItem* SetName;
 		wxMenuItem* SetStats;
 		wxMenuItem* SetSkillProfs;
+		wxMenuItem* SetExpertises;
 		wxMenuItem* SetSavingThrows;
 		wxMenuItem* SetMaxHP;
 		wxMenuItem* SetSpeed;
@@ -281,7 +285,7 @@ public:
 	void updateStats();
 	void updateInititative();
 	void updateSavingThrows();
-	void updatesSkills();
+	void updateSkills();
 
 	void calcCheckedSpells();
 
@@ -336,9 +340,7 @@ public:
 	void fillLevelSpells();
 	int getNumSpells(int level);
 	void initConditions();
-	feature getConditionDescription(const Conditions& cond);
 
 	void setWindowColour(wxWindow* window, ColourPair colour);
 };
 
-void toLowerString(std::string& str);

@@ -1,6 +1,7 @@
 #include "Character.h"
 
 #include <cmath>
+#include "Util.h"
 
 Stats::Stats(int pStr, int pDex, int pCon, int pInt, int pWis, int pCha):
 	Str(pStr),
@@ -322,6 +323,45 @@ void Character::giveClass(CharClass pClass)
 	calcTotLevel();
 }
 
+void Character::setSkillProfs(int x)
+{
+	int ST = 0;
+	if (skillProficiencies & Strength)
+		ST |= Strength;
+	if (skillProficiencies & Dexterity)
+		ST |= Dexterity;
+	if (skillProficiencies & Constitution)
+		ST |= Constitution;
+	if (skillProficiencies & Intelligence)
+		ST |= Intelligence;
+	if (skillProficiencies & Wisdom)
+		ST |= Wisdom;
+	if (skillProficiencies & Charisma)
+		ST |= Charisma;
+
+	skillProficiencies &= ~ST;
+
+	skillProficiencies = x | ST;
+}
+
+void Character::setSavingThrowProfs(int x)
+{
+	if (skillProficiencies & Strength)
+		skillProficiencies &= ~Strength;
+	if (skillProficiencies & Dexterity)
+		skillProficiencies &= ~Dexterity;
+	if (skillProficiencies & Constitution)
+		skillProficiencies &= ~Constitution;
+	if (skillProficiencies & Intelligence)
+		skillProficiencies &= ~Intelligence;
+	if (skillProficiencies & Wisdom)
+		skillProficiencies &= ~Wisdom;
+	if (skillProficiencies & Charisma)
+		skillProficiencies &= ~Charisma;
+
+	skillProficiencies |= x;
+}
+
 void Character::addLanguage(std::string str)
 {
 	languages.push_back(str);
@@ -470,6 +510,44 @@ int Character::getCasterLevel()
 	return static_cast<int>(castLevel);
 }
 
+int Character::getSavingThrow()
+{
+	int ST = 0;
+	if (skillProficiencies & Strength)
+		ST |= Strength;
+	if (skillProficiencies & Dexterity)
+		ST |= Dexterity;
+	if (skillProficiencies & Constitution)
+		ST |= Constitution;
+	if (skillProficiencies & Intelligence)
+		ST |= Intelligence;
+	if (skillProficiencies & Wisdom)
+		ST |= Wisdom;
+	if (skillProficiencies & Charisma)
+		ST |= Charisma;
+
+	return ST;
+}
+
+int Character::getSkillsProfs()
+{
+	int ST = 0;
+	if (skillProficiencies & Strength)
+		ST |= Strength;
+	if (skillProficiencies & Dexterity)
+		ST |= Dexterity;
+	if (skillProficiencies & Constitution)
+		ST |= Constitution;
+	if (skillProficiencies & Intelligence)
+		ST |= Intelligence;
+	if (skillProficiencies & Wisdom)
+		ST |= Wisdom;
+	if (skillProficiencies & Charisma)
+		ST |= Charisma;
+
+	return skillProficiencies & ~ST;
+}
+
 void Character::temp()
 {
 }
@@ -576,6 +654,142 @@ int getStatfromSkill(const Skills& skill, const Stats& stat)
 		return -10;
 		break;
 	}
+}
+
+std::string getSkillStr(const Skills& skill)
+{
+	switch (skill)
+	{
+	case none:
+		return "Skill: none\n";
+	case Acrobatics:
+		return "Acrobatics\n";
+	case Animal_Handling:
+		return "Animal Handling\n";
+	case Arcana:
+		return "Arcana\n";
+	case Athletics:
+		return "Athletics\n";
+	case Deception:
+		return "Deception\n";
+	case History:
+		return "History\n";
+	case Insight:
+		return "Insight\n";
+	case Intimidation:
+		return "Intimidation\n";
+	case Investigation:
+		return "Investigation\n";
+	case Medicine:
+		return "Medicine\n";
+	case Nature:
+		return "Nature\n";
+	case Perception:
+		return "Perception\n";
+	case Performance:
+		return "Performance\n";
+	case Persuasion:
+		return "Persuasion\n";
+	case Religion:
+		return "Religion\n";
+	case Sleight_of_Hand:
+		return "Sleight of Hand\n";
+	case Stealth:
+		return "Stealth\n";
+	case Survival:
+		return "Survival\n";
+	case Strength:
+		return "Strength\n";
+	case Dexterity:
+		return "Dexterity\n";
+	case Constitution:
+		return "Constitution\n";
+	case Intelligence:
+		return "Intelligence\n";
+	case Wisdom:
+		return "Wisdom\n";
+	case Charisma:
+		return "Charisma\n";
+	default:
+		return "Error\n";
+	}
+}
+
+Skills getSkllfromStr(const std::string& str)
+{
+	std::string lstr = str;
+	Util::toLowerString(lstr);
+	if (lstr == "acrobatics")
+		return Skills::Acrobatics;
+
+	if (lstr == "animal handling")
+		return Skills::Animal_Handling;
+
+	if (lstr == "arcana")
+		return Skills::Arcana;
+
+	if (lstr == "athletics")
+		return Skills::Athletics;
+
+	if (lstr == "charisma")
+		return Skills::Charisma;
+
+	if (lstr == "constitution")
+		return Skills::Constitution;
+
+	if (lstr == "deception")
+		return Skills::Deception;
+
+	if (lstr == "dexterity")
+		return Skills::Dexterity;
+
+	if (lstr == "history")
+		return Skills::History;
+
+	if (lstr == "insight")
+		return Skills::Insight;
+
+	if (lstr == "intelligence")
+		return Skills::Intelligence;
+
+	if (lstr == "intimidation")
+		return Skills::Intimidation;
+
+	if (lstr == "investigation")
+		return Skills::Investigation;
+
+	if (lstr == "medicine")
+		return Skills::Medicine;
+	
+	if (lstr == "nature")
+		return Skills::Nature;
+
+	if (lstr == "perception")
+		return Skills::Perception;
+
+	if (lstr == "performance")
+		return Skills::Performance;
+
+	if (lstr == "persuasion")
+		return Skills::Persuasion;
+
+	if (lstr == "religion")
+		return Skills::Religion;
+
+	if (lstr == "sleight of hand")
+		return Skills::Sleight_of_Hand;
+
+	if (lstr == "stealth")
+		return Skills::Stealth;
+
+	if (lstr == "strength")
+		return Skills::Strength;
+
+	if (lstr == "survival")
+		return Skills::Survival;
+
+	if (lstr == "wisdom")
+		return Skills::Wisdom;
 }
 
 std::string getNumStr(int x)

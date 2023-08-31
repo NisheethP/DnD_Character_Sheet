@@ -18,6 +18,7 @@
 #include <string>
 
 #include "MainFrame.h"
+#include "Util.h"
 #include "Character.h"
 #include "Spells.h"
 #include "MoneyDialog.h"
@@ -29,13 +30,14 @@
 #include "ConditionDialog.h"
 #include "AddCondDialog.h"
 #include "StatsDialog.h"
-
+#include "SkillProfDialog.h"
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900,600)),
 	character(pChar),
 	BigFont1(wxFontInfo(wxSize(0, 15))),
 	BigFont2(wxFontInfo(wxSize(0, 18))),
+	SkillFont(wxFontInfo(wxSize(0, 12))),
 	baseColSize(wxSize(170, -1)),
 	masterPanel(new wxPanel(this, wxID_ANY, wxPoint(100, 400), wxDefaultSize)),
 	mainNotebook(new wxNotebook(masterPanel, wxID_ANY))
@@ -78,11 +80,14 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	slotsColour.second = wxColour(0xFF, 0xFF, 0xFF);
 
 	profecientColour = wxColour(0xAA, 0xFF, 0xFF);
+	expertiseColour = wxColour(0xFF, 0xAA, 0xAA);
 
 	//SETTING UP THE WINDOW
 	setWindowColour(this, mainColour);
+
 	BigFont1.MakeBold();
 	BigFont2.MakeBold();
+	SkillFont.MakeBold();
 
 	masterSizer = new wxBoxSizer(wxVERTICAL);
 	
@@ -130,6 +135,7 @@ void MainFrame::CreateMenuBar()
 	SetMenu->AppendSeparator();
 	menuBarItems.SetSavingThrows = SetMenu->Append(wxID_ANY, "Set Savint Throw Profeciencies");
 	menuBarItems.SetSkillProfs = SetMenu->Append(wxID_ANY, "Set Skill Profeciencies");
+	menuBarItems.SetExpertises = SetMenu->Append(wxID_ANY, "Set Skill Expertises");
 	SetMenu->AppendSeparator();
 	menuBarItems.SetSP = SetMenu->Append(wxID_ANY, "Set Spell Points");
 
@@ -202,7 +208,9 @@ void MainFrame::BindControls()
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSpeed->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetName->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetInitMod->GetId());
-	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetInitMod->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSavingThrows->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSkillProfs->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetExpertises->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsAll->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsPlayer->GetId());
@@ -842,6 +850,7 @@ wxPanel* MainFrame::CreateSavingThrows(wxPanel* parent)
 		savingThrowValue = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 		savingThrowValue->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
+		savingThrowName->SetFont(SkillFont);
 		setWindowColour(savingThrowValue, ctrlColour);
 
 		makeSavingThrowPair(savingThrowName, savingThrowValue, tempSkills[i]);
@@ -859,13 +868,14 @@ wxPanel* MainFrame::CreateSavingThrows(wxPanel* parent)
 
 	gridSizer->AddGrowableCol(1);
 
-	stSizer->Add(-1,2);
+	stSizer->Add(-1, 2);
 	stSizer->Add(gridSizer, 0, wxALIGN_LEFT | wxLEFT, 10);
 	stSizer->Add(-1, 2);
 
 	panel->SetSizer(stSizer);
 	panel->Layout();
 
+	updateSavingThrows();
 	return panel;
 }
 
@@ -883,7 +893,6 @@ wxPanel* MainFrame::CreateSkillProf(wxPanel* parent)
 
 	std::wstring profMarker = std::wstring(1, char(159));
 	//std::wstring profMarker = L"\t*";
-	std::wstring totalString = L"";
 	
 	std::vector<Skills> curSkill =
 	{
@@ -907,11 +916,6 @@ wxPanel* MainFrame::CreateSkillProf(wxPanel* parent)
 		Skills::Survival
 	};	
 	
-	wxStaticText* text = new wxStaticText(panel, wxID_ANY, totalString, wxPoint(1200,200), wxDefaultSize);
-	wxFont tempFont(wxFontInfo(wxSize(0, 12)));
-	tempFont.MakeBold();
-	text->SetFont(tempFont);
-
 	wxStaticText* skillName = nullptr;
 	wxTextCtrl* skillValue = nullptr;
 
@@ -920,7 +924,10 @@ wxPanel* MainFrame::CreateSkillProf(wxPanel* parent)
 		skillName = new wxStaticText(panel, wxID_ANY, "");
 		skillValue = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 		skillValue->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+	
+		skillName->SetFont(SkillFont);
 		setWindowColour(skillValue, ctrlColour);
+		skillName->SetForegroundColour(panelColour.second);
 
 		makeSkillPair(skillName, skillValue, curSkill[i]);
 		mainPagePanels.Skills.push_back({skillName, skillValue});
@@ -941,7 +948,7 @@ wxPanel* MainFrame::CreateSkillProf(wxPanel* parent)
 	skillSizer->Add(gridSizer, 0, wxLEFT | wxLEFT, 10);
 	skillSizer->Add(-1, 2);
 
-
+	updateSkills();
 	panel->SetSizer(skillSizer);
 	panel->Layout();
 
@@ -2194,11 +2201,11 @@ void MainFrame::updateStats()
 		mainPagePanels.Stat_TextCtrls[i].second->SetValue(std::to_string(character.getSkillMod(skillNames[i])));
 	}
 	
-	wxMessageBox("HP not updated");
+	wxMessageBox("HP is not updated. Please update manually");
 	updateInititative();
 	updateKnownSpellMods();
 	updateSavingThrows();
-	updatesSkills();
+	updateSkills();
 }
 
 void MainFrame::updateInititative()
@@ -2219,10 +2226,30 @@ void MainFrame::updateSavingThrows()
 	{
 		int x = character.getSkillMod(tempSkills[i], true);
 		mainPagePanels.SavingThrows[i].second->SetValue(std::to_string(x));
+
+		bool isProficient = character.checkProf(tempSkills[i]);
+		bool isExpert = character.checkExpert(tempSkills[i]);
+		
+		if (isExpert)
+		{
+			mainPagePanels.SavingThrows[i].first->SetForegroundColour(expertiseColour);
+		}
+
+		else if (isProficient)
+		{
+			mainPagePanels.SavingThrows[i].first->SetForegroundColour(profecientColour);
+			mainPagePanels.SavingThrows[i].first->SetFont(SkillFont.Underlined());
+		}		
+
+		else
+		{
+			mainPagePanels.SavingThrows[i].first->SetForegroundColour(panelColour.second);
+			mainPagePanels.SavingThrows[i].first->SetFont(SkillFont);
+		}
 	}
 }
 
-void MainFrame::updatesSkills()
+void MainFrame::updateSkills()
 {
 	std::vector<Skills> curSkill =
 	{
@@ -2246,10 +2273,31 @@ void MainFrame::updatesSkills()
 		Skills::Survival
 	};
 
+	
+	
+
 	for (int i = 0; i < curSkill.size(); ++i)
 	{
 		int x = character.getSkillMod(curSkill[i], false);
 		mainPagePanels.Skills[i].second->SetValue(std::to_string(x));
+
+		bool isProficient = character.checkProf(curSkill[i]);
+		bool isExpert = character.checkExpert(curSkill[i]);
+
+		mainPagePanels.Skills[i].first->SetForegroundColour(panelColour.second);
+		mainPagePanels.Skills[i].first->SetFont(SkillFont);
+
+		if (isExpert)
+		{
+			mainPagePanels.Skills[i].first->SetForegroundColour(expertiseColour);
+			mainPagePanels.Skills[i].first->SetFont(SkillFont.Underlined());
+		}
+
+		else if (isProficient)
+		{
+			mainPagePanels.Skills[i].first->SetForegroundColour(profecientColour);
+			mainPagePanels.Skills[i].first->SetFont(SkillFont.Underlined());
+		}
 	}
 }
 
@@ -2412,51 +2460,8 @@ void MainFrame::makeSavingThrowPair(wxStaticText* savingThrowName, wxTextCtrl* s
 {
 	std::wstring tempString = L"";
 	bool isProficient = false;
-
-	switch (curSkill)
-	{
-	case none:
-	case Acrobatics:
-	case Animal_Handling:
-	case Arcana:
-	case Athletics:
-	case Deception:
-	case History:
-	case Insight:
-	case Intimidation:
-	case Investigation:
-	case Medicine:
-	case Nature:
-	case Perception:
-	case Performance:
-	case Persuasion:
-	case Religion:
-	case Sleight_of_Hand:
-	case Stealth:
-	case Survival:
-		break;
-	case Strength:
-		tempString += L"Strength\n";
-		break;
-	case Dexterity:
-		tempString += L"Dexterity\n";
-		break;
-	case Constitution:
-		tempString += L"Constitution\n";
-		break;
-	case Intelligence:
-		tempString += L"Intelligence\n";
-		break;
-	case Wisdom:
-		tempString += L"Wisdom\n";
-		break;
-	case Charisma:
-		tempString += L"Charisma\n";
-		break;
-	default:
-		tempString += L"Error\n";
-		break;
-	}
+	
+	tempString = Util::to_wstring(getSkillStr(curSkill));
 
 	wxFont tempFont(wxFontInfo(wxSize(0, 12)));
 	tempFont.MakeBold();
@@ -2482,87 +2487,7 @@ void MainFrame::makeSkillPair(wxStaticText* skillName, wxTextCtrl* skillValue, S
 	std::wstring tempString = L"";
 	bool isProficient = false;
 
-	switch (curSkill)
-	{
-	case none:
-		tempString += L"Skill: none\n";
-		break;
-	case Acrobatics:
-		tempString += L"Acrobatics\n";
-		break;
-	case Animal_Handling:
-		tempString += L"Animal Handling\n";
-		break;
-	case Arcana:
-		tempString += L"Arcana\n";
-		break;
-	case Athletics:
-		tempString += L"Athletics\n";
-		break;
-	case Deception:
-		tempString += L"Deception\n";
-		break;
-	case History:
-		tempString += L"History\n";
-		break;
-	case Insight:
-		tempString += L"Insight\n";
-		break;
-	case Intimidation:
-		tempString += L"Intimidation\n";
-		break;
-	case Investigation:
-		tempString += L"Investigation\n";
-		break;
-	case Medicine:
-		tempString += L"Medicine\n";
-		break;
-	case Nature:
-		tempString += L"Nature\n";
-		break;
-	case Perception:
-		tempString += L"Perception\n";
-		break;
-	case Performance:
-		tempString += L"Performance\n";
-		break;
-	case Persuasion:
-		tempString += L"Persuasion\n";
-		break;
-	case Religion:
-		tempString += L"Religion\n";
-		break;
-	case Sleight_of_Hand:
-		tempString += L"Sleight of Hand\n";
-		break;
-	case Stealth:
-		tempString += L"Stealth\n";
-		break;
-	case Survival:
-		tempString += L"Survival\n";
-		break;
-	case Strength:
-		tempString += L"Strength\n";
-		break;
-	case Dexterity:
-		tempString += L"Dexterity\n";
-		break;
-	case Constitution:
-		tempString += L"Constitution\n";
-		break;
-	case Intelligence:
-		tempString += L"Intelligence\n";
-		break;
-	case Wisdom:
-		tempString += L"Wisdom\n";
-		break;
-	case Charisma:
-		tempString += L"Charisma\n";
-		break;
-	default:
-		tempString += L"Error\n";
-		break;
-	}
+	tempString = Util::to_wstring(getSkillStr(curSkill));
 
 	wxFont tempFont(wxFontInfo(wxSize(0, 12)));
 	tempFont.MakeBold();
@@ -2581,7 +2506,6 @@ void MainFrame::makeSkillPair(wxStaticText* skillName, wxTextCtrl* skillValue, S
 	}
 
 }
-
 
 
 //------------------------------
@@ -2622,12 +2546,12 @@ void MainFrame::onSpellSearchType(wxCommandEvent& event)
 
 		else
 		{
-			toLowerString(str);
+			Util::toLowerString(str);
 						
 			for (auto it = allSpells.begin(); it != allSpells.end(); ++it)
 			{
 				std::string spellName = it->getName();
-				toLowerString(spellName);
+				Util::toLowerString(spellName);
 
 				if (spellName.find(str) != std::string::npos)
 				{
@@ -3276,6 +3200,140 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 		int x = wxGetNumberFromUser(title, "", "Spell Points", max, 0, max);
 		knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
 	}
+
+	if (obj == menuBarItems.SetSavingThrows->GetId())
+	{
+		std::vector<Skills> skills =
+		{
+			Skills::Strength,
+			Skills::Dexterity,
+			Skills::Constitution,
+			Skills::Intelligence,
+			Skills::Wisdom,
+			Skills::Charisma
+		};
+
+		SkillProfDialog dialog(this, wxID_ANY, skills, character.getSavingThrow());
+
+		int release = dialog.ShowModal();
+		if (release != wxID_CANCEL)
+		{
+			auto list = dialog.getList();
+			int num = list->GetCount();
+			int st = 0;
+
+			for (int i = 0; i < num; ++i)
+			{
+				if (list->IsChecked(i))
+				{
+					st |= skills[i];
+				}
+			}
+
+			character.setSavingThrowProfs(st);
+			updateSavingThrows();
+		}
+	}
+
+	if (obj == menuBarItems.SetSkillProfs->GetId())
+	{
+		std::vector<Skills> skills =
+		{
+			Skills::Acrobatics,
+			Skills::Animal_Handling,
+			Skills::Arcana,
+			Skills::Athletics,
+			Skills::Deception,
+			Skills::History,
+			Skills::Insight,
+			Skills::Intimidation,
+			Skills::Investigation,
+			Skills::Medicine,
+			Skills::Nature,
+			Skills::Perception,
+			Skills::Performance,
+			Skills::Persuasion,
+			Skills::Religion,
+			Skills::Sleight_of_Hand,
+			Skills::Stealth,
+			Skills::Survival
+		};
+
+		SkillProfDialog dialog(this, wxID_ANY, skills, character.getSkillsProfs());
+
+		int release = dialog.ShowModal();
+		if (release != wxID_CANCEL)
+		{
+			auto list = dialog.getList();
+			int num = list->GetCount();
+			int sk = 0;
+
+			for (int i = 0; i < num; ++i)
+			{
+				if (list->IsChecked(i))
+				{
+					sk |= skills[i];
+				}
+			}
+
+			character.setSkillProfs(sk);
+			updateSkills();
+		}
+	}
+
+	if (obj == menuBarItems.SetExpertises->GetId())
+	{
+		std::vector<Skills> allSkills =
+		{
+			Skills::Acrobatics,
+			Skills::Animal_Handling,
+			Skills::Arcana,
+			Skills::Athletics,
+			Skills::Deception,
+			Skills::History,
+			Skills::Insight,
+			Skills::Intimidation,
+			Skills::Investigation,
+			Skills::Medicine,
+			Skills::Nature,
+			Skills::Perception,
+			Skills::Performance,
+			Skills::Persuasion,
+			Skills::Religion,
+			Skills::Sleight_of_Hand,
+			Skills::Stealth,
+			Skills::Survival
+		};
+
+		std::vector<Skills> skills;
+		for (auto it = allSkills.begin(); it != allSkills.end(); ++it)
+		{
+			if (*it & character.getSkillsProfs())
+				skills.push_back(*it);
+		}
+
+		SkillProfDialog dialog(this, wxID_ANY, skills, character.getExpertises());
+
+		int release = dialog.ShowModal();
+		if (release != wxID_CANCEL)
+		{
+			auto list = dialog.getList();
+			int num = list->GetCount();
+			int sk = 0;
+
+			for (int i = 0; i < num; ++i)
+			{
+				if (list->IsChecked(i))
+				{
+					sk |= skills[i];
+				}
+			}
+
+			character.setExpertises(sk);
+			updateSkills();
+		}
+		
+	}
 }
 
 void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
@@ -3604,19 +3662,9 @@ void MainFrame::initConditions()
 	allConditions.push_back({ curCond, curFeature });
 }
 
-feature MainFrame::getConditionDescription(const Conditions&)
-{
-	return feature();
-}
-
 void MainFrame::setWindowColour(wxWindow* window, ColourPair colour)
 {
 	window->SetBackgroundColour(colour.first);
 	window->SetForegroundColour(colour.second);
 }
 
-void toLowerString(std::string& str)
-{
-	for (auto it = str.begin(); it != str.end(); ++it)
-		*it = std::tolower(*it);
-}

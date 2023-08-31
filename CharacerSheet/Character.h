@@ -196,6 +196,10 @@ public:
 
 	int getCasterLevel();
 
+	int getSavingThrow();
+	int getSkillsProfs();
+	int getExpertises() { return skillExpertises; }
+
 	//-------------
 	//SET FUNCTIONS
 	//-------------
@@ -211,6 +215,10 @@ public:
 	void giveClass(ClassType pClassType, int pLevel = 1, CharClass::CasterType type = CharClass::CasterType::None);
 	void giveClass(CharClass pClass);
 	void setInitMod(int x) { initMod = x; };
+
+	void setSkillProfs(int x);
+	void setSavingThrowProfs(int x);
+	void setExpertises(int x) { skillExpertises = x; }
 
 	void addLanguage(std::string str);
 	void addTool(std::string str);
@@ -254,5 +262,8 @@ int getStatMod(int x);
 int getProficiency(int level);
 int getStatfromSkill(const Skills& skill, const Stats& stat);
 
+
+std::string getSkillStr(const Skills& skill);
+Skills getSkllfromStr(const std::string& str);
 std::string getNumStr(int x);
 

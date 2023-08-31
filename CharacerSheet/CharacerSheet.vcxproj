@@ -149,12 +149,14 @@
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MoneyDialog.cpp" />
+    <ClCompile Include="SkillProfDialog.cpp" />
     <ClCompile Include="SliderDialog.cpp" />
     <ClCompile Include="SliderRemDialog.cpp" />
     <ClCompile Include="Spells.cpp" />
     <ClCompile Include="SpellSelectDialog.cpp" />
     <ClCompile Include="SpellSlot.cpp" />
     <ClCompile Include="StatsDialog.cpp" />
+    <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AddCondDialog.h" />
@@ -168,12 +170,14 @@
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MoneyDialog.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SkillProfDialog.h" />
     <ClInclude Include="SliderDialog.h" />
     <ClInclude Include="SliderRemDialog.h" />
     <ClInclude Include="Spells.h" />
     <ClInclude Include="SpellSelectDialog.h" />
     <ClInclude Include="SpellSlot.h" />
     <ClInclude Include="StatsDialog.h" />
+    <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CharacerSheet.rc" />
