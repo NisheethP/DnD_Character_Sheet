@@ -70,8 +70,10 @@ class MainFrame : public wxFrame
 		wxMenuItem* SetMaxHP;
 		wxMenuItem* SetSpeed;
 		wxMenuItem* SetSP;
+		wxMenuItem* SetInitMod;
 		
 		wxMenuItem* ResetSP;
+		wxMenuItem* ResetSlots;
 
 		wxMenuItem* ConditionsAll;
 		wxMenuItem* ConditionsPlayer;
@@ -277,6 +279,9 @@ public:
 	void updateHP();
 	void updatePlayerConds();
 	void updateStats();
+	void updateInititative();
+	void updateSavingThrows();
+	void updatesSkills();
 
 	void calcCheckedSpells();
 
@@ -322,7 +327,6 @@ public:
 	void onKnownSpellsUseSpellPoint(wxCommandEvent& event);
 	
 	void onResetSpellPoints(wxCommandEvent& event);
-	void onSetSpellPoints(wxCommandEvent& event);
 	void onSetMenuEvents(wxCommandEvent& event);
 	void onConditionMenuEvents(wxCommandEvent& event);
 

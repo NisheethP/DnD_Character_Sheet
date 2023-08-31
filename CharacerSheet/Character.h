@@ -176,6 +176,7 @@ public:
 
 	unsigned int getConditions() {return charConditions;}
 	int getInitiative() { return initMod + getSkillMod(Dexterity); }
+	int getInitMod()	{ return initMod; }
 	int getModTotHP()	{ return totHP + totHPMod; }
 
 	Stats* getStats() { return &charStats; }

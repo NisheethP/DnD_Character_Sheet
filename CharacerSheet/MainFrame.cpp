@@ -126,6 +126,8 @@ void MainFrame::CreateMenuBar()
 	menuBarItems.SetMaxHP = SetMenu->Append(wxID_ANY, "Set Max HP");
 	menuBarItems.SetSpeed = SetMenu->Append(wxID_ANY, "Set Speed");
 	menuBarItems.SetStats = SetMenu->Append(wxID_ANY, "Set Stats");
+	menuBarItems.SetInitMod = SetMenu->Append(wxID_ANY, "Set Inititiative Mod");
+	SetMenu->AppendSeparator();
 	menuBarItems.SetSavingThrows = SetMenu->Append(wxID_ANY, "Set Savint Throw Profeciencies");
 	menuBarItems.SetSkillProfs = SetMenu->Append(wxID_ANY, "Set Skill Profeciencies");
 	SetMenu->AppendSeparator();
@@ -194,11 +196,13 @@ void MainFrame::BindControls()
 	mainPagePanels.EL_Conditions->Bind(wxEVT_LIST_ITEM_ACTIVATED, &MainFrame::onConditionListDClick, this);
 
 	this->Bind(wxEVT_MENU, &MainFrame::onResetSpellPoints, this, menuBarItems.ResetSP->GetId());
-	this->Bind(wxEVT_MENU, &MainFrame::onSetSpellPoints, this, menuBarItems.SetSP->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSP->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetMaxHP->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetStats->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSpeed->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetName->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetInitMod->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetInitMod->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsAll->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsPlayer->GetId());
@@ -2189,6 +2193,64 @@ void MainFrame::updateStats()
 		mainPagePanels.Stat_TextCtrls[i].first->SetValue(std::to_string(statsArray[i]));
 		mainPagePanels.Stat_TextCtrls[i].second->SetValue(std::to_string(character.getSkillMod(skillNames[i])));
 	}
+	
+	wxMessageBox("HP not updated");
+	updateInititative();
+	updateKnownSpellMods();
+	updateSavingThrows();
+	updatesSkills();
+}
+
+void MainFrame::updateInititative()
+{
+	int init = character.getInitiative();
+	mainPagePanels.InitMod.first->SetValue(std::to_string(init));
+	mainPagePanels.InitMod.second->SetValue(std::to_string(character.getInitMod()));
+}
+
+void MainFrame::updateSavingThrows()
+{
+	std::vector<Skills> tempSkills =
+	{
+		Skills::Strength, Skills::Dexterity, Skills::Constitution, Skills::Intelligence, Skills::Wisdom, Skills::Charisma
+	};
+
+	for (int i = 0; i < 6; ++i)
+	{
+		int x = character.getSkillMod(tempSkills[i], true);
+		mainPagePanels.SavingThrows[i].second->SetValue(std::to_string(x));
+	}
+}
+
+void MainFrame::updatesSkills()
+{
+	std::vector<Skills> curSkill =
+	{
+		Skills::Acrobatics,
+		Skills::Animal_Handling,
+		Skills::Arcana,
+		Skills::Athletics,
+		Skills::Deception,
+		Skills::History,
+		Skills::Insight,
+		Skills::Intimidation,
+		Skills::Investigation,
+		Skills::Medicine,
+		Skills::Nature,
+		Skills::Perception,
+		Skills::Performance,
+		Skills::Persuasion,
+		Skills::Religion,
+		Skills::Sleight_of_Hand,
+		Skills::Stealth,
+		Skills::Survival
+	};
+
+	for (int i = 0; i < curSkill.size(); ++i)
+	{
+		int x = character.getSkillMod(curSkill[i], false);
+		mainPagePanels.Skills[i].second->SetValue(std::to_string(x));
+	}
 }
 
 void MainFrame::SpellDesc::fillAllSpellTree(std::vector<Spell>& allSpells)
@@ -3156,16 +3218,6 @@ void MainFrame::onResetSpellPoints(wxCommandEvent& event)
 	knownPagePanels.SpellPoints_Val->SetLabel(std::to_string(character.getTotalSpellPoints()));
 }
 
-void MainFrame::onSetSpellPoints(wxCommandEvent& event)
-{
-	std::string title = "Enter number of Spell Points (max ";
-	title += std::to_string(character.getTotalSpellPoints());
-	title += ")";
-	int max = character.getTotalSpellPoints();
-	int x = wxGetNumberFromUser(title, "", "Spell Points", max, 0, max);
-	knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
-}
-
 void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 {
 	auto obj = event.GetId();
@@ -3176,6 +3228,15 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 		int x = wxGetNumberFromUser(title, "", "Max HP", 10, 6, 1e3);
 		character.setTotHP(x);
 		updateHP();
+	}
+
+	if (obj == menuBarItems.SetInitMod->GetId())
+	{
+		std::string title = "Enter Inititiaite Mod";
+		int x = wxGetNumberFromUser(title, "", "Initiative Modifier", 0, -1e3, 1e3);
+		character.setInitMod(x);
+		
+		updateInititative();
 	}
 
 	if (obj == menuBarItems.SetName->GetId())
@@ -3206,7 +3267,15 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 		}
 	}
 
-
+	if (obj == menuBarItems.SetSP->GetId())
+	{
+		std::string title = "Enter number of Spell Points (max ";
+		title += std::to_string(character.getTotalSpellPoints());
+		title += ")";
+		int max = character.getTotalSpellPoints();
+		int x = wxGetNumberFromUser(title, "", "Spell Points", max, 0, max);
+		knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
+	}
 }
 
 void MainFrame::onConditionMenuEvents(wxCommandEvent& event)

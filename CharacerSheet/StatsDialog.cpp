@@ -10,8 +10,8 @@ StatsDialog::StatsDialog(
 	const wxString& name):
 	wxDialog(parent, id, heading, pos, size, style, name)
 {
-	auto sizer = new wxGridSizer(8, 2, 5, 1);
-	int margin = 3;
+	auto sizer = new wxGridSizer(7, 2, 5, 1);
+	int margin = 5;
 
 	std::string statName[6] =
 	{
@@ -29,7 +29,7 @@ StatsDialog::StatsDialog(
 		auto tempSpin = new wxSpinCtrl(this, wxID_ANY, "10", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL | wxSP_ARROW_KEYS);
 
 		sizer->Add(text, 0, wxALIGN_RIGHT | wxLEFT, margin);
-		sizer->Add(tempSpin, 0, wxEXPAND | wxRIGHT, margin);
+		sizer->Add(tempSpin, 0, wxEXPAND | wxLEFT | wxRIGHT, margin);
 
 		tempSpin->SetMin(0);
 		tempSpin->SetMax(30);
@@ -37,8 +37,8 @@ StatsDialog::StatsDialog(
 		spin.push_back(tempSpin);
 	}
 
-	sizer->Add(CreateButtonSizer(wxOK), 0, wxALIGN_RIGHT | wxLEFT | wxTOP, margin);
-	sizer->Add(CreateButtonSizer(wxCANCEL), 0, wxALIGN_RIGHT | wxRIGHT | wxTOP, margin);
+	sizer->Add(CreateButtonSizer(wxOK), 0, wxALIGN_RIGHT | wxLEFT | wxTOP | wxBOTTOM, margin);
+	sizer->Add(CreateButtonSizer(wxCANCEL), 0, wxALIGN_RIGHT | wxRIGHT | wxTOP | wxBOTTOM, margin);
 	//sizer->Add(-1, 2);
 	
 	//sizer->AddGrowableCol(0, 1);
