@@ -970,6 +970,8 @@ wxPanel* MainFrame::CreateFeaturesPanel(wxPanel* parent)
 	wxSize buttonSize(40,-1);
 	mainPagePanels.Feature_AddButton = new wxButton(panel, wxID_ANY, "   +   ", wxDefaultPosition, buttonSize, wxBU_EXACTFIT);
 	mainPagePanels.Feature_RemoveButton = new wxButton(panel, wxID_ANY, "   x   ", wxDefaultPosition, buttonSize, wxBU_EXACTFIT);
+	mainPagePanels.Feature_AddButton->SetMinSize(buttonSize);
+	mainPagePanels.Feature_RemoveButton->SetMinSize(buttonSize);
 
 	mainPagePanels.Feature_Title->SetFont(curFont);
 	mainPagePanels.Feature_AddButton->SetFont(curFont.Bold());
@@ -984,7 +986,7 @@ wxPanel* MainFrame::CreateFeaturesPanel(wxPanel* parent)
 	titleSpacing.x -= mainPagePanels.Feature_AddButton->GetSize().x;
 	titleSpacing.x -= mainPagePanels.Feature_RemoveButton->GetSize().x;
 	titleSpacing.x -= listTitle->GetSize().x;
-	titleSpacing.x -= 10;
+	titleSpacing.x -= 20;
 
 	subSizer->Add(listTitle,0);
 	subSizer->Add(titleSpacing.x, -1);
@@ -1293,6 +1295,9 @@ wxScrolled<wxPanel>* MainFrame::CreateSliderPanel(wxPanel* parent)
 	auto remButton = mainPagePanels.SlidersButtons.first = new wxButton(panel, wxID_ANY, "x");
 	auto addButton = mainPagePanels.SlidersButtons.second= new wxButton(panel, wxID_ANY, "+");
 
+	addButton->SetFont(addButton->GetFont().Bold().Larger());
+	remButton->SetFont(remButton->GetFont().Bold().Larger());
+
 	buttonSizer->Add(remButton, 0, wxALL, 2);
 	buttonSizer->Add(addButton, 0, wxALL, 2);
 
@@ -1397,7 +1402,8 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 		subSizer->Add(3, -1);
 		subSizer->Add(text, 0);
 
-		sizer->Add(subSizer, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
+		sizer->Add(-1, 5);
+		sizer->Add(subSizer, 0, wxEXPAND | wxLEFT, 15);
 
 		mainPagePanels.HitDie.push_back({ spin , text});
 	}
