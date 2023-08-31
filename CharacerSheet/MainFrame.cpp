@@ -541,7 +541,7 @@ wxScrolled<wxPanel>* MainFrame::CreateTestPanel(wxNotebook* parent)
 	panel->SetScrollRate(0, FromDIP(10));
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 
-	std::vector<const char*> art =
+	std::vector<wxArtID> art =
 	{
 		wxART_ERROR,
 		wxART_QUESTION,
@@ -603,10 +603,15 @@ wxScrolled<wxPanel>* MainFrame::CreateTestPanel(wxNotebook* parent)
 	for (int i = 0; i < art.size(); ++i)
 	{
 		auto button = new wxButton(panel, wxID_ANY, "");
-		auto text = new wxStaticText(panel, wxID_ANY, std::to_string(i) + "----");
+		std::string label = "";
+		if (i + 1 < 10)
+			label += "0";
+		label += std::to_string(i+1);
+		auto text = new wxStaticText(panel, wxID_ANY, label + " ........");
+		text->SetFont(text->GetFont().Bold().Larger());
 		text->SetForegroundColour(*wxWHITE);
 		auto sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add(text);
+		sizer->Add(text, 0, wxLEFT, 20);
 		sizer->Add(button);
 		
 		wxBitmap logo = prov.GetBitmap(art[i], wxART_BUTTON);;
@@ -1108,10 +1113,13 @@ wxPanel* MainFrame::CreateToolProfeciencies(wxPanel* parent)
 
 	//panel->SetBackgroundColour(DescColor.first);
 
-	mainPagePanels.EL_ToolProf = new wxEditableListBox(panel, wxID_ANY, "Proficiencies", wxDefaultPosition, wxDefaultSize, wxEL_ALLOW_NEW | wxEL_ALLOW_DELETE | wxEL_NO_REORDER);
+	mainPagePanels.EL_ToolProf = new wxEditableListBox(panel, wxID_ANY, "Proficiencies", wxDefaultPosition, wxDefaultSize, 
+		wxEL_ALLOW_NEW | wxEL_ALLOW_DELETE | wxEL_ALLOW_EDIT | wxEL_NO_REORDER);
 
 	setWindowColour(mainPagePanels.EL_ToolProf->GetListCtrl(), descColour);
 	setWindowColour(mainPagePanels.EL_ToolProf->GetParent(), descColour);
+
+	mainPagePanels.EL_ToolProf->GetEditButton()->Destroy();
 
 	mainPagePanels.EL_ToolProf->SetupColours();
 	mainPagePanels.EL_ToolProf->SetFont(mainPagePanels.EL_ToolProf->GetFont().Bold());
@@ -1136,10 +1144,13 @@ wxPanel* MainFrame::CreateLangProfeciencies(wxPanel* parent)
 
 	//panel->SetBackgroundColour(DescColor.first);
 
-	mainPagePanels.EL_LangProf = new wxEditableListBox(panel, wxID_ANY, "Languages", wxDefaultPosition, wxDefaultSize, wxEL_ALLOW_NEW | wxEL_ALLOW_DELETE | wxEL_NO_REORDER);
+	mainPagePanels.EL_LangProf = new wxEditableListBox(panel, wxID_ANY, "Languages", wxDefaultPosition, wxDefaultSize, 
+		wxEL_ALLOW_NEW | wxEL_ALLOW_DELETE | wxEL_ALLOW_EDIT | wxEL_NO_REORDER);
 
 	setWindowColour(mainPagePanels.EL_LangProf->GetListCtrl(), descColour);
 	setWindowColour(mainPagePanels.EL_LangProf->GetParent(), descColour);
+
+	mainPagePanels.EL_LangProf->GetEditButton()->Destroy();
 
 	mainPagePanels.EL_LangProf->SetupColours();
 	mainPagePanels.EL_LangProf->SetFont(mainPagePanels.EL_LangProf->GetFont().Bold());
@@ -3625,6 +3636,9 @@ void MainFrame::onConditionListDClick(wxCommandEvent& event)
 	
 	auto list = mainPagePanels.EL_Conditions->GetListCtrl();
 	int items = list->GetSelectedItemCount();
+	int totCount = list->GetItemCount();
+	if (totCount == 1)
+		return;
 	long item = -1;
 	
 	ConditionDialog* dialog = new ConditionDialog(this, wxID_ANY, playerConditions.size(), &playerConditions, "Conditions", wxDefaultPosition, FromDIP(wxSize(500, -1)), wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);

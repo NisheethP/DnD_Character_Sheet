@@ -36,8 +36,13 @@ ConditionDialog::ConditionDialog(
 	sizer->Add(CreateButtonSizer(wxCLOSE), 0, wxALIGN_RIGHT | wxLEFT | wxRIGHT, 15);
 	sizer->Add(-1, 5);
 
-	condList->Select(1);
-	desc->SetValue(conditions->at(1).second.description);
+	int sel = 0;
+	if (number > 1)
+		sel = 1;
+
+	condList->Select(sel);
+	desc->SetValue(conditions->at(sel).second.description);
+
 	SetSizer(sizer);
 	Layout();
 
