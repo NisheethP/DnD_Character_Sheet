@@ -46,6 +46,7 @@ class MainFrame : public wxFrame
 	wxColour expertiseColour;
 
 	wxSize baseColSize;
+	wxSize buttonSize;
 
 	wxSizer* masterSizer;
 	wxPanel* masterPanel;
@@ -190,7 +191,7 @@ class MainFrame : public wxFrame
 		wxTextCtrl* SelectedSpells_Val = nullptr;
 		wxTextCtrl* SpellPoints_Val = nullptr;
 
-		wxTextCtrl* spellPoints;
+		wxTextCtrl* spellPoints = nullptr;
 		std::vector<wxButton*> spellPointButton;
 
 		std::vector<std::tuple<wxStaticText*, wxSpinCtrl*, wxButton*, wxCheckListBox*>> SpellSlotLevelList;
@@ -317,6 +318,7 @@ public:
 	void onFeatureSelect(wxCommandEvent& event);
 	void onToolProfecsSelect(wxListEvent& event);
 	void onToolProfecs(wxListEvent& event);
+	void onToolProfecsButton(wxCommandEvent& event);
 	void onLangProfecs(wxListEvent& event);
 	void onAddRemMoney(wxCommandEvent& event);
 	void onConditionListDClick(wxCommandEvent& event);

@@ -8,6 +8,7 @@
 #include <wx/wrapsizer.h>
 #include <wx/numdlg.h> 
 #include <wx/choicdlg.h>
+#include <wx/artprov.h>	
 
 #include <wx/file.h>
 #include <wx/textfile.h>
@@ -38,7 +39,8 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	BigFont1(wxFontInfo(wxSize(0, 15))),
 	BigFont2(wxFontInfo(wxSize(0, 18))),
 	SkillFont(wxFontInfo(wxSize(0, 12))),
-	baseColSize(wxSize(170, -1)),
+	baseColSize(170, -1),
+	buttonSize(40,-1),
 	masterPanel(new wxPanel(this, wxID_ANY, wxPoint(100, 400), wxDefaultSize)),
 	mainNotebook(new wxNotebook(masterPanel, wxID_ANY))
 {
@@ -167,8 +169,9 @@ void MainFrame::BindControls()
 	mainPagePanels.GiveTempHPButton->Bind(wxEVT_BUTTON, &MainFrame::onGiveTempHPButton, this);
 	mainPagePanels.Feature_AddButton->GetParent()->Bind(wxEVT_BUTTON, &MainFrame::onFeatureButton, this);
 	mainPagePanels.Feature_FullList->Bind(wxEVT_LISTBOX, &MainFrame::onFeatureSelect, this);
-	mainPagePanels.EL_ToolProf->Bind(wxEVT_LIST_ITEM_FOCUSED, &MainFrame::onToolProfecsSelect, this);
+	//mainPagePanels.EL_ToolProf->Bind(wxEVT_LIST_ITEM_FOCUSED, &MainFrame::onToolProfecsSelect, this);
 	mainPagePanels.EL_ToolProf->Bind(wxEVT_LIST_INSERT_ITEM, &MainFrame::onToolProfecs, this);
+	//mainPagePanels.EL_ToolProf->Bind(wxEVT_BUTTON, &MainFrame::onToolProfecsButton, this);
 	mainPagePanels.EL_ToolProf->Bind(wxEVT_LIST_DELETE_ITEM, &MainFrame::onToolProfecs, this);
 	mainPagePanels.EL_ToolProf->Bind(wxEVT_LIST_INSERT_ITEM, &MainFrame::onLangProfecs, this);
 	mainPagePanels.EL_ToolProf->Bind(wxEVT_LIST_DELETE_ITEM, &MainFrame::onLangProfecs, this);
@@ -534,7 +537,86 @@ wxScrolled<wxPanel>* MainFrame::CreateTestPanel(wxNotebook* parent)
 {
 	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY);
 	panel->SetBackgroundColour(mainColour.first);
+
+	panel->SetScrollRate(0, FromDIP(10));
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
+
+	std::vector<const char*> art =
+	{
+		wxART_ERROR,
+		wxART_QUESTION,
+		wxART_WARNING,
+		wxART_INFORMATION,
+		wxART_ADD_BOOKMARK,
+		wxART_DEL_BOOKMARK,
+		wxART_HELP_SIDE_PANEL,
+		wxART_HELP_SETTINGS,
+		wxART_HELP_BOOK,
+		wxART_HELP_FOLDER,
+		wxART_HELP_PAGE,
+		wxART_GO_BACK,
+		wxART_GO_FORWARD,
+		wxART_GO_UP,
+		wxART_GO_DOWN,
+		wxART_GO_TO_PARENT,
+		wxART_GO_HOME,
+		wxART_GOTO_FIRST,
+		wxART_GOTO_LAST,
+		wxART_PRINT,
+		wxART_HELP,
+		wxART_TIP,
+		wxART_REPORT_VIEW,
+		wxART_LIST_VIEW,
+		wxART_NEW_DIR,
+		wxART_FOLDER,
+		wxART_FOLDER_OPEN,
+		wxART_GO_DIR_UP,
+		wxART_EXECUTABLE_FILE,
+		wxART_NORMAL_FILE,
+		wxART_TICK_MARK,
+		wxART_CROSS_MARK,
+		wxART_MISSING_IMAGE,
+		wxART_NEW,
+		wxART_FILE_OPEN,
+		wxART_FILE_SAVE,
+		wxART_FILE_SAVE_AS,
+		wxART_DELETE,
+		wxART_COPY,
+		wxART_CUT,
+		wxART_PASTE,
+		wxART_UNDO,
+		wxART_REDO,
+		wxART_PLUS,
+		wxART_MINUS,
+		wxART_CLOSE,
+		wxART_QUIT,
+		wxART_FIND,
+		wxART_FIND_AND_REPLACE,
+		wxART_HARDDISK,
+		wxART_FLOPPY,
+		wxART_CDROM,
+		wxART_REMOVABLE
+	};
+
+	wxArtProvider prov;
+
+	for (int i = 0; i < art.size(); ++i)
+	{
+		auto button = new wxButton(panel, wxID_ANY, "");
+		auto text = new wxStaticText(panel, wxID_ANY, std::to_string(i) + "----");
+		text->SetForegroundColour(*wxWHITE);
+		auto sizer = new wxBoxSizer(wxHORIZONTAL);
+		sizer->Add(text);
+		sizer->Add(button);
+		
+		wxBitmap logo = prov.GetBitmap(art[i], wxART_BUTTON);;
+		button->SetBitmap(logo);
+		
+		mainSizer->Add(sizer);
+		mainSizer->Add(-1, 5);
+
+	}
+
 
 	panel->SetSizer(mainSizer);
 	panel->Layout();
@@ -667,7 +749,9 @@ wxPanel* MainFrame::CreateTempHPPanel(wxPanel* parent)
 	wxStaticText* headHP = new wxStaticText(panel, wxID_ANY, "Temp HP", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 	wxStaticLine* horLine = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 	mainPagePanels.TempHP = new wxSpinCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
-	mainPagePanels.GiveTempHPButton = new wxButton(panel, wxID_ANY, "+");
+	mainPagePanels.GiveTempHPButton = new wxButton(panel, wxID_ANY, "");
+
+	mainPagePanels.GiveTempHPButton->SetBitmap(wxArtProvider().GetBitmap(wxART_PLUS));
 
 	mainPagePanels.GiveTempHPButton->SetMaxSize(wxSize(30,-1));
 
@@ -967,15 +1051,16 @@ wxPanel* MainFrame::CreateFeaturesPanel(wxPanel* parent)
 	
 	mainPagePanels.Feature_FullList = new wxListBox(panel, wxID_ANY, wxDefaultPosition, tempSize, 0, {},wxLB_SINGLE);
 
-	wxSize buttonSize(40,-1);
-	mainPagePanels.Feature_AddButton = new wxButton(panel, wxID_ANY, "   +   ", wxDefaultPosition, buttonSize, wxBU_EXACTFIT);
-	mainPagePanels.Feature_RemoveButton = new wxButton(panel, wxID_ANY, "   x   ", wxDefaultPosition, buttonSize, wxBU_EXACTFIT);
+	mainPagePanels.Feature_AddButton = new wxButton(panel, wxID_ANY, "", wxDefaultPosition, buttonSize, wxBU_EXACTFIT);
+	mainPagePanels.Feature_RemoveButton = new wxButton(panel, wxID_ANY, "", wxDefaultPosition, buttonSize, wxBU_EXACTFIT);
 	mainPagePanels.Feature_AddButton->SetMinSize(buttonSize);
 	mainPagePanels.Feature_RemoveButton->SetMinSize(buttonSize);
 
+	wxArtProvider prov;
+	mainPagePanels.Feature_AddButton->SetBitmap(prov.GetBitmap(wxART_PLUS, wxART_BUTTON));
+	mainPagePanels.Feature_RemoveButton->SetBitmap(prov.GetBitmap(wxART_MINUS, wxART_BUTTON));
+
 	mainPagePanels.Feature_Title->SetFont(curFont);
-	mainPagePanels.Feature_AddButton->SetFont(curFont.Bold());
-	mainPagePanels.Feature_RemoveButton->SetFont(curFont.Bold());
 	mainPagePanels.Feature_FullList->SetFont(curFont);
 
 	auto listTitle = new wxStaticText(panel, wxID_ANY, "Features List", wxDefaultPosition, wxDefaultSize, wxALIGN_BOTTOM);
@@ -986,12 +1071,12 @@ wxPanel* MainFrame::CreateFeaturesPanel(wxPanel* parent)
 	titleSpacing.x -= mainPagePanels.Feature_AddButton->GetSize().x;
 	titleSpacing.x -= mainPagePanels.Feature_RemoveButton->GetSize().x;
 	titleSpacing.x -= listTitle->GetSize().x;
-	titleSpacing.x -= 20;
+	titleSpacing.x -= 16;
 
 	subSizer->Add(listTitle,0);
 	subSizer->Add(titleSpacing.x, -1);
 	subSizer->Add(mainPagePanels.Feature_RemoveButton, 0, wxALIGN_CENTER);
-	subSizer->Add(10, -1);
+	subSizer->Add(4, -1);
 	subSizer->Add(mainPagePanels.Feature_AddButton, 0 , wxALIGN_CENTER);
 
 	setWindowColour(mainPagePanels.Feature_Title, descColour);
@@ -1123,11 +1208,14 @@ wxPanel* MainFrame::CreateMoney(wxPanel* parent)
 	std::vector<wxStaticBoxSizer*> box;
 	wxBoxSizer* buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	mainPagePanels.moneyButtons.first = new wxButton(panel, wxID_ANY, "-", wxDefaultPosition, wxSize(0.5*curSize.x-25, -1));
-	mainPagePanels.moneyButtons.second = new wxButton(panel, wxID_ADD, "+");
+	//wxSize butSiz = FromDIP(wxSize(0.5 * curSize.x - 40, 25));
+	wxSize butSiz(buttonSize.x, buttonSize.y);
+	mainPagePanels.moneyButtons.first = new wxButton(panel, wxID_ANY, "", wxDefaultPosition, butSiz, wxBU_EXACTFIT);
+	mainPagePanels.moneyButtons.second = new wxButton(panel, wxID_ANY, "", wxDefaultPosition, butSiz, wxBU_EXACTFIT);
 
-	mainPagePanels.moneyButtons.first->SetFont(curFont);
-	mainPagePanels.moneyButtons.second->SetFont(curFont.Smaller());
+	wxArtProvider prov;
+	mainPagePanels.moneyButtons.first->SetBitmap(prov.GetBitmap(wxART_MINUS, wxART_BUTTON));
+	mainPagePanels.moneyButtons.second->SetBitmap(prov.GetBitmap(wxART_PLUS, wxART_BUTTON));
 
 	buttonSizer->Add(mainPagePanels.moneyButtons.first, 1, wxALIGN_CENTER | wxRIGHT, 2);
 	buttonSizer->Add(mainPagePanels.moneyButtons.second, 1, wxALIGN_CENTER | wxLEFT, 2);
@@ -1158,7 +1246,7 @@ wxPanel* MainFrame::CreateMoney(wxPanel* parent)
 		sizer->Add(curSize.x, 5);
 	}
 
-	mainSizer->Add(sizer, 1, wxALIGN_CENTER_HORIZONTAL | wxLEFT | wxRIGHT, 10);
+	mainSizer->Add(sizer, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 10);
 
 	panel->SetSizer(mainSizer);
 	panel->Layout();
@@ -1292,11 +1380,12 @@ wxScrolled<wxPanel>* MainFrame::CreateSliderPanel(wxPanel* parent)
 
 	panel->SetScrollRate(0, FromDIP(10));
 
-	auto remButton = mainPagePanels.SlidersButtons.first = new wxButton(panel, wxID_ANY, "x");
-	auto addButton = mainPagePanels.SlidersButtons.second= new wxButton(panel, wxID_ANY, "+");
+	auto remButton = mainPagePanels.SlidersButtons.first = new wxButton(panel, wxID_ANY, "", wxDefaultPosition, buttonSize);
+	auto addButton = mainPagePanels.SlidersButtons.second= new wxButton(panel, wxID_ANY, "", wxDefaultPosition, buttonSize);
 
-	addButton->SetFont(addButton->GetFont().Bold().Larger());
-	remButton->SetFont(remButton->GetFont().Bold().Larger());
+	wxArtProvider prov;
+	remButton->SetBitmap(prov.GetBitmap(wxART_MINUS, wxART_BUTTON));
+	addButton->SetBitmap(prov.GetBitmap(wxART_PLUS, wxART_BUTTON));
 
 	buttonSizer->Add(remButton, 0, wxALL, 2);
 	buttonSizer->Add(addButton, 0, wxALL, 2);
@@ -1733,8 +1822,12 @@ wxPanel* MainFrame::CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel)
 	useSpellPoint = new wxButton(panel, wxID_ANY, SP_String, wxDefaultPosition, wxSize(curSize.x*1.5, curSize.y));
 	list = new wxCheckListBox(panel, wxID_ANY, wxDefaultPosition, baseSize);
 
-	AddSpell = new wxButton(panel, wxID_ANY, "+", wxDefaultPosition, curSize);
-	RemSpell = new wxButton(panel, wxID_ANY, "x", wxDefaultPosition, curSize);
+	AddSpell = new wxButton(panel, wxID_ANY, "", wxDefaultPosition, wxSize(curSize.x, buttonSize.y));
+	RemSpell = new wxButton(panel, wxID_ANY, "", wxDefaultPosition, wxSize(curSize.x, buttonSize.y));
+
+	wxArtProvider prov;
+	AddSpell->SetBitmap(prov.GetBitmap(wxART_PLUS, wxART_BUTTON));
+	RemSpell->SetBitmap(prov.GetBitmap(wxART_MINUS, wxART_BUTTON));
 
 	SpellSlotBox = { text, slots, useButton, list };
 	knownPagePanels.SpellSlotLevelList.push_back(SpellSlotBox);
@@ -3469,8 +3562,13 @@ void MainFrame::onToolProfecs(wxListEvent& event)
 
 	if (event.GetEventType() == wxEVT_LIST_INSERT_ITEM)
 	{
-
+		wxMessageBox("Insert");
 	}
+}
+
+void MainFrame::onToolProfecsButton(wxCommandEvent& event)
+{
+	wxMessageBox("Button Pressed");
 }
 
 void MainFrame::onLangProfecs(wxListEvent& event)
