@@ -28,6 +28,7 @@
 #include "SliderRemDialog.h"
 #include "ConditionDialog.h"
 #include "AddCondDialog.h"
+#include "StatsDialog.h"
 
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
@@ -1025,6 +1026,7 @@ wxPanel* MainFrame::CreateToolProfeciencies(wxPanel* parent)
 	setWindowColour(mainPagePanels.EL_ToolProf->GetParent(), descColour);
 
 	mainPagePanels.EL_ToolProf->SetupColours();
+	mainPagePanels.EL_ToolProf->SetFont(mainPagePanels.EL_ToolProf->GetFont().Bold());
 	
 	sizer->Add(mainPagePanels.EL_ToolProf, 1, wxEXPAND);
 
@@ -1052,6 +1054,7 @@ wxPanel* MainFrame::CreateLangProfeciencies(wxPanel* parent)
 	setWindowColour(mainPagePanels.EL_LangProf->GetParent(), descColour);
 
 	mainPagePanels.EL_LangProf->SetupColours();
+	mainPagePanels.EL_LangProf->SetFont(mainPagePanels.EL_LangProf->GetFont().Bold());
 	mainPagePanels.EL_LangProf->SetMaxSize(FromDIP(wxSize(-1,120)));
 	
 	sizer->Add(mainPagePanels.EL_LangProf, 1, wxEXPAND);
@@ -1079,6 +1082,7 @@ wxPanel* MainFrame::CreatePlayerConditions(wxPanel* parent)
 
 	mainPagePanels.EL_Conditions->SetupColours();
 	mainPagePanels.EL_Conditions->SetMaxSize(FromDIP(wxSize(-1, 120)));
+	mainPagePanels.EL_Conditions->SetFont(mainPagePanels.EL_Conditions->GetFont().Bold());
 
 	auto list = mainPagePanels.EL_Conditions->GetListCtrl();
 
@@ -1277,6 +1281,8 @@ wxScrolled<wxPanel>* MainFrame::CreateSliderPanel(wxPanel* parent)
 	buttonSizer->Add(addButton, 0, wxALL, 2);
 
 	setWindowColour(sizer->GetStaticBox(), mainColour);
+
+	sizer->GetStaticBox()->SetFont(sizer->GetStaticBox()->GetFont().Larger().Bold());
 
 	sizer->Add(buttonSizer, 0, wxALIGN_RIGHT);
 	auto horLine = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, wxSize(1.5*baseColSize.x, -1));
@@ -2168,6 +2174,20 @@ void MainFrame::updatePlayerConds()
 
 		if (it->first & cond)
 			playerConditions.push_back(*it);
+	}
+}
+
+void MainFrame::updateStats()
+{
+	auto stat = character.getStats();
+	int statsArray[6] = { stat->Str,stat->Dex, stat->Con, stat->Int, stat->Wis, stat->Cha };
+	Skills skillNames[6] = { Skills::Strength, Skills::Dexterity, Skills::Constitution, Skills::Intelligence, Skills::Wisdom, Skills::Charisma };
+
+	
+	for (int i = 0; i < 6; ++i)
+	{
+		mainPagePanels.Stat_TextCtrls[i].first->SetValue(std::to_string(statsArray[i]));
+		mainPagePanels.Stat_TextCtrls[i].second->SetValue(std::to_string(character.getSkillMod(skillNames[i])));
 	}
 }
 
@@ -3174,7 +3194,16 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 
 	if (obj == menuBarItems.SetStats->GetId())
 	{
-		wxMessageBox("Stats");
+		StatsDialog dialog(this);
+
+		int release = dialog.ShowModal();
+
+		if (release != wxID_CANCEL)
+		{
+			auto stat = dialog.getStats();
+			character.setStats(Stats(stat[0], stat[1], stat[2], stat[3], stat[4], stat[5]));
+			updateStats();
+		}
 	}
 
 

@@ -96,12 +96,7 @@ Character::Character(std::string pName, std::vector<CharClass>& pCharClass, Stat
 	charSlots(),
 	initMod(0)
 {
-	charStatMods.Str = getStatMod(charStats.Str);
-	charStatMods.Dex = getStatMod(charStats.Dex);
-	charStatMods.Con = getStatMod(charStats.Con);
-	charStatMods.Int = getStatMod(charStats.Int);
-	charStatMods.Wis = getStatMod(charStats.Wis);
-	charStatMods.Cha = getStatMod(charStats.Cha);
+	updateStatMods();
 
 	characterClassStr = "";
 
@@ -198,6 +193,17 @@ void Character::calcTotLevel()
 	}
 }
 
+void Character::updateStatMods()
+{
+	charStatMods.Str = getStatMod(charStats.Str);
+	charStatMods.Dex = getStatMod(charStats.Dex);
+	charStatMods.Con = getStatMod(charStats.Con);
+	charStatMods.Int = getStatMod(charStats.Int);
+	charStatMods.Wis = getStatMod(charStats.Wis);
+	charStatMods.Cha = getStatMod(charStats.Cha);
+
+}
+
 int Character::getSkillMod(const Skills& skill, bool isSavingThrow)
 {
 	int mod = getStatfromSkill(skill, charStatMods);
@@ -261,6 +267,7 @@ int Character::multiclassGetSorcererSlots(int spellLevel)
 void Character::setStats(Stats stat)
 {
 	this->charStats = stat;
+	updateStatMods();
 }
 
 void Character::setStats(int str, int dex, int con, int pInt, int wis, int cha)
@@ -271,6 +278,7 @@ void Character::setStats(int str, int dex, int con, int pInt, int wis, int cha)
 	charStats.Int = pInt;
 	charStats.Wis = wis;
 	charStats.Cha = cha;
+	updateStatMods();
 }
 
 void Character::setCurHP(int x)

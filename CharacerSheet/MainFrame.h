@@ -276,6 +276,7 @@ public:
 	void updateMoneyCtrls();
 	void updateHP();
 	void updatePlayerConds();
+	void updateStats();
 
 	void calcCheckedSpells();
 

@@ -235,7 +235,7 @@ public:
 	void initSlots();
 
 	void calcTotLevel();
-
+	void updateStatMods();
 	int getSkillMod(const Skills& skill, bool isSavingThrow = false);
 
 	void giveTempHP(int x) { tempHP = x; }

@@ -12,7 +12,7 @@ class FeatureDialog : public wxDialog
 
 public:
 	FeatureDialog(wxWindow* parent,
-		wxWindowID 	id = wxID_ANY,
+		wxWindowID	id = wxID_ANY,
 		const wxString& heading = "Add Feature",
 		const wxPoint& pos = wxDefaultPosition,
 		const wxSize& size = wxDefaultSize,
