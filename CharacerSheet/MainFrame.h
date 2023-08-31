@@ -244,8 +244,8 @@ public:
 	wxPanel* CreateMoney(wxPanel* parent);
 	wxPanel* CreateSubHPPanel(wxPanel* parent);
 	wxPanel* CreateInitiativePanel(wxPanel* parent);
+	wxPanel* CreateDeathSavesPanel(wxPanel* parent);
 	wxScrolled<wxPanel>* CreateSliderPanel(wxPanel* parent);
-
 	wxScrolled<wxPanel>* CreateHitDiePanel(wxPanel* parent);
 
 

@@ -257,9 +257,9 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 
 		//Below Health
 		{{1,1}, {1,1}},		//11  INITIATIVE
-		{{1,2}, {1,1}},		//12  HIT-DIE
-		{{1,3}, {1,1}},		//13  DEATH SAVES
-		{{1,4}, {1,2}},		//14  AC-MODS
+		{{1,2}, {1,1}},		//12  SUB-HP
+		{{1,3}, {1,1}},		//13  HIT-DIE
+		{{1,4}, {1,2}},		//14  DEATH SAVES
 
 		//Language Profeciencies
 		{{2,4}, {1,2}},		//15   LANG PROFS
@@ -341,14 +341,14 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[13];
+	p = CreateDeathSavesPanel(panel);
+	p->SetBackgroundColour(panelBGColour);
+	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
+
+	curItem = items[14];
 	auto p1 = CreateHitDiePanel(panel);
 	p1->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p1, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
-
-	curItem = items[14];
-	p = new wxPanel(panel, wxID_ANY, wxDefaultPosition, wxSize(mainPagePanels.AC->GetParent()->GetSize().x, -1));
-	p->SetBackgroundColour(panelBGColour);
-	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[15];
 	p = CreateLangProfeciencies(panel);
@@ -535,16 +535,6 @@ wxScrolled<wxPanel>* MainFrame::CreateTestPanel(wxNotebook* parent)
 	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY);
 	panel->SetBackgroundColour(mainColour.first);
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
-
-	panel->SetBackgroundColour(wxColour(0x30,0x30,0x40));
-	//DeathSavesControl *deathSaves = new DeathSavesControl(panel, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(300,200)));
-	//setWindowColour(deathSaves, { *wxBLACK, *wxWHITE });
-
-	//mainSizer->Add(deathSaves, 0, wxEXPAND);
-
-	wxButton* button = new wxButton(panel, wxID_ANY, "Test");
-	
-	button->Bind(wxEVT_BUTTON,&MainFrame::onTest, this);
 
 	panel->SetSizer(mainSizer);
 	panel->Layout();
@@ -1276,6 +1266,21 @@ wxPanel* MainFrame::CreateInitiativePanel(wxPanel* parent)
 	return panel;
 }
 
+wxPanel* MainFrame::CreateDeathSavesPanel(wxPanel* parent)
+{
+
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+
+	DeathSavesControl* deathSaves = new DeathSavesControl(panel, wxID_ANY, panelColour.second, panelColour.first);
+
+	sizer->Add(deathSaves, 0, wxALIGN_CENTER);
+
+	panel->SetSizer(sizer);
+	Layout();
+	return panel;
+}
+
 wxScrolled<wxPanel>* MainFrame::CreateSliderPanel(wxPanel* parent)
 {
 	auto panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, 2*baseColSize, wxVSCROLL);
@@ -1308,10 +1313,13 @@ wxScrolled<wxPanel>* MainFrame::CreateSliderPanel(wxPanel* parent)
 
 wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 {
-	auto panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	wxSize ACSize = mainPagePanels.AC->GetParent()->GetSize();
+	ACSize.y = -1;
+
+	auto panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, ACSize);
 	auto sizer = new wxBoxSizer(wxVERTICAL);
-
-
+	panel->SetScrollRate(0, FromDIP(10));
+	panel->SetMaxSize(FromDIP(wxSize(this->GetSize().x, 200)));
 	auto& charClass = character.getCharClass();
 
 	std::vector<CharClass> tempClasses;

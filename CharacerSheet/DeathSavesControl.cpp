@@ -3,42 +3,73 @@
 #include <wx/graphics.h>
 #include <wx/dcbuffer.h>
 
-DeathSavesControl::DeathSavesControl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name):
-	wxWindow(parent, id, pos, size, style, name)
+DeathSavesControl::DeathSavesControl(wxWindow* parent, wxWindowID id, wxColour fg, wxColour bg, const wxPoint& pos, const wxSize& size, long style, const wxString& name):
+	wxWindow(parent, id, pos, size, style, name),
+	fgColour(fg),
+	bgColour(bg)
 {
-	this->SetBackgroundStyle(wxBG_STYLE_PAINT);
+	auto mainSizer = new wxBoxSizer(wxHORIZONTAL);
+	auto verSizer = new wxBoxSizer(wxVERTICAL);
+	auto succSizer = new wxStaticBoxSizer(wxHORIZONTAL, this, "Successes");
+	auto failSizer = new wxStaticBoxSizer(wxHORIZONTAL, this, "Fails");
 
-	this->Bind(wxEVT_PAINT, &DeathSavesControl::OnPaint, this);
+	int flag = wxLEFT;
+	int margin = 5;
+	for (int i = 0; i < 3; ++i)
+	{
+		success[i] = new wxRadioButton(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxRB_SINGLE);
+		fails[i] = new wxRadioButton(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxRB_SINGLE);
+
+		succSizer->Add(success[i], 0, flag, margin);
+		failSizer->Add(fails[i], 0, flag, margin);
+	}
+	
+	auto sucBox = succSizer->GetStaticBox();
+	auto failBox = failSizer->GetStaticBox();
+	sucBox->SetForegroundColour(fgColour);
+	failBox->SetForegroundColour(fgColour);
+
+	sucBox->SetBackgroundColour(bgColour);
+	failBox->SetBackgroundColour(bgColour);
+
+	this->SetBackgroundColour(bgColour);
+
+	succSizer->GetStaticBox()->SetFont(succSizer->GetStaticBox()->GetFont().Bold().Larger());
+	failSizer->GetStaticBox()->SetFont(failSizer->GetStaticBox()->GetFont().Bold().Larger());
+
+	verSizer->Add(-1, margin);
+	verSizer->Add(succSizer, 1, wxEXPAND);
+	verSizer->Add(-1, margin);
+	verSizer->Add(failSizer, 1, wxEXPAND);
+	verSizer->Add(-1, margin);
+
+	std::string spacer = "  ";
+	std::string buttonText = "";
+	buttonText += spacer + "R" + spacer + "\n";
+	buttonText += spacer + "E" + spacer + "\n";
+	buttonText += spacer + "S" + spacer + "\n";
+	buttonText += spacer + "E" + spacer + "\n";
+	buttonText += spacer + "T" + spacer + "\n";
+	reset = new wxButton(this, wxID_ANY, buttonText, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+
+	reset->SetFont(reset->GetFont().Bold());
+
+	mainSizer->Add(verSizer, 0, wxEXPAND);
+	mainSizer->Add(10, -1);
+	mainSizer->Add(reset, 0, wxEXPAND | wxTOP | wxBOTTOM, 10);
+
+	reset->Bind(wxEVT_BUTTON, &DeathSavesControl::onReset, this);
+
+	SetSizer(mainSizer);
+	Layout();
 }
 
-void DeathSavesControl::OnPaint(wxPaintEvent& event)
+void DeathSavesControl::onReset(wxCommandEvent& event)
 {
-	wxAutoBufferedPaintDC dc(this);
-	dc.Clear();
-
-	wxGraphicsContext* gc = wxGraphicsContext::Create(dc);
-
-	if (gc)
+	for (int i = 0; i < 3; ++i)
 	{
-		
-		wxSize rectSize1 = this->FromDIP(wxSize(200,100));
-		wxSize rectSize2 = this->FromDIP(wxSize(rectSize1.x-thickness, rectSize1.x - thickness));
-		wxDouble rad = this->FromDIP(10.f);
-		wxPoint rectOrigin = {};
-
-
-		wxColour fg = this->GetForegroundColour();
-		wxColour bg = this->GetBackgroundColour();
-
-
-		gc->SetBrush(fg);
-		gc->DrawRoundedRectangle(rectOrigin.x, rectOrigin.y, rectSize1.GetWidth(), rectSize1.GetHeight(), rad);
-		
-		gc->SetBrush(bg);
-		gc->DrawRoundedRectangle(rectOrigin.x+10, rectOrigin.y+10, rectSize2.GetWidth(), rectSize2.GetHeight(), rad);
-
-		
-
-		delete gc;
+		success[i]->SetValue(false);
+		fails[i]->SetValue(false);
 	}
 }
+
