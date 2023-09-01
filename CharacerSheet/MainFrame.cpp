@@ -32,6 +32,7 @@
 #include "AddCondDialog.h"
 #include "StatsDialog.h"
 #include "SkillProfDialog.h"
+#include "DiceRollerDialog.h"
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900,600)),
@@ -122,6 +123,7 @@ void MainFrame::CreateMenuBar()
 	wxMenu* SetMenu = new wxMenu();
 	wxMenu* ResetMenu = new wxMenu();
 	wxMenu* ConditionMenu = new wxMenu();
+	wxMenu* DiceMenu = new wxMenu();
 
 	fileMenu->Append(wxID_NEW);
 	fileMenu->Append(wxID_OPEN);
@@ -156,12 +158,13 @@ void MainFrame::CreateMenuBar()
 	ResetMenu->AppendSeparator();
 	menuBarItems.ResetSlots = ResetMenu->Append(wxID_ANY, "Delete Spells");
 	
+	menuBarItems.DiceRoll = DiceMenu->Append(wxID_ANY, "Roll Dice");
 
 	menuBar->Append(fileMenu, "File");
 	menuBar->Append(SetMenu, "Set Values");
 	menuBar->Append(ResetMenu, "Reset Values");
 	menuBar->Append(ConditionMenu, "Conditions");
-
+	menuBar->Append(DiceMenu, "Dice");
 	SetMenuBar(menuBar);
 }
 
@@ -213,7 +216,6 @@ void MainFrame::BindControls()
 
 	mainPagePanels.EL_Conditions->Bind(wxEVT_LIST_ITEM_ACTIVATED, &MainFrame::onConditionListDClick, this);
 
-	this->Bind(wxEVT_MENU, &MainFrame::onResetSpellPoints, this, menuBarItems.ResetSP->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSP->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetMaxHP->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetStats->GetId());
@@ -228,6 +230,8 @@ void MainFrame::BindControls()
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsPlayer->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsAdd->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsRemove->GetId());
+
+	this->Bind(wxEVT_MENU, &MainFrame::onDiceMenuEvents, this, menuBarItems.DiceRoll->GetId());
 }
 
 wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
@@ -3581,6 +3585,12 @@ void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
 			}
 		}
 	}
+}
+
+void MainFrame::onDiceMenuEvents(wxCommandEvent& event)
+{
+	DiceRollerDialog* dialog = new DiceRollerDialog(this, wxID_ANY, "Roll Dice", wxDefaultPosition, FromDIP(wxSize(600,500)));
+	dialog->Show();
 }
 
 void MainFrame::onToolProfecsSelect(wxListEvent& event)

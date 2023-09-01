@@ -145,6 +145,7 @@
     <ClCompile Include="CharClass.cpp" />
     <ClCompile Include="ConditionDialog.cpp" />
     <ClCompile Include="DeathSavesControl.cpp" />
+    <ClCompile Include="DiceRollerDialog.cpp" />
     <ClCompile Include="FeatureDialog.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="MainFrame.cpp" />
@@ -165,11 +166,11 @@
     <ClInclude Include="CharClass.h" />
     <ClInclude Include="ConditionDialog.h" />
     <ClInclude Include="DeathSavesControl.h" />
+    <ClInclude Include="DiceRollerDialog.h" />
     <ClInclude Include="FeatureDialog.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MoneyDialog.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="SkillProfDialog.h" />
     <ClInclude Include="SliderDialog.h" />
     <ClInclude Include="SliderRemDialog.h" />
@@ -178,9 +179,6 @@
     <ClInclude Include="SpellSlot.h" />
     <ClInclude Include="StatsDialog.h" />
     <ClInclude Include="Util.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="CharacerSheet.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

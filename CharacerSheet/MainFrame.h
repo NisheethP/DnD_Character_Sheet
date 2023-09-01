@@ -89,6 +89,8 @@ class MainFrame : public wxFrame
 		wxMenuItem* ConditionsPlayer;
 		wxMenuItem* ConditionsAdd;
 		wxMenuItem* ConditionsRemove;
+
+		wxMenuItem* DiceRoll;
 	}menuBarItems;
 
 	//CONTROLS IN SPELLS PAGE
@@ -338,6 +340,7 @@ public:
 	void onSetMenuEvents(wxCommandEvent& event);
 	void onResetMenuEvents(wxCommandEvent& event);
 	void onConditionMenuEvents(wxCommandEvent& event);
+	void onDiceMenuEvents(wxCommandEvent& event);
 
 	void onTest(wxCommandEvent& event);
 
