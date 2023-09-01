@@ -367,9 +367,44 @@ void Character::addLanguage(std::string str)
 	languages.push_back(str);
 }
 
+bool Character::remLanguage(std::string str)
+{
+	Util::toLowerString(str);
+
+	for (auto it = languages.begin(); it != languages.end(); ++it)
+	{
+		auto cur = *it;
+		Util::toLowerString(cur);
+		if (cur == str)
+		{
+			it = languages.erase(it);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void Character::addTool(std::string str)
 {
 	toolProf.push_back(str);
+}
+
+bool Character::remTool(std::string str)
+{
+	Util::toLowerString(str);
+	for (auto it = toolProf.begin(); it != toolProf.end(); ++it)
+	{
+		auto cur = *it;
+		Util::toLowerString(cur);
+		if (cur == str)
+		{
+			toolProf.erase(it);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void Character::addSpell(Spell pSpell)
@@ -380,6 +415,21 @@ void Character::addSpell(Spell pSpell)
 	{
 		knownSpells.push_back(pSpell);
 	}
+}
+
+bool Character::remSpell(std::string spellName)
+{
+	Util::toLowerString(spellName);
+	for (auto it = knownSpells.begin(); it != knownSpells.end(); ++it)
+	{
+		if (it->getName() == spellName)
+		{
+			knownSpells.erase(it);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void Character::addMoney(int p, int g, int s, int c)

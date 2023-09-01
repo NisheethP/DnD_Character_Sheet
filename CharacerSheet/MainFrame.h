@@ -149,11 +149,9 @@ class MainFrame : public wxFrame
 
 		wxButton* Feature_AddButton = nullptr;
 		wxButton* Feature_RemoveButton = nullptr;
-		wxButton* Feature_MoveUpButton = nullptr;
-		wxButton* Feature_MoveDownButton = nullptr;
 
-		wxEditableListBox* EL_ToolProf = nullptr;
-		wxEditableListBox* EL_LangProf = nullptr;
+		std::tuple<wxStaticText*, wxButton*, wxButton*, wxListBox*> ToolProf = {nullptr, nullptr, nullptr, nullptr};
+		std::tuple<wxStaticText*, wxButton*, wxButton*, wxListBox*> LangProf = {nullptr, nullptr, nullptr, nullptr};
 		wxEditableListBox* EL_Conditions = nullptr;
 
 		std::vector<std::pair<wxTextCtrl*, wxTextCtrl*>> Stat_TextCtrls;
@@ -294,6 +292,7 @@ public:
 
 	void makeSavingThrowPair(wxStaticText* savingThrowName, wxTextCtrl* savingThrowValue, Skills curSkill);
 	void makeSkillPair(wxStaticText* skillName, wxTextCtrl* skillValue, Skills curSkill);
+	void makeAddRemList(wxStaticText*& title, wxButton*& add, wxButton*& rem, wxListBox*& list, wxSizer* sizer, wxPanel* parent);
 
 	//----------------------
 	//Event Handlers
@@ -317,9 +316,8 @@ public:
 	void onFeatureButton(wxCommandEvent& event);
 	void onFeatureSelect(wxCommandEvent& event);
 	void onToolProfecsSelect(wxListEvent& event);
-	void onToolProfecs(wxListEvent& event);
-	void onToolProfecsButton(wxCommandEvent& event);
-	void onLangProfecs(wxListEvent& event);
+	void onToolProfecs(wxCommandEvent& event);
+	void onLangProfecs(wxCommandEvent& event);
 	void onAddRemMoney(wxCommandEvent& event);
 	void onConditionListDClick(wxCommandEvent& event);
 

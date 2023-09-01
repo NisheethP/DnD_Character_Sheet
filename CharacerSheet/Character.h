@@ -221,8 +221,15 @@ public:
 	void setExpertises(int x) { skillExpertises = x; }
 
 	void addLanguage(std::string str);
+	bool remLanguage(std::string str);
+	
 	void addTool(std::string str);
+	bool remTool(std::string str);
+
 	void addSpell(Spell pSpell);
+	bool remSpell(Spell pSpell);
+	bool remSpell(std::string spellName);
+
 	void addMoney(int p, int g, int s, int c);
 
 	void addFeature(feature pFeat);

@@ -170,11 +170,6 @@ void MainFrame::BindControls()
 	mainPagePanels.Feature_AddButton->GetParent()->Bind(wxEVT_BUTTON, &MainFrame::onFeatureButton, this);
 	mainPagePanels.Feature_FullList->Bind(wxEVT_LISTBOX, &MainFrame::onFeatureSelect, this);
 	//mainPagePanels.EL_ToolProf->Bind(wxEVT_LIST_ITEM_FOCUSED, &MainFrame::onToolProfecsSelect, this);
-	mainPagePanels.EL_ToolProf->Bind(wxEVT_LIST_INSERT_ITEM, &MainFrame::onToolProfecs, this);
-	//mainPagePanels.EL_ToolProf->Bind(wxEVT_BUTTON, &MainFrame::onToolProfecsButton, this);
-	mainPagePanels.EL_ToolProf->Bind(wxEVT_LIST_DELETE_ITEM, &MainFrame::onToolProfecs, this);
-	mainPagePanels.EL_ToolProf->Bind(wxEVT_LIST_INSERT_ITEM, &MainFrame::onLangProfecs, this);
-	mainPagePanels.EL_ToolProf->Bind(wxEVT_LIST_DELETE_ITEM, &MainFrame::onLangProfecs, this);
 	mainPagePanels.moneyButtons.first->GetParent()->Bind(wxEVT_BUTTON, &MainFrame::onAddRemMoney, this);
 	
 	spellDesc.spellSplitter->Bind(wxEVT_SPLITTER_SASH_POS_CHANGED, &MainFrame::onSpellSplitterResize, this);
@@ -201,6 +196,12 @@ void MainFrame::BindControls()
 
 	mainPagePanels.SlidersButtons.first->Bind(wxEVT_BUTTON, &MainFrame::onAddRemSlider, this);
 	mainPagePanels.SlidersButtons.second->Bind(wxEVT_BUTTON, &MainFrame::onAddRemSlider, this);
+
+	get<1>(mainPagePanels.ToolProf)->Bind(wxEVT_BUTTON, &MainFrame::onToolProfecs, this);
+	get<2>(mainPagePanels.ToolProf)->Bind(wxEVT_BUTTON, &MainFrame::onToolProfecs, this);
+
+	get<1>(mainPagePanels.LangProf)->Bind(wxEVT_BUTTON, &MainFrame::onLangProfecs, this);
+	get<2>(mainPagePanels.LangProf)->Bind(wxEVT_BUTTON, &MainFrame::onLangProfecs, this);
 
 	mainPagePanels.EL_Conditions->Bind(wxEVT_LIST_ITEM_ACTIVATED, &MainFrame::onConditionListDClick, this);
 
@@ -1101,37 +1102,6 @@ wxPanel* MainFrame::CreateFeaturesPanel(wxPanel* parent)
 	return panel;
 }
 
-wxPanel* MainFrame::CreateToolProfeciencies(wxPanel* parent)
-{
-	wxSize tempSize;
-	//tempSize.x = baseColSize.x*1.3;
-	tempSize.x = mainPagePanels.AC->GetParent()->GetSize().x;
-
-	tempSize.y = -1;
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize);
-	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-
-	//panel->SetBackgroundColour(DescColor.first);
-
-	mainPagePanels.EL_ToolProf = new wxEditableListBox(panel, wxID_ANY, "Proficiencies", wxDefaultPosition, wxDefaultSize, 
-		wxEL_ALLOW_NEW | wxEL_ALLOW_DELETE | wxEL_ALLOW_EDIT | wxEL_NO_REORDER);
-
-	setWindowColour(mainPagePanels.EL_ToolProf->GetListCtrl(), descColour);
-	setWindowColour(mainPagePanels.EL_ToolProf->GetParent(), descColour);
-
-	mainPagePanels.EL_ToolProf->GetEditButton()->Destroy();
-
-	mainPagePanels.EL_ToolProf->SetupColours();
-	mainPagePanels.EL_ToolProf->SetFont(mainPagePanels.EL_ToolProf->GetFont().Bold());
-	
-	sizer->Add(mainPagePanels.EL_ToolProf, 1, wxEXPAND);
-
-	panel->SetSizer(sizer);
-	panel->Layout();
-
-	return panel;
-}
-
 wxPanel* MainFrame::CreateLangProfeciencies(wxPanel* parent)
 {
 	wxSize tempSize;
@@ -1144,19 +1114,41 @@ wxPanel* MainFrame::CreateLangProfeciencies(wxPanel* parent)
 
 	//panel->SetBackgroundColour(DescColor.first);
 
-	mainPagePanels.EL_LangProf = new wxEditableListBox(panel, wxID_ANY, "Languages", wxDefaultPosition, wxDefaultSize, 
-		wxEL_ALLOW_NEW | wxEL_ALLOW_DELETE | wxEL_ALLOW_EDIT | wxEL_NO_REORDER);
+	auto& text = std::get<0>(mainPagePanels.LangProf) = new wxStaticText(panel, wxID_ANY, "Languages");
+	auto& add = std::get<1>(mainPagePanels.LangProf);
+	auto& rem = std::get<2>(mainPagePanels.LangProf);
+	auto& list = std::get<3>(mainPagePanels.LangProf);
 
-	setWindowColour(mainPagePanels.EL_LangProf->GetListCtrl(), descColour);
-	setWindowColour(mainPagePanels.EL_LangProf->GetParent(), descColour);
+	makeAddRemList(text, add, rem, list, sizer, panel);
 
-	mainPagePanels.EL_LangProf->GetEditButton()->Destroy();
+	setWindowColour(panel, descColour);
+	setWindowColour(list, listColour);
 
-	mainPagePanels.EL_LangProf->SetupColours();
-	mainPagePanels.EL_LangProf->SetFont(mainPagePanels.EL_LangProf->GetFont().Bold());
-	mainPagePanels.EL_LangProf->SetMaxSize(FromDIP(wxSize(-1,120)));
-	
-	sizer->Add(mainPagePanels.EL_LangProf, 1, wxEXPAND);
+	panel->SetSizer(sizer);
+	panel->Layout();
+
+	return panel;
+}
+
+wxPanel* MainFrame::CreateToolProfeciencies(wxPanel* parent)
+{
+	wxSize tempSize;
+	//tempSize.x = baseColSize.x*1.3;
+	tempSize.x = mainPagePanels.AC->GetParent()->GetSize().x;
+
+	tempSize.y = -1;
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize);
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+
+	auto& text = std::get<0>(mainPagePanels.ToolProf) = new wxStaticText(panel, wxID_ANY, "Profeciencies");
+	auto& add = std::get<1>(mainPagePanels.ToolProf);
+	auto& rem = std::get<2>(mainPagePanels.ToolProf);
+	auto& list = std::get<3>(mainPagePanels.ToolProf);
+
+	makeAddRemList(text, add, rem, list, sizer, panel);
+
+	setWindowColour(panel, descColour);
+	setWindowColour(list, listColour);
 
 	panel->SetSizer(sizer);
 	panel->Layout();
@@ -2625,6 +2617,29 @@ void MainFrame::makeSkillPair(wxStaticText* skillName, wxTextCtrl* skillValue, S
 
 }
 
+void MainFrame::makeAddRemList(wxStaticText*& title, wxButton*& add, wxButton*& rem, wxListBox*& list, wxSizer* sizer, wxPanel* parent)
+{
+	add = new wxButton(parent, wxID_ANY, "", wxDefaultPosition, buttonSize);
+	rem = new wxButton(parent, wxID_ANY, "", wxDefaultPosition, buttonSize);
+	list = new wxListBox(parent, wxID_ANY);
+
+	add->SetBitmap(wxArtProvider().GetBitmap(wxART_PLUS, wxART_BUTTON));
+	rem->SetBitmap(wxArtProvider().GetBitmap(wxART_MINUS, wxART_BUTTON));
+
+	auto titleSizer = new wxGridSizer(1, 2, 0, 0);
+	auto buttonSizer = new wxBoxSizer(wxHORIZONTAL);
+	
+	buttonSizer->Add(rem);
+	buttonSizer->Add(4, -1);
+	buttonSizer->Add(add);
+
+	titleSizer->Add(title, 0, wxALIGN_LEFT | wxALIGN_BOTTOM);
+	titleSizer->Add(buttonSizer, 0, wxALIGN_RIGHT | wxALIGN_BOTTOM);
+	
+	sizer->Add(titleSizer, 0, wxEXPAND);
+	sizer->Add(-1, 5);
+	sizer->Add(list, 1, wxEXPAND);
+}
 
 //------------------------------
 ///EVENT HANDLERS
@@ -3028,20 +3043,6 @@ void MainFrame::onFeatureButton(wxCommandEvent& event)
 		updateFeaturesList();
 		return;
 	}
-
-	if (eventObject == mainPagePanels.Feature_MoveDownButton)
-	{
-
-		updateFeaturesList();
-		return;
-	}
-
-	if (eventObject == mainPagePanels.Feature_MoveUpButton)
-	{
-		updateFeaturesList();
-		return;
-	}
-
 }
 
 void MainFrame::onFeatureSelect(wxCommandEvent& event)
@@ -3546,52 +3547,74 @@ void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
 void MainFrame::onToolProfecsSelect(wxListEvent& event)
 {
 
-	wxListCtrl* list = mainPagePanels.EL_ToolProf->GetListCtrl();
-	if (event.GetEventType() == wxEVT_LIST_ITEM_FOCUSED)
+	//wxListCtrl* list = std::get<3>(mainPagePanels.ToolProf);
+	//if (event.GetEventType() == wxEVT_LIST_ITEM_FOCUSED)
+	//{
+	//	int items = list->GetSelectedItemCount();
+	//	long item = -1;
+	//	for (;; )
+	//	{
+	//		item = list->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	//		if (item == -1)
+	//			break;
+
+	//		// this item is selected - do whatever is needed with it
+	//		//std::string str = list->GetItemText(item).ToStdString();
+	//		//wxMessageBox(str);
+	//	}
+	//}	
+}
+
+void MainFrame::onToolProfecs(wxCommandEvent& event)
+{
+	auto obj = event.GetEventObject();
+	auto& list = std::get<3>(mainPagePanels.ToolProf);
+	
+	if (obj == std::get<1>(mainPagePanels.ToolProf))
 	{
-		int items = list->GetSelectedItemCount();
-		long item = -1;
-		for (;; )
+		wxString str = "";
+		str = wxGetTextFromUser("Enter profecient item:", "Tools", "Default Tool");
+		if (str == "")
+			return;
+		else
 		{
-			item = list->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-			if (item == -1)
-				break;
-
-			// this item is selected - do whatever is needed with it
-			//std::string str = list->GetItemText(item).ToStdString();
-			//wxMessageBox(str);
+			list->Append(str);
+			character.addTool(str.ToStdString());
 		}
-	}	
-}
-
-void MainFrame::onToolProfecs(wxListEvent& event)
-{
-	if (event.GetEventType() == wxEVT_LIST_DELETE_ITEM)
-	{
-
 	}
 
-	if (event.GetEventType() == wxEVT_LIST_INSERT_ITEM)
+	if (obj == std::get<2>(mainPagePanels.ToolProf))
 	{
-		wxMessageBox("Insert");
+		int i = list->GetSelection();
+		character.remTool(list->GetString(i).ToStdString());
+		list->Delete(i);
+		
 	}
 }
 
-void MainFrame::onToolProfecsButton(wxCommandEvent& event)
+void MainFrame::onLangProfecs(wxCommandEvent& event)
 {
-	wxMessageBox("Button Pressed");
-}
+	auto obj = event.GetEventObject();
+	auto& list = std::get<3>(mainPagePanels.LangProf);
 
-void MainFrame::onLangProfecs(wxListEvent& event)
-{
-	if (event.GetEventType() == wxEVT_LIST_DELETE_ITEM)
+	if (obj == std::get<1>(mainPagePanels.LangProf))
 	{
-
+		wxString str = "";
+		str = wxGetTextFromUser("Enter Language:", "Languages", "Common");
+		if (str == "")
+			return;
+		else
+		{
+			list->Append(str);
+			character.addLanguage(str.ToStdString());
+		}
 	}
 
-	if (event.GetEventType() == wxEVT_LIST_INSERT_ITEM)
+	if (obj == std::get<2>(mainPagePanels.LangProf))
 	{
-
+		int i = list->GetSelection();
+		character.remLanguage(list->GetString(i).ToStdString());
+		list->Delete(i);
 	}
 }
 
