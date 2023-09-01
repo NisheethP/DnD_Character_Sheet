@@ -140,6 +140,9 @@ void MainFrame::CreateMenuBar()
 	menuBarItems.SetExpertises = SetMenu->Append(wxID_ANY, "Set Skill Expertises");
 	SetMenu->AppendSeparator();
 	menuBarItems.SetSP = SetMenu->Append(wxID_ANY, "Set Spell Points");
+	menuBarItems.SetSlots = SetMenu->Append(wxID_ANY, "Set Spell Slots");
+	menuBarItems.SetWarlockSlots = SetMenu->Append(wxID_ANY, "Set Warlock Slots");
+
 
 	menuBarItems.ConditionsAll = ConditionMenu->Append(wxID_ANY, "See All Conditions");
 	menuBarItems.ConditionsPlayer = ConditionMenu->Append(wxID_ANY, "See Character Condtions");
@@ -148,6 +151,11 @@ void MainFrame::CreateMenuBar()
 	menuBarItems.ConditionsRemove = ConditionMenu->Append(wxID_ANY, "Remove Condtion from Player");
 
 	menuBarItems.ResetSP = ResetMenu->Append(wxID_ANY, "Reset Spell Points");
+	menuBarItems.ResetSlots = ResetMenu->Append(wxID_ANY, "Reset Slots");
+	menuBarItems.ResetSlots = ResetMenu->Append(wxID_ANY, "Uncheck Spells");
+	ResetMenu->AppendSeparator();
+	menuBarItems.ResetSlots = ResetMenu->Append(wxID_ANY, "Delete Spells");
+	
 
 	menuBar->Append(fileMenu, "File");
 	menuBar->Append(SetMenu, "Set Values");
@@ -3256,11 +3264,6 @@ void MainFrame::onKnownSpellsUseSpellPoint(wxCommandEvent& event)
 	event.Skip();
 }
 
-void MainFrame::onResetSpellPoints(wxCommandEvent& event)
-{
-	knownPagePanels.SpellPoints_Val->SetLabel(std::to_string(character.getTotalSpellPoints()));
-}
-
 void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 {
 	auto obj = event.GetId();
@@ -3312,11 +3315,11 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 
 	if (obj == menuBarItems.SetSP->GetId())
 	{
-		std::string title = "Enter number of Spell Points (max ";
+		std::string title = "Enter number of Spell Points (def ";
 		title += std::to_string(character.getTotalSpellPoints());
 		title += ")";
 		int max = character.getTotalSpellPoints();
-		int x = wxGetNumberFromUser(title, "", "Spell Points", max, 0, max);
+		int x = wxGetNumberFromUser(title, "", "Spell Points", max, 0, 10*max);
 		knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
 	}
 
@@ -3453,6 +3456,42 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 		}
 		
 	}
+
+	if (obj == menuBarItems.SetSlots->GetId())
+	{
+
+	}
+
+	if (obj == menuBarItems.SetWarlockSlots->GetId())
+	{
+
+	}
+}
+
+void MainFrame::onResetMenuEvents(wxCommandEvent& event)
+{
+	auto obj = event.GetId();
+
+	if (obj == menuBarItems.ResetSP->GetId())
+	{
+		knownPagePanels.SpellPoints_Val->SetLabel(std::to_string(character.getTotalSpellPoints()));
+	}
+
+	if (obj == menuBarItems.ResetSlots->GetId())
+	{
+		
+	}
+
+	if (obj == menuBarItems.ResetUncheckSpells->GetId())
+	{
+
+	}
+
+	if (obj == menuBarItems.ResetDeleteSpells->GetId())
+	{
+
+	}
+
 }
 
 void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
