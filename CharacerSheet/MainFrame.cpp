@@ -33,6 +33,8 @@
 #include "StatsDialog.h"
 #include "SkillProfDialog.h"
 #include "DiceRollerDialog.h"
+#include "SpellSlotDialog.h"
+
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900,600)),
@@ -225,6 +227,8 @@ void MainFrame::BindControls()
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSavingThrows->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSkillProfs->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetExpertises->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSlots->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetWarlockSlots->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsAll->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsPlayer->GetId());
@@ -1645,7 +1649,6 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	sizer->Add(verBar, 0, wxEXPAND);
 	sizer->Add(gapBig, -1);
 
-
 	sizer->Add(SpellCastMod_Text, 0, wxALIGN_CENTER);
 	sizer->Add(gapSmall, -1);
 	sizer->Add(knownPagePanels.SpellCastMod_Val, 0, wxALIGN_CENTER);
@@ -1673,7 +1676,7 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	sizer->Add(verBar, 0, wxEXPAND);
 	sizer->Add(gapBig, -1);
 
-	if (uses.SpellPoints)
+	//if (uses.SpellPoints)
 	{
 		sizer->Add(SpellPoints_Text, 0, wxALIGN_CENTER);
 		sizer->Add(gapSmall, -1);
@@ -1711,16 +1714,6 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	panel->SetSizerAndFit(sizer);
 	panel->Layout();
 
-	return panel;
-}
-
-wxPanel* MainFrame::CreateSpellPoints(wxPanel* parent)
-{
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
-	auto sizer = wxBoxSizer(wxHORIZONTAL);
-
-	wxStaticText* text = new wxStaticText(panel, wxID_ANY, "Spell Points");
-	knownPagePanels.spellPoints;
 	return panel;
 }
 
@@ -1891,24 +1884,27 @@ wxPanel* MainFrame::CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel)
 
 	if (spellLevel == 0)
 	{
-		delete slots;
-		delete useButton;
-		delete useSpellPoint;
+		//delete slots;
+		//delete useButton;
+		//delete useSpellPoint;
+		slots->Hide();
+		useButton->Hide();
+		useSpellPoint->Hide();
 	}
 	else
 	{
 		if (!uses.SpellSlots)
 		{
-			delete slots;
-			delete useButton;
+			slots->Hide();
+			useButton->Hide();
 		}
 
 		if (!uses.SpellPoints)
-			delete useSpellPoint;
+			useSpellPoint->Hide();
 	}
 	
 
-	if (spellLevel != 0 && uses.SpellSlots)
+	//if (spellLevel != 0 && uses.SpellSlots)
 	{
 		subSizer->Add(5, -1);
 		subSizer->Add(slots, 0, wxEXPAND);
@@ -1916,7 +1912,7 @@ wxPanel* MainFrame::CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel)
 		subSizer->Add(useButton, 0, wxEXPAND);
 	}
 
-	if (spellLevel != 0 && uses.SpellPoints)
+	//if (spellLevel != 0 && uses.SpellPoints)
 	{
 		subSizer->Add(2, -1);
 		subSizer->Add(useSpellPoint, 0, wxEXPAND);
@@ -2264,6 +2260,51 @@ void MainFrame::updateKnownSpellMods()
 
 	spellSaveMod = 8 + spellMod;
 	knownPagePanels.SpellSaveMod_Val->SetLabel(std::to_string(spellSaveMod));
+}
+
+void MainFrame::updateKnownSpellsLists()
+{
+	for (int i = 1; i < 10; ++i)
+	{
+		auto slotSpin = std::get<1>(knownPagePanels.SpellSlotLevelList[i]);
+		auto& spSlots = character.getSpellSlots();
+		int x = spSlots.slots[i].first;
+		if (x == -1)
+			slotSpin->SetMax(0);
+
+		slotSpin->SetMax(x);
+		slotSpin->SetValue(slotSpin->GetMax());
+
+		x = character.getTotalSpellPoints();
+		knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
+
+		if (uses.SpellSlots)
+		{
+			slotSpin->Show();
+			std::get<2>(knownPagePanels.SpellSlotLevelList[i])->Show();
+		}
+
+		if (!uses.SpellSlots)
+		{
+			slotSpin->Hide();
+			std::get<2>(knownPagePanels.SpellSlotLevelList[i])->Hide();
+		}
+
+		if (uses.SpellPoints)
+		{
+			knownPagePanels.SpellPoints_Val->Show();
+			knownPagePanels.spellPointButton[i]->Show();
+		}
+
+		if (!uses.SpellPoints)
+		{
+			knownPagePanels.SpellPoints_Val->Hide();
+			knownPagePanels.spellPointButton[i]->Hide();
+		}
+		
+		slotSpin->GetParent()->GetParent()->Layout();
+		Layout();
+	}
 }
 
 void MainFrame::updateMoneyCtrls()
@@ -3463,7 +3504,42 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 
 	if (obj == menuBarItems.SetSlots->GetId())
 	{
+		auto dialog = new SpellSlotDialog(this);
+		int release = dialog->ShowModal();
+		if (release != wxID_CANCEL)
+		{
+			overrides.spellSlot = true;
+			uses.SpellSlots = false;
 
+			SpellSlot newSlots;
+
+			for (int i = 0; i < 10; ++i)
+			{
+				if (i == 0)
+				{
+					newSlots.slots.push_back({ -4, 0 });
+					continue;
+				}
+				
+				int numSlots = dialog->getSlots(i);
+
+				if (numSlots == -1)
+				{
+					wxMessageBox("Slots index out of bounds");
+					return;
+				}
+
+				if (numSlots > 0)
+					uses.SpellSlots = true;
+
+				newSlots.slots.push_back({numSlots, 0});
+			}
+
+			if (uses.SpellSlots)
+				character.setSpellSlots(newSlots);
+
+			updateKnownSpellsLists();
+		}
 	}
 
 	if (obj == menuBarItems.SetWarlockSlots->GetId())

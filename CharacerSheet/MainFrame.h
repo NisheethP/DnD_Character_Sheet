@@ -55,7 +55,7 @@ class MainFrame : public wxFrame
 	struct Uses
 	{
 		bool SpellPoints = true;
-		bool SpellSlots = true;
+		bool SpellSlots = false;
 	}uses;	
 
 	struct Overrides
@@ -194,9 +194,8 @@ class MainFrame : public wxFrame
 		wxTextCtrl* SpellCastMod_Val = nullptr;
 		wxTextCtrl* SpellSaveMod_Val = nullptr;
 		wxTextCtrl* SelectedSpells_Val = nullptr;
+		
 		wxTextCtrl* SpellPoints_Val = nullptr;
-
-		wxTextCtrl* spellPoints = nullptr;
 		std::vector<wxButton*> spellPointButton;
 
 		std::vector<std::tuple<wxStaticText*, wxSpinCtrl*, wxButton*, wxCheckListBox*>> SpellSlotLevelList;
@@ -281,17 +280,21 @@ public:
 
 	void updateDispSpell(std::string str);
 	void updateSpellDesc();
+
 	void updateKnownSpellDesc();
 	void updateKnownDispSpell(std::string str);
-	void updateFeaturesList();
 	void updateKnownSpellMods();
-	void updateMoneyCtrls();
+	void updateKnownSpellsLists();
+
 	void updateHP();
-	void updatePlayerConds();
 	void updateStats();
 	void updateInititative();
 	void updateSavingThrows();
 	void updateSkills();
+
+	void updateMoneyCtrls();
+	void updatePlayerConds();
+	void updateFeaturesList();
 
 	void calcCheckedSpells();
 

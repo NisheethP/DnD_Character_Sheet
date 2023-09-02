@@ -216,6 +216,7 @@ public:
 	void giveClass(CharClass pClass);
 	void setInitMod(int x) { initMod = x; };
 
+	void setSpellSlots(SpellSlot slots) { charSlots = slots; }
 	void setSkillProfs(int x);
 	void setSavingThrowProfs(int x);
 	void setExpertises(int x) { skillExpertises = x; }

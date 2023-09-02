@@ -156,6 +156,7 @@
     <ClCompile Include="Spells.cpp" />
     <ClCompile Include="SpellSelectDialog.cpp" />
     <ClCompile Include="SpellSlot.cpp" />
+    <ClCompile Include="SpellSlotDialog.cpp" />
     <ClCompile Include="StatsDialog.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
@@ -177,6 +178,7 @@
     <ClInclude Include="Spells.h" />
     <ClInclude Include="SpellSelectDialog.h" />
     <ClInclude Include="SpellSlot.h" />
+    <ClInclude Include="SpellSlotDialog.h" />
     <ClInclude Include="StatsDialog.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>

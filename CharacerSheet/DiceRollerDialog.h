@@ -20,7 +20,7 @@ class DiceRollerDialog : public wxDialog
 public:
 	DiceRollerDialog(wxWindow* parent,
 		wxWindowID	id = wxID_ANY,
-		const wxString& heading = "Add Feature",
+		const wxString& heading = "Dice Roller",
 		const wxPoint& pos = wxDefaultPosition,
 		const wxSize& size = wxDefaultSize,
 		long 	style = wxDEFAULT_DIALOG_STYLE,
