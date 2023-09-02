@@ -17,34 +17,38 @@ DiceRollerDialog::DiceRollerDialog(
 	const wxString& name) :
 	wxDialog(parent, id, heading, pos, size, style, name)
 {
+
 	mainSizer = new wxBoxSizer(wxHORIZONTAL);
 	diceSizer = new wxBoxSizer(wxVERTICAL);
 	auto buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	
+	auto scrollPanel = new wxScrolled<wxPanel>(this);
+	scrollPanel->SetScrollRate(0, FromDIP(10));
+	scrollPanel->SetSizer(diceSizer);
 	int margin = 5;
 
-	Roll = new wxButton(this, wxID_ANY, "ROLL", wxDefaultPosition, wxDefaultSize);
-	Add = new wxButton(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize);
+	Roll = new wxButton(scrollPanel, wxID_ANY, "ROLL", wxDefaultPosition, wxDefaultSize);
+	Add = new wxButton(scrollPanel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize);
 
 	//Roll->SetBitmap(wxArtProvider().GetBitmap(wxART_DELETE, wxART_BUTTON));
 	Add->SetBitmap(wxArtProvider().GetBitmap(wxART_PLUS, wxART_BUTTON));
 
-	buttonSizer->Add(-1, 3);
 	buttonSizer->Add(Add);
 	buttonSizer->Add(5,-1);
 	buttonSizer->Add(Roll);
-	buttonSizer->Add(-1, 3);
+	//buttonSizer->Add(-1, 10);
 
-	diceSizer->Add(buttonSizer, 0, wxALIGN_RIGHT | wxBOTTOM, 10);
+	diceSizer->Add(buttonSizer, 0, wxALIGN_RIGHT | wxBOTTOM | wxRIGHT, 10);
 
 	History = new wxListBox(this, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(200,-1)));
 	History->SetFont(History->GetFont().Larger());
-
-	wxPanel* p = createDiceLine(this);
-	diceSizer->Add(p);
+	
+	wxPanel* p = createDiceLine(scrollPanel);
+	diceSizer->Add(p, 0, wxRIGHT, 10);
+	diceSizer->Add(-1, 2);
 
 	mainSizer->Add(History, 1, wxEXPAND | wxALL, margin);
-	mainSizer->Add(diceSizer, 0, wxEXPAND | wxALL, margin);
+	mainSizer->Add(scrollPanel, 0, wxEXPAND | wxALL, margin);
 
 	mainSizer->SetMinSize(this->GetMinSize());
 	BindAll();
@@ -163,8 +167,11 @@ void DiceRollerDialog::BindAll()
 
 void DiceRollerDialog::onAddRow(wxCommandEvent& event)
 {
-	wxPanel* p = createDiceLine(this);
-	diceSizer->Add(p);
+	if (DiceLine.size() > 25)
+		return;
+	wxPanel* p = createDiceLine(Add->GetParent());
+	diceSizer->Add(p, 0, wxRIGHT, 10);
+	diceSizer->Add(-1, 2);
 	mainSizer->Layout();
 }
 

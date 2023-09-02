@@ -3665,7 +3665,8 @@ void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
 
 void MainFrame::onDiceMenuEvents(wxCommandEvent& event)
 {
-	DiceRollerDialog* dialog = new DiceRollerDialog(this, wxID_ANY, "Roll Dice", wxDefaultPosition, FromDIP(wxSize(600,500)));
+	DiceRollerDialog* dialog = new DiceRollerDialog(this, wxID_ANY, "Roll Dice", wxDefaultPosition, FromDIP(wxSize(600,500)), 
+		wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE);
 	dialog->Show();
 }
 
