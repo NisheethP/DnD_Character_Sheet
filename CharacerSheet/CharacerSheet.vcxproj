@@ -159,6 +159,7 @@
     <ClCompile Include="SpellSlotDialog.cpp" />
     <ClCompile Include="StatsDialog.cpp" />
     <ClCompile Include="Util.cpp" />
+    <ClCompile Include="WarlockSlotsDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AddCondDialog.h" />
@@ -181,6 +182,7 @@
     <ClInclude Include="SpellSlotDialog.h" />
     <ClInclude Include="StatsDialog.h" />
     <ClInclude Include="Util.h" />
+    <ClInclude Include="WarlockSlotsDialog.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

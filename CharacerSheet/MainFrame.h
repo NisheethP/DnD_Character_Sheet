@@ -54,8 +54,8 @@ class MainFrame : public wxFrame
 
 	struct Uses
 	{
-		bool SpellPoints = true;
-		bool SpellSlots = false;
+		bool SpellPoints = false;
+		bool SpellSlots = true;
 	}uses;	
 
 	struct Overrides

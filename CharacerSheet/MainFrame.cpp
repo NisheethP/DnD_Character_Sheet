@@ -34,7 +34,7 @@
 #include "SkillProfDialog.h"
 #include "DiceRollerDialog.h"
 #include "SpellSlotDialog.h"
-
+#include "WarlockSlotsDialog.h"
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900,600)),
@@ -137,10 +137,10 @@ void MainFrame::CreateMenuBar()
 	menuBarItems.SetMaxHP = SetMenu->Append(wxID_ANY, "Set Max HP");
 	menuBarItems.SetSpeed = SetMenu->Append(wxID_ANY, "Set Speed");
 	menuBarItems.SetStats = SetMenu->Append(wxID_ANY, "Set Stats");
-	menuBarItems.SetInitMod = SetMenu->Append(wxID_ANY, "Set Inititiative Mod");
+	menuBarItems.SetInitMod = SetMenu->Append(wxID_ANY, "Set Initiative Mod");
 	SetMenu->AppendSeparator();
-	menuBarItems.SetSavingThrows = SetMenu->Append(wxID_ANY, "Set Savint Throw Profeciencies");
-	menuBarItems.SetSkillProfs = SetMenu->Append(wxID_ANY, "Set Skill Profeciencies");
+	menuBarItems.SetSavingThrows = SetMenu->Append(wxID_ANY, "Set Saving Throw proficiency");
+	menuBarItems.SetSkillProfs = SetMenu->Append(wxID_ANY, "Set Skill Proficiency");
 	menuBarItems.SetExpertises = SetMenu->Append(wxID_ANY, "Set Skill Expertises");
 	SetMenu->AppendSeparator();
 	menuBarItems.SetSP = SetMenu->Append(wxID_ANY, "Set Spell Points");
@@ -149,10 +149,10 @@ void MainFrame::CreateMenuBar()
 
 
 	menuBarItems.ConditionsAll = ConditionMenu->Append(wxID_ANY, "See All Conditions");
-	menuBarItems.ConditionsPlayer = ConditionMenu->Append(wxID_ANY, "See Character Condtions");
+	menuBarItems.ConditionsPlayer = ConditionMenu->Append(wxID_ANY, "See Character Condition");
 	ConditionMenu->AppendSeparator();
-	menuBarItems.ConditionsAdd = ConditionMenu->Append(wxID_ANY, "Add Condtion to Player");
-	menuBarItems.ConditionsRemove = ConditionMenu->Append(wxID_ANY, "Remove Condtion from Player");
+	menuBarItems.ConditionsAdd = ConditionMenu->Append(wxID_ANY, "Add Condition to Player");
+	menuBarItems.ConditionsRemove = ConditionMenu->Append(wxID_ANY, "Remove Condition from Player");
 
 	menuBarItems.ResetSP = ResetMenu->Append(wxID_ANY, "Reset Spell Points");
 	menuBarItems.ResetSlots = ResetMenu->Append(wxID_ANY, "Reset Slots");
@@ -2272,8 +2272,14 @@ void MainFrame::updateKnownSpellsLists()
 		if (x == -1)
 			slotSpin->SetMax(0);
 
-		slotSpin->SetMax(x);
-		slotSpin->SetValue(slotSpin->GetMax());
+		if (spSlots.slots[i].second != -1)
+			x += spSlots.slots[i].second;
+		
+		if (x > 0)
+		{
+			slotSpin->SetMax(x);
+			slotSpin->SetValue(slotSpin->GetMax());
+		}		
 
 		x = character.getTotalSpellPoints();
 		knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
@@ -3512,12 +3518,13 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 			uses.SpellSlots = false;
 
 			SpellSlot newSlots;
+			SpellSlot oldSlots = character.getSpellSlots();
 
 			for (int i = 0; i < 10; ++i)
 			{
 				if (i == 0)
 				{
-					newSlots.slots.push_back({ -4, 0 });
+					newSlots.slots.push_back({ oldSlots.slots[i].first, oldSlots.slots[i].second });
 					continue;
 				}
 				
@@ -3532,7 +3539,7 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 				if (numSlots > 0)
 					uses.SpellSlots = true;
 
-				newSlots.slots.push_back({numSlots, 0});
+				newSlots.slots.push_back({numSlots, oldSlots.slots[i].second});
 			}
 
 			if (uses.SpellSlots)
@@ -3544,7 +3551,47 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 
 	if (obj == menuBarItems.SetWarlockSlots->GetId())
 	{
+		auto dialog = new WarlockSlotsDialog(this);
+		int release = dialog->ShowModal();
+		if (release != wxID_CANCEL)
+		{
+			overrides.spellSlot = true;
+			uses.SpellSlots = false;
 
+			SpellSlot newSlots;
+			SpellSlot oldSlots = character.getSpellSlots();
+			
+			for (int i = 0; i < 10; ++i)
+			{
+				if (i == 0)
+				{
+					newSlots.slots.push_back({ oldSlots.slots[i].first, oldSlots.slots[i].second });
+					continue;
+				}
+
+				int numSlots = dialog->getNumSlots();
+				int level = dialog->getLevel();
+				
+				if (numSlots != 0)
+					uses.SpellSlots = true;
+
+				if (i == level)
+				{
+					newSlots.slots.push_back({ oldSlots.slots[i].first , numSlots});
+				}
+
+				else
+				{
+					newSlots.slots.push_back({ oldSlots.slots[i].first , -1 });
+				}
+
+				if (uses.SpellSlots)
+					character.setSpellSlots(newSlots);
+			}
+
+			updateKnownSpellsLists();
+		}
+		
 	}
 }
 

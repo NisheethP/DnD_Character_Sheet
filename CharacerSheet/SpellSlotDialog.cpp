@@ -17,7 +17,7 @@ SpellSlotDialog::SpellSlotDialog(wxWindow* parent, wxWindowID id, const wxString
 		auto text = new wxStaticText(this, wxID_ANY, "Level " + std::to_string(lev));
 		auto spin = new wxSpinCtrl(this, wxID_ANY, "0");
 
-		auto vali = &(slots[lev]);
+		auto vali = &(slots[lev-1]);
 		spin->SetValidator(wxGenericValidator(vali));
 
 		horSizer->Add(text, 0, wxALIGN_CENTER);

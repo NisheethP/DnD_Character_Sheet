@@ -75,6 +75,9 @@
     <ClCompile Include="SpellSlotDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WarlockSlotsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainFrame.h">
@@ -135,6 +138,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SpellSlotDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WarlockSlotsDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
