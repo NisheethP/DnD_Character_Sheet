@@ -42,7 +42,7 @@ class MainFrame : public wxFrame
 	ColourPair mainColour;
 	ColourPair panelColour;
 	ColourPair slotsColour;
-	wxColour profecientColour;
+	wxColour proficientColour;
 	wxColour expertiseColour;
 
 	wxSize baseColSize;
@@ -225,7 +225,7 @@ public:
 	wxScrolled<wxPanel>* CreateSpellsPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateKnownSpellsPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateSpellSlotsTable(wxNotebook* parent);
-	wxScrolled<wxPanel>* CreateInveontoryPage(wxNotebook* parent);
+	wxScrolled<wxPanel>* CreateInventoryPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateTestPanel(wxNotebook* parent);
 
 
@@ -243,8 +243,8 @@ public:
 	wxPanel* CreateSavingThrows(wxPanel* parent);
 	wxPanel* CreateSkillProf(wxPanel* parent);
 	wxPanel* CreateFeaturesPanel(wxPanel* parent);
-	wxPanel* CreateToolProfeciencies(wxPanel* parent);
-	wxPanel* CreateLangProfeciencies(wxPanel* parent);
+	wxPanel* CreateToolProficiencies(wxPanel* parent);
+	wxPanel* CreateLangProficiencies(wxPanel* parent);
 	wxPanel* CreatePlayerConditions(wxPanel* parent);
 	wxPanel* CreateMoney(wxPanel* parent);
 	wxPanel* CreateSubHPPanel(wxPanel* parent);
@@ -264,7 +264,6 @@ public:
 	//Known Spells Page Functions
 	//----------------------
 	wxPanel* CreateKnownSpellAbilityPanel(wxPanel* parent);
-	wxPanel* CreateSpellPoints(wxPanel* parent);
 	wxPanel* CreateKnownSpellsAllLevels(wxPanel* parent);
 	wxPanel* CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel);
 
@@ -288,7 +287,7 @@ public:
 
 	void updateHP();
 	void updateStats();
-	void updateInititative();
+	void updateInitiative();
 	void updateSavingThrows();
 	void updateSkills();
 

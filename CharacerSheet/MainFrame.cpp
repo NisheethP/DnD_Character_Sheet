@@ -84,7 +84,7 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	slotsColour.first = wxColour(0x22, 0x19, 0x19);
 	slotsColour.second = wxColour(0xFF, 0xFF, 0xFF);
 
-	profecientColour = wxColour(0xAA, 0xFF, 0xFF);
+	proficientColour = wxColour(0xAA, 0xFF, 0xFF);
 	expertiseColour = wxColour(0xFF, 0xAA, 0xAA);
 
 	//SETTING UP THE WINDOW
@@ -124,8 +124,10 @@ void MainFrame::CreateMenuBar()
 	wxMenu* fileMenu = new wxMenu();
 	wxMenu* SetMenu = new wxMenu();
 	wxMenu* ResetMenu = new wxMenu();
+	wxMenu* Rest = new wxMenu();
 	wxMenu* ConditionMenu = new wxMenu();
 	wxMenu* DiceMenu = new wxMenu();
+	
 
 	fileMenu->Append(wxID_NEW);
 	fileMenu->Append(wxID_OPEN);
@@ -269,7 +271,7 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 		//Features
 		{{2,2}, {5,2}},		//8
 
-		//Tool Profeciencies
+		//Tool Proficiencies
 		{{3,4}, {2,2}},		//9   TOOL PROFS
 
 		//Money
@@ -281,13 +283,13 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 		{{1,3}, {1,1}},		//13  HIT-DIE
 		{{1,4}, {1,2}},		//14  DEATH SAVES
 
-		//Language Profeciencies
+		//Language Proficiencies
 		{{2,4}, {1,2}},		//15   LANG PROFS
 
 		//Sliders
 		{{7,2}, {4,2}},		//16   SLIDERS
 
-		//Condtions
+		//Conditions
 		{{5,4}, {1,2}}		//17   CONDITIONS
 	};
 
@@ -343,7 +345,7 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[9];
-	p = CreateToolProfeciencies(panel);
+	p = CreateToolProficiencies(panel);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[10];
@@ -371,7 +373,7 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 	mainGridSizer->Add(p1, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[15];
-	p = CreateLangProfeciencies(panel);
+	p = CreateLangProficiencies(panel);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[16];
@@ -541,7 +543,7 @@ wxScrolled<wxPanel>* MainFrame::CreateSpellSlotsTable(wxNotebook* parent)
 	return panel;
 }
 
-wxScrolled<wxPanel>* MainFrame::CreateInveontoryPage(wxNotebook* parent)
+wxScrolled<wxPanel>* MainFrame::CreateInventoryPage(wxNotebook* parent)
 {
 	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxVSCROLL);
 	panel->SetBackgroundColour(mainColour.first);
@@ -1118,7 +1120,7 @@ wxPanel* MainFrame::CreateFeaturesPanel(wxPanel* parent)
 	return panel;
 }
 
-wxPanel* MainFrame::CreateLangProfeciencies(wxPanel* parent)
+wxPanel* MainFrame::CreateLangProficiencies(wxPanel* parent)
 {
 	wxSize tempSize;
 	//tempSize.x = baseColSize.x*1.3;
@@ -1146,7 +1148,7 @@ wxPanel* MainFrame::CreateLangProfeciencies(wxPanel* parent)
 	return panel;
 }
 
-wxPanel* MainFrame::CreateToolProfeciencies(wxPanel* parent)
+wxPanel* MainFrame::CreateToolProficiencies(wxPanel* parent)
 {
 	wxSize tempSize;
 	//tempSize.x = baseColSize.x*1.3;
@@ -2070,7 +2072,7 @@ void MainFrame::CreatePages(wxNotebook* parent)
 	SlotsTablePage->SetForegroundColour(slotsColour.second);
 	parent->AddPage(SlotsTablePage, "SpellSlotTable");
 
-	wxWindow* Inventory = CreateInveontoryPage(parent);
+	wxWindow* Inventory = CreateInventoryPage(parent);
 	Inventory->SetBackgroundColour(wxColour(0x19, 0x19, 0x22));
 	parent->AddPage(Inventory, "Inventory");
 
@@ -2371,13 +2373,13 @@ void MainFrame::updateStats()
 	}
 	
 	wxMessageBox("HP is not updated. Please update manually");
-	updateInititative();
+	updateInitiative();
 	updateKnownSpellMods();
 	updateSavingThrows();
 	updateSkills();
 }
 
-void MainFrame::updateInititative()
+void MainFrame::updateInitiative()
 {
 	int init = character.getInitiative();
 	mainPagePanels.InitMod.first->SetValue(std::to_string(init));
@@ -2406,7 +2408,7 @@ void MainFrame::updateSavingThrows()
 
 		else if (isProficient)
 		{
-			mainPagePanels.SavingThrows[i].first->SetForegroundColour(profecientColour);
+			mainPagePanels.SavingThrows[i].first->SetForegroundColour(proficientColour);
 			mainPagePanels.SavingThrows[i].first->SetFont(SkillFont.Underlined());
 		}		
 
@@ -2464,7 +2466,7 @@ void MainFrame::updateSkills()
 
 		else if (isProficient)
 		{
-			mainPagePanels.Skills[i].first->SetForegroundColour(profecientColour);
+			mainPagePanels.Skills[i].first->SetForegroundColour(proficientColour);
 			mainPagePanels.Skills[i].first->SetFont(SkillFont.Underlined());
 		}
 	}
@@ -2645,7 +2647,7 @@ void MainFrame::makeSavingThrowPair(wxStaticText* savingThrowName, wxTextCtrl* s
 
 	if (isProficient)
 	{
-		savingThrowName->SetForegroundColour(profecientColour);
+		savingThrowName->SetForegroundColour(proficientColour);
 		savingThrowName->SetFont(tempFont.Underlined());
 	}
 
@@ -2670,7 +2672,7 @@ void MainFrame::makeSkillPair(wxStaticText* skillName, wxTextCtrl* skillValue, S
 	isProficient = character.checkProf(curSkill);
 	if (isProficient)
 	{
-		skillName->SetForegroundColour(profecientColour);
+		skillName->SetForegroundColour(proficientColour);
 		skillName->SetFont(tempFont.Underlined());
 	}
 
@@ -3333,7 +3335,7 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 		int x = wxGetNumberFromUser(title, "", "Initiative Modifier", 0, -1e3, 1e3);
 		character.setInitMod(x);
 		
-		updateInititative();
+		updateInitiative();
 	}
 
 	if (obj == menuBarItems.SetName->GetId())
