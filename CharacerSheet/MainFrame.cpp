@@ -2893,8 +2893,8 @@ void MainFrame::onAddRemSlider(wxCommandEvent& event)
 
 			value->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
-			setWindowColour(text, ctrlColour);
-			setWindowColour(slider , ctrlColour);
+			text->SetForegroundColour(panelColour.second);
+			slider->SetForegroundColour(mainColour.second);
 			setWindowColour(value, ctrlColour);
 
 			auto font = text->GetFont();
