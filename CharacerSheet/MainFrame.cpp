@@ -10,6 +10,7 @@
 #include <wx/choicdlg.h>
 #include <wx/artprov.h>	
 #include <wx/fontdlg.h>
+#include <wx/colordlg.h>
 
 #include <wx/file.h>
 #include <wx/textfile.h>
@@ -168,6 +169,9 @@ void MainFrame::CreateMenuBar()
 	menuBarItems.DiceRoll = DiceMenu->Append(wxID_ANY, "Roll Dice");
 
 	menuBarItems.NotesFont = NotesMenu->Append(wxID_ANY, "Font Settings");
+	NotesMenu->AppendSeparator();
+	menuBarItems.NotesColour = NotesMenu->Append(wxID_ANY, "Background Colour");
+	menuBarItems.NotesDefBGColour = NotesMenu->Append(wxID_ANY, "Default Background");
 
 	menuBar->Append(fileMenu, "File");
 	menuBar->Append(SetMenu, "Set Values");
@@ -254,6 +258,8 @@ void MainFrame::BindControls()
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsRemove->GetId());
 	
 	this->Bind(wxEVT_MENU, &MainFrame::onNotesMenuEvents, this, menuBarItems.NotesFont->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onNotesMenuEvents, this, menuBarItems.NotesColour->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onNotesMenuEvents, this, menuBarItems.NotesDefBGColour->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onDiceMenuEvents, this, menuBarItems.DiceRoll->GetId());
 }
@@ -579,7 +585,7 @@ wxScrolled<wxPanel>* MainFrame::CreateNotesPage(wxNotebook* parent)
 	auto mainSizer = new wxBoxSizer(wxHORIZONTAL);
 	auto listSizer = new wxBoxSizer(wxVERTICAL);
 	
-	auto& TextBox = notesPanels.PageText = new wxTextCtrl(panel, wxID_ANY);
+	auto& TextBox = notesPanels.PageText = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 	auto title = new wxStaticText(panel, wxID_ANY, "Pages");
 
 	makeAddRemList(title, notesPanels.AddPage, notesPanels.RemPage, notesPanels.PageList, listSizer, panel);
@@ -597,6 +603,7 @@ wxScrolled<wxPanel>* MainFrame::CreateNotesPage(wxNotebook* parent)
 	notesPanels.PageList->Append("Page 1");
 	notesPanels.PageList->SetSelection(0);
 	notesPanels.pages.push_back("");
+	TextBox->SetFont(TextBox->GetFont().Larger());
 
 	panel->SetSizer(mainSizer);
 	return panel;
@@ -3878,22 +3885,48 @@ void MainFrame::onDiceMenuEvents(wxCommandEvent& event)
 
 void MainFrame::onNotesMenuEvents(wxCommandEvent& event)
 {
-	auto& text = notesPanels.PageText;
-	auto oldFont = text->GetFont();
-	wxFontData oldFontData; 
+	auto obj = event.GetId();
+	if (obj == menuBarItems.NotesFont->GetId())
+	{
+		auto& text = notesPanels.PageText;
+		auto oldFont = text->GetFont();
+		wxFontData oldFontData;
 
-	oldFontData.SetInitialFont(oldFont);
-	
-	auto fontDialog = new wxFontDialog(this, oldFontData);
-	int release = fontDialog->ShowModal();
-	
-	if (release == wxID_CANCEL)
-		return;
+		oldFontData.SetInitialFont(oldFont);
 
-	auto& newFont = fontDialog->GetFontData();
+		auto fontDialog = new wxFontDialog(this, oldFontData);
+		int release = fontDialog->ShowModal();
 
-	text->SetFont(newFont.GetChosenFont());
-	text->SetForegroundColour(newFont.GetColour());
+		if (release == wxID_CANCEL)
+			return;
+
+		auto& newFont = fontDialog->GetFontData();
+
+		text->SetFont(newFont.GetChosenFont());
+		text->SetForegroundColour(newFont.GetColour());
+	}
+
+	if (obj == menuBarItems.NotesColour->GetId())
+	{
+		auto& text = notesPanels.PageText;
+		auto colour = notesPanels.PageText->GetBackgroundColour();
+		wxColourData oldColour;
+		oldColour.SetColour(colour);
+
+		auto dialog = new wxColourDialog(this, &oldColour);
+		
+		
+		if (dialog->ShowModal() == wxID_CANCEL)
+			return;
+
+		text->SetBackgroundColour(dialog->GetColourData().GetColour());
+	}
+
+	if (obj == menuBarItems.NotesDefBGColour->GetId())
+	{
+		auto& text = notesPanels.PageText;
+		text->SetBackgroundColour(ctrlColour.first);
+	}
 }
 
 void MainFrame::onToolProfecsSelect(wxListEvent& event)

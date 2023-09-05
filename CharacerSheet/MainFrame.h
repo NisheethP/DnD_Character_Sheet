@@ -94,7 +94,9 @@ class MainFrame : public wxFrame
 		wxMenuItem* ConditionsRemove;
 
 		wxMenuItem* NotesFont;
-
+		wxMenuItem* NotesColour;
+		wxMenuItem* NotesDefBGColour;
+		
 		wxMenuItem* DiceRoll;
 	}menuBarItems;
 
