@@ -203,8 +203,8 @@ public:
 	//-------------
 	//SET FUNCTIONS
 	//-------------
-	void setTotHP(int x) { totHP = x; };
-	void setName(std::string name) { characterName = name; };
+	void setTotHP(int x) { totHP = x; }
+	void setName(std::string name) { characterName = name; }
 	void setStats(Stats stat);
 	void setSpeed(int x) { speed = x; }
 	void setStats(int str = 10, int dex = 10, int con = 10, int pInt = 10, int wis = 10, int cha = 10);
@@ -214,12 +214,13 @@ public:
 	void setAC(int x) { AC = x; }
 	void giveClass(ClassType pClassType, int pLevel = 1, CharClass::CasterType type = CharClass::CasterType::None);
 	void giveClass(CharClass pClass);
-	void setInitMod(int x) { initMod = x; };
+	void setInitMod(int x) { initMod = x; }
 
-	void setSpellSlots(SpellSlot slots) { charSlots = slots; }
+	void setSpellSlots(SpellSlot slots) { charSlots = slots; curCharSlots = slots; }
 	void setSkillProfs(int x);
 	void setSavingThrowProfs(int x);
 	void setExpertises(int x) { skillExpertises = x; }
+	void setSpellPoints(int x) { SpellPoints = x; curSpellPoints = x; }
 
 	void addLanguage(std::string str);
 	bool remLanguage(std::string str);
@@ -228,7 +229,6 @@ public:
 	bool remTool(std::string str);
 
 	void addSpell(Spell pSpell);
-	bool remSpell(Spell pSpell);
 	bool remSpell(std::string spellName);
 
 	void addMoney(int p, int g, int s, int c);

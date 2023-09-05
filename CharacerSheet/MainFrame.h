@@ -15,6 +15,7 @@
 #include "Character.h"
 #include <vector>
 #include <tuple>
+#include <map>
 #include "Spells.h"
 
 
@@ -84,6 +85,8 @@ class MainFrame : public wxFrame
 		wxMenuItem* ResetUncheckSpells;
 		wxMenuItem* ResetDeleteSpells;
 		
+		wxMenuItem* RestLong;
+		wxMenuItem* RestShort;
 
 		wxMenuItem* ConditionsAll;
 		wxMenuItem* ConditionsPlayer;
@@ -215,7 +218,18 @@ class MainFrame : public wxFrame
 
 	}knownPagePanels;
 
-		
+	struct NotesPanels
+	{
+		std::vector<std::string> pages;
+		wxButton* AddPage = nullptr;
+		wxButton* RemPage = nullptr;
+		wxListBox* PageList = nullptr;
+		wxTextCtrl* PageText = nullptr;
+
+		int curPageNum = 0;
+
+	}notesPanels;
+
 public:
 	MainFrame(const wxString& title, const Character& pChar);
 
@@ -226,6 +240,7 @@ public:
 	wxScrolled<wxPanel>* CreateKnownSpellsPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateSpellSlotsTable(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateInventoryPage(wxNotebook* parent);
+	wxScrolled<wxPanel>* CreateNotesPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateTestPanel(wxNotebook* parent);
 
 
@@ -267,6 +282,13 @@ public:
 	wxPanel* CreateKnownSpellsAllLevels(wxPanel* parent);
 	wxPanel* CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel);
 
+
+	
+	//----------------------
+	//Notes Page Functions 
+	//----------------------
+	wxPanel* CreateNotesPage();
+
 	//----------------------
 	//Other Functions
 	//----------------------
@@ -294,6 +316,7 @@ public:
 	void updateMoneyCtrls();
 	void updatePlayerConds();
 	void updateFeaturesList();
+	void updateNotes();
 
 	void calcCheckedSpells();
 
@@ -302,6 +325,8 @@ public:
 	void makeSavingThrowPair(wxStaticText* savingThrowName, wxTextCtrl* savingThrowValue, Skills curSkill);
 	void makeSkillPair(wxStaticText* skillName, wxTextCtrl* skillValue, Skills curSkill);
 	void makeAddRemList(wxStaticText*& title, wxButton*& add, wxButton*& rem, wxListBox*& list, wxSizer* sizer, wxPanel* parent);
+
+	void HealToPerc();
 
 	//----------------------
 	//Event Handlers
@@ -339,8 +364,14 @@ public:
 	void onKnownSpellsUseSpell(wxCommandEvent& event);
 	void onKnownSpellsUseSpellPoint(wxCommandEvent& event);
 	
+	void onNotesType(wxCommandEvent& event);
+	void onNotesAddRem(wxCommandEvent& event);
+	void onNotesSelect(wxCommandEvent& event);
+	void onNotesDClick(wxCommandEvent& event);
+
 	void onSetMenuEvents(wxCommandEvent& event);
 	void onResetMenuEvents(wxCommandEvent& event);
+	void onRestMenuEvents(wxCommandEvent& event);
 	void onConditionMenuEvents(wxCommandEvent& event);
 	void onDiceMenuEvents(wxCommandEvent& event);
 

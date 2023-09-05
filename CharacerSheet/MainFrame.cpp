@@ -124,7 +124,7 @@ void MainFrame::CreateMenuBar()
 	wxMenu* fileMenu = new wxMenu();
 	wxMenu* SetMenu = new wxMenu();
 	wxMenu* ResetMenu = new wxMenu();
-	wxMenu* Rest = new wxMenu();
+	wxMenu* RestMenu = new wxMenu();
 	wxMenu* ConditionMenu = new wxMenu();
 	wxMenu* DiceMenu = new wxMenu();
 	
@@ -149,6 +149,8 @@ void MainFrame::CreateMenuBar()
 	menuBarItems.SetSlots = SetMenu->Append(wxID_ANY, "Set Spell Slots");
 	menuBarItems.SetWarlockSlots = SetMenu->Append(wxID_ANY, "Set Warlock Slots");
 
+	menuBarItems.RestLong = RestMenu->Append(wxID_ANY, "Long Rest");
+	menuBarItems.RestShort = RestMenu->Append(wxID_ANY, "Short Rest");
 
 	menuBarItems.ConditionsAll = ConditionMenu->Append(wxID_ANY, "See All Conditions");
 	menuBarItems.ConditionsPlayer = ConditionMenu->Append(wxID_ANY, "See Character Condition");
@@ -167,6 +169,7 @@ void MainFrame::CreateMenuBar()
 	menuBar->Append(fileMenu, "File");
 	menuBar->Append(SetMenu, "Set Values");
 	menuBar->Append(ResetMenu, "Reset Values");
+	menuBar->Append(RestMenu, "Rest");
 	menuBar->Append(ConditionMenu, "Conditions");
 	menuBar->Append(DiceMenu, "Dice");
 	SetMenuBar(menuBar);
@@ -220,6 +223,12 @@ void MainFrame::BindControls()
 
 	mainPagePanels.EL_Conditions->Bind(wxEVT_LIST_ITEM_ACTIVATED, &MainFrame::onConditionListDClick, this);
 
+	notesPanels.AddPage->Bind(wxEVT_BUTTON, &MainFrame::onNotesAddRem, this);
+	notesPanels.RemPage->Bind(wxEVT_BUTTON, &MainFrame::onNotesAddRem, this);
+	notesPanels.PageText->Bind(wxEVT_TEXT, &MainFrame::onNotesType, this);
+	notesPanels.PageList->Bind(wxEVT_LISTBOX, &MainFrame::onNotesSelect, this);
+	notesPanels.PageList->Bind(wxEVT_LISTBOX_DCLICK, &MainFrame::onNotesDClick, this);
+
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSP->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetMaxHP->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetStats->GetId());
@@ -231,6 +240,9 @@ void MainFrame::BindControls()
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetExpertises->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSlots->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetWarlockSlots->GetId());
+
+	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestLong->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestShort->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsAll->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsPlayer->GetId());
@@ -552,6 +564,38 @@ wxScrolled<wxPanel>* MainFrame::CreateInventoryPage(wxNotebook* parent)
 	return panel;
 }
 
+wxScrolled<wxPanel>* MainFrame::CreateNotesPage(wxNotebook* parent)
+{
+	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxVSCROLL);
+	panel->SetBackgroundColour(mainColour.first);
+	panel->SetScrollRate(0, FromDIP(10));
+
+	auto mainSizer = new wxBoxSizer(wxHORIZONTAL);
+	auto listSizer = new wxBoxSizer(wxVERTICAL);
+	
+	auto& TextBox = notesPanels.PageText = new wxTextCtrl(panel, wxID_ANY);
+	auto title = new wxStaticText(panel, wxID_ANY, "Pages");
+
+	makeAddRemList(title, notesPanels.AddPage, notesPanels.RemPage, notesPanels.PageList, listSizer, panel);
+
+	notesPanels.PageList->SetFont(notesPanels.PageList->GetFont().Larger().Bold());
+	//title->SetFont(title->GetFont().Larger().Bold());
+	
+	mainSizer->Add(TextBox, 1, wxEXPAND | wxALL, 5);
+	mainSizer->Add(listSizer, 0, wxEXPAND | wxTOP | wxBOTTOM | wxRIGHT, 5);
+
+	setWindowColour(TextBox, ctrlColour);
+	setWindowColour(notesPanels.PageList, listColour);
+	setWindowColour(title, mainColour);
+	
+	notesPanels.PageList->Append("Page 1");
+	notesPanels.PageList->SetSelection(0);
+	notesPanels.pages.push_back("");
+
+	panel->SetSizer(mainSizer);
+	return panel;
+}
+
 wxScrolled<wxPanel>* MainFrame::CreateTestPanel(wxNotebook* parent)
 {
 	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY);
@@ -841,7 +885,7 @@ wxPanel* MainFrame::CreateStats(wxPanel* parent)
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
 	setWindowColour(panel, mainColour);
 
-	//wxStaticText* profBonus = new wxStaticText(panel, wxID_ANY, "Profeciency: " + std::to_string(character.getProfBonus()));
+	//wxStaticText* profBonus = new wxStaticText(panel, wxID_ANY, "Proficiency: " + std::to_string(character.getProfBonus()));
 
 	std::string StatNames[6] = {"STR", "DEX", "CON","INT", "WIS", "CHA"};
 	Skills skillNames[6] =	{Skills::Strength, Skills::Dexterity, Skills::Constitution, Skills::Intelligence, Skills::Wisdom, Skills::Charisma};
@@ -896,7 +940,7 @@ wxPanel* MainFrame::CreateStats(wxPanel* parent)
 		mainPagePanels.Stat_TextCtrls[i].second->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 	}
 	
-	wxStaticBoxSizer* profBox = new wxStaticBoxSizer(wxVERTICAL, panel, "Profeciency Bonus");
+	wxStaticBoxSizer* profBox = new wxStaticBoxSizer(wxVERTICAL, panel, "Proficiency Bonus");
 	wxTextCtrl* profVal = new wxTextCtrl(panel, wxID_ANY, to_string(character.getProfBonus()), wxDefaultPosition, 
 		wxSize(30, -1), wxTE_READONLY | wxTE_CENTER);
 
@@ -1158,7 +1202,7 @@ wxPanel* MainFrame::CreateToolProficiencies(wxPanel* parent)
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
-	auto& text = std::get<0>(mainPagePanels.ToolProf) = new wxStaticText(panel, wxID_ANY, "Profeciencies");
+	auto& text = std::get<0>(mainPagePanels.ToolProf) = new wxStaticText(panel, wxID_ANY, "Proficiencies");
 	auto& add = std::get<1>(mainPagePanels.ToolProf);
 	auto& rem = std::get<2>(mainPagePanels.ToolProf);
 	auto& list = std::get<3>(mainPagePanels.ToolProf);
@@ -1351,7 +1395,7 @@ wxPanel* MainFrame::CreateInitiativePanel(wxPanel* parent)
 
 	Init->SetValue(std::to_string(initiative));
 
-	auto InitBox = new wxStaticBoxSizer(wxHORIZONTAL, panel, "Inititative");
+	auto InitBox = new wxStaticBoxSizer(wxHORIZONTAL, panel, "Initiative");
 	auto subSizer = new wxBoxSizer(wxHORIZONTAL);
 	
 	InitBox->Add(Init, 1, wxEXPAND | wxLEFT | wxRIGHT, 30);
@@ -1609,7 +1653,7 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 
 	knownPagePanels.Combo_SpellCastSkill = new wxComboBox(panel, wxID_ANY, "Intelligence", wxDefaultPosition, wxDefaultSize, 3, choices, wxCB_READONLY);
 
-	auto ProfBonus_Text = new wxStaticText(panel, wxID_ANY, "Profeciency\nBonus", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+	auto ProfBonus_Text = new wxStaticText(panel, wxID_ANY, "Proficiency\nBonus", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
 	knownPagePanels.ProfBonus_Val = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 	knownPagePanels.ProfBonus_Val->SetLabel(std::to_string(character.getProfBonus()));
 
@@ -1936,6 +1980,7 @@ wxPanel* MainFrame::CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel)
 	return panel;
 }
 
+
 //------------------------------
 ///KNOWN SPELLS PAGE PANELS
 //------------------------------
@@ -2066,6 +2111,10 @@ void MainFrame::CreatePages(wxNotebook* parent)
 	wxWindow* knownSpellsPage = CreateKnownSpellsPage(parent);
 	//knownSpellsPage->SetBackgroundColour(wxColour(0x99,0x77,0x77));
 	parent->AddPage(knownSpellsPage, "Known Spells", true);
+
+	wxWindow* Notes = CreateNotesPage(parent);
+	setWindowColour(Notes, mainColour);
+	parent->AddPage(Notes, "Notes");
 
 	wxWindow* SlotsTablePage = CreateSpellSlotsTable(parent);
 	SlotsTablePage->SetBackgroundColour(slotsColour.first);
@@ -2240,6 +2289,12 @@ void MainFrame::updateFeaturesList()
 			list->Append(it->title);
 		}
 	}	
+}
+
+void MainFrame::updateNotes()
+{
+	notesPanels.PageList->SetSelection(notesPanels.curPageNum);
+	notesPanels.PageText->SetValue(notesPanels.pages[notesPanels.curPageNum]);
 }
 
 void MainFrame::updateKnownSpellMods()
@@ -2702,6 +2757,23 @@ void MainFrame::makeAddRemList(wxStaticText*& title, wxButton*& add, wxButton*& 
 	sizer->Add(list, 1, wxEXPAND);
 }
 
+void MainFrame::HealToPerc()
+{
+	SetFocus();
+	auto& spin = std::get<1>(mainPagePanels.HealToX);
+	auto& HP = mainPagePanels.HP;
+	float perc = static_cast<float>(spin->GetValue()) / 100.f;
+
+	int healedHP = perc * (character.getModTotHP());
+	int curHP = character.getCurHP();
+
+	if (curHP < healedHP)
+	{
+		character.setCurHP(healedHP);
+		HP->SetValue(healedHP);
+	}
+}
+
 //------------------------------
 ///EVENT HANDLERS
 //------------------------------
@@ -2800,7 +2872,7 @@ void MainFrame::onACCheckBoxTick(wxCommandEvent& event)
 void MainFrame::onGiveTempHPButton(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
-	int x = wxGetNumberFromUser("Enter temporary hitpoints:", "", "", 0L, 0L, 100L);
+	int x = wxGetNumberFromUser("Enter temporary HP:", "", "", 0L, 0L, 100L);
 	mainPagePanels.TempHP->SetValue(x);
 	character.giveTempHP(x);
 }
@@ -2821,18 +2893,7 @@ void MainFrame::onSetArmorButton(wxCommandEvent& event)
 
 void MainFrame::onHealToButton(wxCommandEvent& event)
 {
-	auto& spin = std::get<1>(mainPagePanels.HealToX);
-	auto& HP = mainPagePanels.HP;
-	float perc = static_cast<float>(spin->GetValue()) / 100.f;
-
-	int healedHP = perc * (character.getModTotHP());
-	int curHP = character.getCurHP();
-
-	if (curHP < healedHP)
-	{
-		character.setCurHP(healedHP);
-		HP->SetValue(healedHP);
-	}
+	HealToPerc();
 }
 
 void MainFrame::onHPSpin(wxSpinEvent& event)
@@ -3286,7 +3347,10 @@ void MainFrame::onKnownSpellsUseSpell(wxCommandEvent& event)
 		{
 			int curVal = spin->GetValue();
 			if (curVal != 0)
+			{
 				spin->SetValue(curVal - 1);
+
+			}
 			
 			return;
 		}
@@ -3315,6 +3379,77 @@ void MainFrame::onKnownSpellsUseSpellPoint(wxCommandEvent& event)
 	}
 
 	event.Skip();
+}
+
+void MainFrame::onNotesType(wxCommandEvent& event)
+{
+	auto str = notesPanels.PageText->GetValue();
+	notesPanels.pages[notesPanels.curPageNum] = str;
+}
+
+void MainFrame::onNotesAddRem(wxCommandEvent& event)
+{
+	auto obj = event.GetEventObject();
+
+	if (obj == notesPanels.AddPage)
+	{
+		int numPages = notesPanels.pages.size();
+		notesPanels.curPageNum = numPages - 1;
+		auto name = wxGetTextFromUser("Enter Page name");
+
+		if (name == "")
+			name = "Page " + std::to_string(numPages + 1);
+
+		notesPanels.pages.push_back("");
+		notesPanels.PageList->Append(name);
+				
+		updateNotes();		
+	}
+
+	if (obj == notesPanels.RemPage)
+	{
+		int numPages = notesPanels.pages.size();
+
+		auto res = wxMessageDialog(this, "Confirm page deletion", "", wxOK | wxCANCEL | wxCANCEL_DEFAULT).ShowModal();
+		if (res == wxID_CANCEL)
+			return;
+
+		if (numPages == 1)
+		{
+			notesPanels.curPageNum = 0;
+			notesPanels.pages[0] = "";
+			notesPanels.PageList->SetString(0, "Page 1");
+		}
+
+		else
+		{
+			notesPanels.curPageNum = 0;
+			int i = notesPanels.PageList->GetSelection();
+
+			notesPanels.PageList->Delete(i);
+			notesPanels.pages.erase(notesPanels.pages.begin() + i);
+		}
+		
+		updateNotes();
+	}
+}
+
+void MainFrame::onNotesSelect(wxCommandEvent& event)
+{
+	notesPanels.curPageNum = notesPanels.PageList->GetSelection();
+	updateNotes();
+	notesPanels.PageText->SetFocus();
+}
+
+void MainFrame::onNotesDClick(wxCommandEvent& event)
+{
+	int i = notesPanels.PageList->GetSelection();
+	auto str = notesPanels.PageList->GetString(i);
+
+	auto res = wxGetTextFromUser("Enter new name", "Caption", str);
+	if (res.ToStdString() == "")
+		res = str;
+	notesPanels.PageList->SetString(i, res);
 }
 
 void MainFrame::onSetMenuEvents(wxCommandEvent& event)
@@ -3621,6 +3756,22 @@ void MainFrame::onResetMenuEvents(wxCommandEvent& event)
 
 	}
 
+}
+
+void MainFrame::onRestMenuEvents(wxCommandEvent& event)
+{
+	auto obj = event.GetId();
+	
+	if (obj == menuBarItems.RestLong->GetId())
+	{
+		HealToPerc();
+		
+	}
+
+	if (obj == menuBarItems.RestShort->GetId())
+	{
+
+	}
 }
 
 void MainFrame::onConditionMenuEvents(wxCommandEvent& event)

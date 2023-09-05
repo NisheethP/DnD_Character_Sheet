@@ -117,6 +117,9 @@ Character::Character(std::string pName, std::vector<CharClass>& pCharClass, Stat
 	languages.push_back("Common");
 
 	profBonus = getProficiency(totalLevel);
+
+	curCharSlots = charSlots;
+	curSpellPoints = SpellPoints;
 }
 
 std::string Character::getClass()
