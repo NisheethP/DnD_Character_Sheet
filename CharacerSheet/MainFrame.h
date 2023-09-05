@@ -93,6 +93,8 @@ class MainFrame : public wxFrame
 		wxMenuItem* ConditionsAdd;
 		wxMenuItem* ConditionsRemove;
 
+		wxMenuItem* NotesFont;
+
 		wxMenuItem* DiceRoll;
 	}menuBarItems;
 
@@ -283,12 +285,6 @@ public:
 	wxPanel* CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel);
 
 
-	
-	//----------------------
-	//Notes Page Functions 
-	//----------------------
-	wxPanel* CreateNotesPage();
-
 	//----------------------
 	//Other Functions
 	//----------------------
@@ -374,6 +370,7 @@ public:
 	void onRestMenuEvents(wxCommandEvent& event);
 	void onConditionMenuEvents(wxCommandEvent& event);
 	void onDiceMenuEvents(wxCommandEvent& event);
+	void onNotesMenuEvents(wxCommandEvent& event);
 
 	void onTest(wxCommandEvent& event);
 

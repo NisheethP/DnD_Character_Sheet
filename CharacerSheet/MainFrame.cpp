@@ -9,6 +9,7 @@
 #include <wx/numdlg.h> 
 #include <wx/choicdlg.h>
 #include <wx/artprov.h>	
+#include <wx/fontdlg.h>
 
 #include <wx/file.h>
 #include <wx/textfile.h>
@@ -127,7 +128,7 @@ void MainFrame::CreateMenuBar()
 	wxMenu* RestMenu = new wxMenu();
 	wxMenu* ConditionMenu = new wxMenu();
 	wxMenu* DiceMenu = new wxMenu();
-	
+	wxMenu* NotesMenu = new wxMenu();
 
 	fileMenu->Append(wxID_NEW);
 	fileMenu->Append(wxID_OPEN);
@@ -166,12 +167,15 @@ void MainFrame::CreateMenuBar()
 	
 	menuBarItems.DiceRoll = DiceMenu->Append(wxID_ANY, "Roll Dice");
 
+	menuBarItems.NotesFont = NotesMenu->Append(wxID_ANY, "Font Settings");
+
 	menuBar->Append(fileMenu, "File");
 	menuBar->Append(SetMenu, "Set Values");
 	menuBar->Append(ResetMenu, "Reset Values");
 	menuBar->Append(RestMenu, "Rest");
 	menuBar->Append(ConditionMenu, "Conditions");
 	menuBar->Append(DiceMenu, "Dice");
+	menuBar->Append(NotesMenu, "Notes");
 	SetMenuBar(menuBar);
 }
 
@@ -248,6 +252,8 @@ void MainFrame::BindControls()
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsPlayer->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsAdd->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsRemove->GetId());
+	
+	this->Bind(wxEVT_MENU, &MainFrame::onNotesMenuEvents, this, menuBarItems.NotesFont->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onDiceMenuEvents, this, menuBarItems.DiceRoll->GetId());
 }
@@ -3868,6 +3874,26 @@ void MainFrame::onDiceMenuEvents(wxCommandEvent& event)
 	DiceRollerDialog* dialog = new DiceRollerDialog(this, wxID_ANY, "Roll Dice", wxDefaultPosition, FromDIP(wxSize(600,500)), 
 		wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE);
 	dialog->Show();
+}
+
+void MainFrame::onNotesMenuEvents(wxCommandEvent& event)
+{
+	auto& text = notesPanels.PageText;
+	auto oldFont = text->GetFont();
+	wxFontData oldFontData; 
+
+	oldFontData.SetInitialFont(oldFont);
+	
+	auto fontDialog = new wxFontDialog(this, oldFontData);
+	int release = fontDialog->ShowModal();
+	
+	if (release == wxID_CANCEL)
+		return;
+
+	auto& newFont = fontDialog->GetFontData();
+
+	text->SetFont(newFont.GetChosenFont());
+	text->SetForegroundColour(newFont.GetColour());
 }
 
 void MainFrame::onToolProfecsSelect(wxListEvent& event)
