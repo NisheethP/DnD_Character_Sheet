@@ -187,7 +187,10 @@ public:
 	std::vector<feature>& getFeatures() { return features; }
 	std::vector<Spell>& getKnownSpells() { return knownSpells; }
 
-	SpellSlot& getSpellSlots() { return charSlots; }
+	SpellSlot& getSpellSlots()		{ return charSlots; }
+	SpellSlot& getCurSpellSlots()	{ return curCharSlots; }
+	int& getSpellPoints()			{ return SpellPoints; }
+	int& getCurSpellPoints()		{ return curSpellPoints; }
 
 	int& getPlatinum()	{ return platinum; }
 	int& getGold()		{ return gold; }

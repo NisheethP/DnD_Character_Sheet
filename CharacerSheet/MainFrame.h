@@ -325,6 +325,8 @@ public:
 	void makeAddRemList(wxStaticText*& title, wxButton*& add, wxButton*& rem, wxListBox*& list, wxSizer* sizer, wxPanel* parent);
 
 	void HealToPerc();
+	void FillRegularSlots();
+	void FillWarlockSlots();
 
 	//----------------------
 	//Event Handlers

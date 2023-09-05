@@ -2337,7 +2337,7 @@ void MainFrame::updateKnownSpellsLists()
 	for (int i = 1; i < 10; ++i)
 	{
 		auto slotSpin = std::get<1>(knownPagePanels.SpellSlotLevelList[i]);
-		auto& spSlots = character.getSpellSlots();
+		auto& spSlots = character.getCurSpellSlots();
 		int x = spSlots.slots[i].first;
 		if (x == -1)
 			slotSpin->SetMax(0);
@@ -2616,11 +2616,15 @@ void MainFrame::loadSpells()
 	//LOADING SPELLS INTO MEMORY
 	std::string path = "D:\\C++ Programmes\\CharacerSheet\\";
 	std::string fileName = "allSpells.csv";
+	path = "";
 
 	wxFile spellFile(path + fileName, wxFile::read);
 
 	if (!spellFile.IsOpened())
+	{
 		wxMessageBox("File not Opened", "Caption", wxOK | wxCENTRE | wxICON_ERROR, this);
+		this->Destroy();
+	}
 
 	wxFileInputStream fileStream(spellFile);
 	wxTextInputStream fileTextStream(fileStream);
@@ -2784,6 +2788,30 @@ void MainFrame::HealToPerc()
 	{
 		character.setCurHP(healedHP);
 		HP->SetValue(healedHP);
+	}
+}
+
+void MainFrame::FillRegularSlots()
+{
+	if (uses.SpellSlots)
+	{
+		auto& slots = character.getCurSpellSlots();
+		auto& maxSlots = character.getSpellSlots();
+
+		for (int i = 0; i < slots.slots.size(); ++i)
+			slots.slots[i].first = maxSlots.slots[i].first;
+	}
+}
+
+void MainFrame::FillWarlockSlots()
+{
+	if (uses.SpellSlots)
+	{
+		auto& slots = character.getCurSpellSlots();
+		auto& maxSlots = character.getSpellSlots();
+
+		for (int i = 0; i < slots.slots.size(); ++i)
+			slots.slots[i].second = maxSlots.slots[i].second;
 	}
 }
 
@@ -3362,7 +3390,11 @@ void MainFrame::onKnownSpellsUseSpell(wxCommandEvent& event)
 			if (curVal != 0)
 			{
 				spin->SetValue(curVal - 1);
-
+				auto& curSlots = character.getCurSpellSlots();
+				if (curSlots.slots[i].second != 0)
+					curSlots.slots[i].second--;
+				else
+					curSlots.slots[i].first--;
 			}
 			
 			return;
@@ -3385,8 +3417,10 @@ void MainFrame::onKnownSpellsUseSpellPoint(wxCommandEvent& event)
 			int curVal = std::stoi(val->GetValue().ToStdString());
 			int newVal = curVal - convSlotToPoint(i);
 			if (newVal >= 0)
+			{
 				val->SetValue(std::to_string(newVal));
-
+				character.getCurSpellPoints() = newVal;
+			}
 			return;
 		}
 	}
@@ -3778,13 +3812,16 @@ void MainFrame::onRestMenuEvents(wxCommandEvent& event)
 	if (obj == menuBarItems.RestLong->GetId())
 	{
 		HealToPerc();
-		
+		FillRegularSlots();
+		FillWarlockSlots();
 	}
 
 	if (obj == menuBarItems.RestShort->GetId())
 	{
-
+		FillWarlockSlots();
 	}
+
+	updateKnownSpellsLists();
 }
 
 void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
