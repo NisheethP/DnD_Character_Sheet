@@ -127,10 +127,12 @@ void MainFrame::CreateMenuBar()
 	wxMenu* SetMenu = new wxMenu();
 	wxMenu* ResetMenu = new wxMenu();
 	wxMenu* RestMenu = new wxMenu();
+	wxMenu* RestAddMenu = new wxMenu();
+	wxMenu* RestRemMenu = new wxMenu();
 	wxMenu* ConditionMenu = new wxMenu();
 	wxMenu* DiceMenu = new wxMenu();
 	wxMenu* NotesMenu = new wxMenu();
-
+	
 	fileMenu->Append(wxID_NEW);
 	fileMenu->Append(wxID_OPEN);
 	fileMenu->AppendSeparator();
@@ -153,6 +155,17 @@ void MainFrame::CreateMenuBar()
 
 	menuBarItems.RestLong = RestMenu->Append(wxID_ANY, "Long Rest");
 	menuBarItems.RestShort = RestMenu->Append(wxID_ANY, "Short Rest");
+	RestMenu->AppendSeparator();
+	RestMenu->AppendSubMenu(RestAddMenu, "Add Slider");
+		menuBarItems.RestAddSliderToLong = RestAddMenu->Append(wxID_ANY, "To Long Rest");
+		menuBarItems.RestAddSliderToShort = RestAddMenu->Append(wxID_ANY, "To Short Rest");
+		menuBarItems.RestAddSliderToLong->Enable(false);
+		menuBarItems.RestAddSliderToShort->Enable(false);
+	RestMenu->AppendSubMenu(RestRemMenu, "Remove Slider");
+		menuBarItems.RestRemSliderToLong = RestRemMenu->Append(wxID_ANY, "To Long Rest");
+		menuBarItems.RestRemSliderToShort = RestRemMenu->Append(wxID_ANY, "To Short Rest");
+		menuBarItems.RestRemSliderToLong->Enable(false);
+		menuBarItems.RestRemSliderToShort->Enable(false);
 
 	menuBarItems.ConditionsAll = ConditionMenu->Append(wxID_ANY, "See All Conditions");
 	menuBarItems.ConditionsPlayer = ConditionMenu->Append(wxID_ANY, "See Character Condition");
@@ -251,6 +264,10 @@ void MainFrame::BindControls()
 
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestLong->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestShort->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestAddSliderToLong->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestAddSliderToShort->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestRemSliderToShort->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestRemSliderToShort->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsAll->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsPlayer->GetId());
@@ -2338,17 +2355,23 @@ void MainFrame::updateKnownSpellsLists()
 	{
 		auto slotSpin = std::get<1>(knownPagePanels.SpellSlotLevelList[i]);
 		auto& spSlots = character.getCurSpellSlots();
+		auto& maxSlots = character.getSpellSlots();
 		int x = spSlots.slots[i].first;
-		if (x == -1)
-			slotSpin->SetMax(0);
-
+		int y = maxSlots.slots[i].first;
+		
 		if (spSlots.slots[i].second != -1)
 			x += spSlots.slots[i].second;
 		
+		if (y == -1)
+			slotSpin->SetMax(0);
+
+		if (spSlots.slots[i].second != -1)
+			y += spSlots.slots[i].second;
+		
 		if (x > 0)
 		{
-			slotSpin->SetMax(x);
-			slotSpin->SetValue(slotSpin->GetMax());
+			slotSpin->SetMax(y);
+			slotSpin->SetValue(x);
 		}		
 
 		x = character.getTotalSpellPoints();
@@ -2815,6 +2838,32 @@ void MainFrame::FillWarlockSlots()
 	}
 }
 
+void MainFrame::DefaultLongSliders()
+{
+	for (auto it = longRestSliders.begin(); it != longRestSliders.end(); ++it)
+	{
+		auto& slider = mainPagePanels.Sliders[*it].second;
+		auto& text = mainPagePanels.Sliders[*it].first;
+		auto& def = mainPagePanels.SliderDefaults[*it];
+		character.updateSlider(text->GetLabel().ToStdString(), def);
+		slider->SetValue(def);
+		mainPagePanels.SliderVal[*it]->SetValue(std::to_string(def));
+	}
+}
+
+void MainFrame::DefaultShortSliders()
+{
+	for (auto it = shortRestSliders.begin(); it != shortRestSliders.end(); ++it)
+	{
+		auto& slider = mainPagePanels.Sliders[*it].second;
+		auto& text = mainPagePanels.Sliders[*it].first;
+		auto& def = mainPagePanels.SliderDefaults[*it];
+		character.updateSlider(text->GetLabel().ToStdString(), def);
+		slider->SetValue(def);
+		mainPagePanels.SliderVal[*it]->SetValue(std::to_string(def));
+	}
+}
+
 //------------------------------
 ///EVENT HANDLERS
 //------------------------------
@@ -2982,60 +3031,63 @@ void MainFrame::onAddRemSlider(wxCommandEvent& event)
 		SliderDialog dialog(this);
 
 		int release = dialog.ShowModal();
-		if (release != wxID_CANCEL)
-		{
-			auto title = dialog.getTitle();
-			int min = dialog.getMin();
-			int max = dialog.getMax();
-			int def = dialog.getDef();
-			auto slider = new wxSlider(panel, wxID_ANY, def, min, max, wxDefaultPosition, wxDefaultSize, wxSL_MIN_MAX_LABELS | wxSL_TICKS);
+		if (release == wxID_CANCEL)
+			return;
+		
+		auto title = dialog.getTitle();
+		int min = dialog.getMin();
+		int max = dialog.getMax();
+		int def = dialog.getDef();
+		auto slider = new wxSlider(panel, wxID_ANY, def, min, max, wxDefaultPosition, wxDefaultSize, wxSL_MIN_MAX_LABELS | wxSL_TICKS);
 
-			auto text = new wxStaticText(panel, wxID_ANY, title, wxDefaultPosition, wxDefaultSize);
-			auto horLine = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(1.5*baseColSize.x,-1)));
+		auto text = new wxStaticText(panel, wxID_ANY, title, wxDefaultPosition, wxDefaultSize);
+		auto horLine = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(1.5*baseColSize.x,-1)));
 
-			auto value = new wxTextCtrl(panel, wxID_ANY, std::to_string(def), wxDefaultPosition, FromDIP(wxSize(50, -1)), wxALIGN_CENTER_HORIZONTAL);
+		auto value = new wxTextCtrl(panel, wxID_ANY, std::to_string(def), wxDefaultPosition, FromDIP(wxSize(50, -1)), wxALIGN_CENTER_HORIZONTAL);
 
-			value->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+		value->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
-			text->SetForegroundColour(panelColour.second);
-			slider->SetForegroundColour(mainColour.second);
-			setWindowColour(value, ctrlColour);
+		text->SetForegroundColour(panelColour.second);
+		slider->SetForegroundColour(mainColour.second);
+		setWindowColour(value, ctrlColour);
 
-			auto font = text->GetFont();
-			font.MakeLarger();
-			font.MakeBold();
-			font.MakeUnderlined();
-			text->SetFont(font);
+		auto font = text->GetFont();
+		font.MakeLarger();
+		font.MakeBold();
+		font.MakeUnderlined();
+		text->SetFont(font);
 
-			value->SetFont(value->GetFont().MakeBold().MakeLarger());
+		value->SetFont(value->GetFont().MakeBold().MakeLarger());
 
-			auto subSizer = new wxBoxSizer(wxHORIZONTAL);
+		auto subSizer = new wxBoxSizer(wxHORIZONTAL);
 
-			auto sizeFlag = wxALIGN_CENTER;
+		auto sizeFlag = wxALIGN_CENTER;
 
-			subSizer->Add(text, 0, sizeFlag);
-			subSizer->Add(value, 0, sizeFlag | wxLEFT, 5);
-			subSizer->Add(slider, 1, wxEXPAND | wxLEFT, 10);
-			//subSizer->Add(-1,5);
+		subSizer->Add(text, 0, sizeFlag);
+		subSizer->Add(value, 0, sizeFlag | wxLEFT, 5);
+		subSizer->Add(slider, 1, wxEXPAND | wxLEFT, 10);
+		//subSizer->Add(-1,5);
 
-			sizer->Add(-1, 3);
-			sizer->Add(subSizer, 0, wxEXPAND | wxRIGHT, 20);
-			sizer->Add(horLine, 0, wxEXPAND);
-			sizer->Add(-1, 3);
+		sizer->Add(-1, 3);
+		sizer->Add(subSizer, 0, wxEXPAND | wxRIGHT, 20);
+		sizer->Add(horLine, 0, wxEXPAND);
+		sizer->Add(-1, 3);
 
-			mainPagePanels.Sliders.push_back({text, slider});
-			mainPagePanels.sliderLine.push_back(horLine);
-			mainPagePanels.SliderVal.push_back(value);
+		mainPagePanels.Sliders.push_back({text, slider});
+		mainPagePanels.SliderDefaults.push_back(def);
+		mainPagePanels.sliderLine.push_back(horLine);
+		mainPagePanels.SliderVal.push_back(value);
 
-			character.addSlider({title, slider->GetValue()});
+		character.addSlider({title, slider->GetValue()});
 
-			panel->FitInside();
-			panel->Layout();
+		panel->FitInside();
+		panel->Layout();
 
-			slider->Bind(wxEVT_SLIDER, &MainFrame::onSliderChange, this);
-			value->Bind(wxEVT_TEXT, &MainFrame::onSliderValChange, this);
-		}
-
+		slider->Bind(wxEVT_SLIDER, &MainFrame::onSliderChange, this);
+		value->Bind(wxEVT_TEXT, &MainFrame::onSliderValChange, this);
+		
+		menuBarItems.RestAddSliderToLong->Enable();
+		menuBarItems.RestAddSliderToShort->Enable();
 	}
 
 	//REM
@@ -3044,27 +3096,50 @@ void MainFrame::onAddRemSlider(wxCommandEvent& event)
 		SliderRemDialog dialog(this, wxID_ANY, mainPagePanels.Sliders);
 
 		int release = dialog.ShowModal();
-		if (release != wxID_CANCEL)
+		if (release == wxID_CANCEL)
+			return;
+		
+		int x = dialog.getSelected();
+		if (x != -1)
 		{
-			int x = dialog.getSelected();
-			if (x != -1)
-			{
-				mainPagePanels.Sliders[x].second->Unbind(wxEVT_SLIDER, &MainFrame::onSliderChange, this);
-				delete mainPagePanels.Sliders[x].first;
-				delete mainPagePanels.Sliders[x].second;
-				delete mainPagePanels.sliderLine[x];
-				delete mainPagePanels.SliderVal[x];
+			mainPagePanels.Sliders[x].second->Unbind(wxEVT_SLIDER, &MainFrame::onSliderChange, this);
+			mainPagePanels.Sliders[x].first->Destroy();
+			mainPagePanels.Sliders[x].second->Destroy();
+			mainPagePanels.sliderLine[x]->Destroy();
+			mainPagePanels.SliderVal[x]->Destroy();
 				
-				mainPagePanels.Sliders.erase(mainPagePanels.Sliders.begin() + x);
-				mainPagePanels.sliderLine.erase(mainPagePanels.sliderLine.begin() + x);
-				mainPagePanels.SliderVal.erase(mainPagePanels.SliderVal.begin() + x);
-				character.remSlider(x);
+			mainPagePanels.Sliders.erase(mainPagePanels.Sliders.begin() + x);
+			mainPagePanels.SliderDefaults.erase(mainPagePanels.SliderDefaults.begin() + x);
+			mainPagePanels.sliderLine.erase(mainPagePanels.sliderLine.begin() + x);
+			mainPagePanels.SliderVal.erase(mainPagePanels.SliderVal.begin() + x);
+			character.remSlider(x);
 
-				auto panel = mainPagePanels.SlidersButtons.second->GetParent();
-
-				panel->FitInside();
-				panel->Layout();
+			for (auto it = shortRestSliders.begin(); it != shortRestSliders.end(); ++it)
+			{
+				if (*it == x)
+				{
+					shortRestSliders.erase(it);
+				}
 			}
+			
+			for (auto it = longRestSliders.begin(); it != longRestSliders.end(); ++it)
+			{
+				if (*it == x)
+				{
+					longRestSliders.erase(it);
+				}
+			}
+
+			auto panel = mainPagePanels.SlidersButtons.second->GetParent();
+
+			panel->FitInside();
+			panel->Layout();
+		}
+		
+		if (mainPagePanels.Sliders.size() == 0)
+		{
+			menuBarItems.RestAddSliderToLong->Enable(false);
+			menuBarItems.RestAddSliderToShort->Enable(false);
 		}
 	}
 }
@@ -3391,7 +3466,7 @@ void MainFrame::onKnownSpellsUseSpell(wxCommandEvent& event)
 			{
 				spin->SetValue(curVal - 1);
 				auto& curSlots = character.getCurSpellSlots();
-				if (curSlots.slots[i].second != 0)
+				if (curSlots.slots[i].second > 0 || curSlots.slots[i].second == -4)
 					curSlots.slots[i].second--;
 				else
 					curSlots.slots[i].first--;
@@ -3814,11 +3889,124 @@ void MainFrame::onRestMenuEvents(wxCommandEvent& event)
 		HealToPerc();
 		FillRegularSlots();
 		FillWarlockSlots();
+		DefaultLongSliders();
+		DefaultShortSliders();
 	}
 
 	if (obj == menuBarItems.RestShort->GetId())
 	{
+		DefaultShortSliders();
 		FillWarlockSlots();
+	}
+
+	if (obj == menuBarItems.RestAddSliderToLong->GetId())
+	{
+		
+		SliderRemDialog dialog(this, wxID_ANY, mainPagePanels.Sliders);
+		if (dialog.ShowModal() == wxID_CANCEL)
+			return;
+
+		int x = dialog.getSelected();
+		
+		if (x == -1)
+			return;
+
+		for (auto& it : shortRestSliders)
+			if (x == x)
+				return;
+
+		longRestSliders.push_back(x);
+
+		menuBarItems.RestRemSliderToLong->Enable();
+	}
+
+	if (obj == menuBarItems.RestAddSliderToShort->GetId())
+	{
+		SliderRemDialog dialog(this, wxID_ANY, mainPagePanels.Sliders);
+		if (dialog.ShowModal() == wxID_CANCEL)
+			return;
+
+		int x = dialog.getSelected();
+
+		if (x == -1)
+			return;
+
+		for (auto& it : longRestSliders)
+			if (x == x)
+				return;
+
+		shortRestSliders.push_back(x);
+		menuBarItems.RestRemSliderToShort->Enable();
+	}
+
+	if (obj == menuBarItems.RestRemSliderToLong->GetId())
+	{
+		std::vector<std::pair<wxStaticText*, wxSlider*>> newSliders;
+		for (auto it = longRestSliders.begin(); it != longRestSliders.end(); ++it)
+			newSliders.push_back(mainPagePanels.Sliders[*it]);
+
+		SliderRemDialog dialog(this, wxID_ANY, newSliders);
+		
+		if (dialog.ShowModal() == wxID_CANCEL)
+			return;
+
+		int sel = dialog.getSelected();
+		
+		if (sel == -1)
+			return;
+
+		for (int i = 0; i < mainPagePanels.Sliders.size(); ++i)
+		{
+			if (newSliders[sel] == mainPagePanels.Sliders[i])
+			{
+				for (auto it = longRestSliders.begin(); it != longRestSliders.end(); ++it)
+				{
+					if (*it == i)
+					{
+						longRestSliders.erase(it);
+						return;
+					}
+				}
+			}
+		}
+
+		if (longRestSliders.size() == 0)
+			menuBarItems.RestRemSliderToLong->Enable(false);
+
+	}
+
+	if (obj == menuBarItems.RestRemSliderToShort->GetId())
+	{
+		std::vector<std::pair<wxStaticText*, wxSlider*>> newSliders;
+		for (auto it = shortRestSliders.begin(); it != shortRestSliders.end(); ++it)
+			newSliders.push_back(mainPagePanels.Sliders[*it]);
+
+		SliderRemDialog dialog(this, wxID_ANY, newSliders);
+
+		if (dialog.ShowModal() == wxID_CANCEL)
+			return;
+
+		int sel = dialog.getSelected();
+
+		if (sel == -1)
+			return;
+
+		for (int i = 0; i < mainPagePanels.Sliders.size(); ++i)
+		{
+			if (newSliders[sel] == mainPagePanels.Sliders[i])
+			{
+				for (auto it = shortRestSliders.begin(); it != shortRestSliders.end(); ++it)
+				{
+					if (*it == i)
+					{
+						longRestSliders.erase(it);
+						return;
+					}
+				}
+			}
+		}
+		if (shortRestSliders.size() == 0)
+			menuBarItems.RestRemSliderToShort->Enable(false);
 	}
 
 	updateKnownSpellsLists();

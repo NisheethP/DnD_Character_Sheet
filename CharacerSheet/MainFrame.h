@@ -29,6 +29,9 @@ class MainFrame : public wxFrame
 	std::vector<std::pair<Conditions, feature>> playerConditions;
 	std::vector<std::pair<Conditions, feature>> not_playerConditions;
 
+	std::vector<int> shortRestSliders;
+	std::vector<int> longRestSliders;
+
 	std::vector<Spell> allSpells;
 	std::vector<Spell*> allSpellsLevel[10];
 	Character character;
@@ -87,6 +90,11 @@ class MainFrame : public wxFrame
 		
 		wxMenuItem* RestLong;
 		wxMenuItem* RestShort;
+
+		wxMenuItem* RestAddSliderToShort;
+		wxMenuItem* RestAddSliderToLong;
+		wxMenuItem* RestRemSliderToShort;
+		wxMenuItem* RestRemSliderToLong;
 
 		wxMenuItem* ConditionsAll;
 		wxMenuItem* ConditionsPlayer;
@@ -183,6 +191,7 @@ class MainFrame : public wxFrame
 		std::pair<wxButton*, wxButton*> SlidersButtons;
 		std::vector<wxTextCtrl*> SliderVal;
 		std::vector<std::pair<wxStaticText* ,wxSlider*>> Sliders;
+		std::vector<int> SliderDefaults;
 		std::vector<wxStaticLine*> sliderLine;
 		//MainPagePanels();
 
@@ -327,6 +336,9 @@ public:
 	void HealToPerc();
 	void FillRegularSlots();
 	void FillWarlockSlots();
+
+	void DefaultLongSliders();
+	void DefaultShortSliders();
 
 	//----------------------
 	//Event Handlers

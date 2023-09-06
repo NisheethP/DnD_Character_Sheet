@@ -30,6 +30,9 @@ WarlockSlotsDialog::WarlockSlotsDialog(wxWindow* parent, wxWindowID id, const wx
 		horSizer->Add(spin);
 
 		sizer->Add(horSizer, 0, wxALIGN_RIGHT | wxALL, 5);
+
+		if (i == 1)
+			spin->SetMax(5);
 	}
 
 	sizer->Add(CreateButtonSizer(wxOK | wxCANCEL), 0, wxALIGN_RIGHT | wxRIGHT | wxBOTTOM, 5);
