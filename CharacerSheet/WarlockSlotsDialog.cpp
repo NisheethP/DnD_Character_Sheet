@@ -20,7 +20,7 @@ WarlockSlotsDialog::WarlockSlotsDialog(wxWindow* parent, wxWindowID id, const wx
 	for (int i = 0; i < 2; ++i)
 	{
 		auto text = new wxStaticText(this, wxID_ANY, str[i]);
-		auto spin = new wxSpinCtrl(this, wxID_ANY, "0");
+		auto spin = new wxSpinCtrl(this, wxID_ANY, "0", wxDefaultPosition, wxSize(60, -1));
 		
 		spin->SetValidator(wxGenericValidator(x[i]));
 		auto horSizer = new wxBoxSizer(wxHORIZONTAL);

@@ -12,6 +12,8 @@
 #include <wx/html/htmlwin.h>
 #include <wx/splitter.h>
 
+#include "AttackControl.h"
+
 #include "Character.h"
 #include <vector>
 #include <tuple>
@@ -194,6 +196,8 @@ class MainFrame : public wxFrame
 		std::vector<int> SliderDefaults;
 		std::vector<wxStaticLine*> sliderLine;
 		//MainPagePanels();
+
+		AttackControl* AttackPanel = nullptr;
 
 	}mainPagePanels;
 

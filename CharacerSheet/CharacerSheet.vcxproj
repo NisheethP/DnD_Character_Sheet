@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="AddCondDialog.cpp" />
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="AttackControl.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="CharClass.cpp" />
     <ClCompile Include="ConditionDialog.cpp" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="AddCondDialog.h" />
     <ClInclude Include="App.h" />
+    <ClInclude Include="AttackControl.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="CharClass.h" />
     <ClInclude Include="ConditionDialog.h" />

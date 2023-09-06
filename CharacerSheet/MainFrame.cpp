@@ -37,6 +37,7 @@
 #include "DiceRollerDialog.h"
 #include "SpellSlotDialog.h"
 #include "WarlockSlotsDialog.h"
+#include "AttackControl.h"
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900,600)),
@@ -287,7 +288,8 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 	panel->SetBackgroundColour(mainColour.first);
 	panel->SetScrollRate(0, FromDIP(10));
 	
-	wxGridBagSizer* mainGridSizer = new wxGridBagSizer(5, 5);
+	int gap = 5;
+	wxGridBagSizer* mainGridSizer = new wxGridBagSizer(gap, gap);
 
 	std::vector<std::pair<wxGBPosition, wxGBSpan>> items =
 	{
@@ -331,7 +333,10 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 		{{7,2}, {4,2}},		//16   SLIDERS
 
 		//Conditions
-		{{5,4}, {1,2}}		//17   CONDITIONS
+		{{5,4}, {1,2}},		//17   CONDITIONS
+		
+		//ATTACK LIST
+		{{6,4}, {2,2}}		//18   ATTACKS
 	};
 
 	wxPanel* p;
@@ -423,6 +428,13 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 
 	curItem = items[17];
 	p = CreatePlayerConditions(panel);
+	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
+
+	curItem = items[18];
+	p = mainPagePanels.AttackPanel = new AttackControl(panel, wxID_ANY, wxDefaultPosition, mainPagePanels.AC->GetParent()->GetSize());
+	setWindowColour(p, panelColour);
+	setWindowColour(mainPagePanels.AttackPanel->getList(), listColour);
+
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	//mainGridSizer->AddGrowableRow(0);
