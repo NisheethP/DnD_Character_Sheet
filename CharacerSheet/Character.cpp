@@ -563,6 +563,30 @@ int Character::getCasterLevel()
 	return static_cast<int>(castLevel);
 }
 
+std::vector<CharClass>& Character::getCombinedClasses()
+{
+	std::vector<CharClass> tempClasses;
+
+	for (auto i = charClass.begin(); i != charClass.end(); ++i)
+	{
+		int charLevel = i->level;
+		bool classExists = false;
+		for (auto j = tempClasses.begin(); j < tempClasses.end(); ++j)
+		{
+			if (j->classType == i->classType)
+			{
+				j->level += i->level;
+				classExists = true;
+			}
+		}
+
+		if (!classExists)
+			tempClasses.push_back(*i);
+	}
+
+	return tempClasses;
+}
+
 int Character::getSavingThrow()
 {
 	int ST = 0;
@@ -857,6 +881,33 @@ std::string getNumStr(int x)
 	str += std::to_string(x);
 
 	return str;
+}
+
+std::string getDieTypeStr(DieType die)
+{
+	switch (die)
+	{
+	case DieType::d4:
+		return "d4";
+	case DieType::d6:
+		return "d6";
+	case DieType::d8:
+		return "d8";
+	case DieType::d10:
+		return "d10";
+	case DieType::d12:
+		return "d12";
+	case DieType::d20:
+		return "d20";
+	case DieType::d100:
+		return "d100";
+	case DieType::error:
+		return "Die:ERROR";
+	default:
+		return "Die:EMPTY";
+		break;
+	}
+	return std::string();
 }
 
 bool feature::operator==(const feature& rhs)

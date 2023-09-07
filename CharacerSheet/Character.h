@@ -198,6 +198,7 @@ public:
 	int& getCopper()	{ return copper; }
 
 	int getCasterLevel();
+	std::vector<CharClass>& getCombinedClasses();
 
 	int getSavingThrow();
 	int getSkillsProfs();
@@ -278,3 +279,4 @@ std::string getSkillStr(const Skills& skill);
 Skills getSkllfromStr(const std::string& str);
 std::string getNumStr(int x);
 
+std::string getDieTypeStr(DieType die);

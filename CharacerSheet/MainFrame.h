@@ -108,6 +108,8 @@ class MainFrame : public wxFrame
 		wxMenuItem* NotesDefBGColour;
 		
 		wxMenuItem* DiceRoll;
+		wxMenuItem* DiceAdv;
+
 	}menuBarItems;
 
 	//CONTROLS IN SPELLS PAGE

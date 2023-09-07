@@ -28,9 +28,11 @@ public:
 
 	~DiceRollerDialog();
 
-	wxPanel* createDiceLine(wxWindow* parent);
+	wxPanel* createDiceLine(wxWindow* parent, int pNum = 1, std::string pDieType = "d4", int pMod = 0);
 
 	void BindAll();
+
+	void addDiceRow(int num = 1, std::string dice = "d4", int mod = 0);
 
 	void onRemoveRow(wxCommandEvent& event);
 	void onAddRow(wxCommandEvent& event);

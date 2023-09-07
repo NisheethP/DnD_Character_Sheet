@@ -181,6 +181,8 @@ void MainFrame::CreateMenuBar()
 	menuBarItems.ResetSlots = ResetMenu->Append(wxID_ANY, "Delete Spells");
 	
 	menuBarItems.DiceRoll = DiceMenu->Append(wxID_ANY, "Roll Dice");
+	menuBarItems.DiceAdv = DiceMenu->Append(wxID_ANY, "Roll 2d20");
+
 
 	menuBarItems.NotesFont = NotesMenu->Append(wxID_ANY, "Font Settings");
 	NotesMenu->AppendSeparator();
@@ -280,6 +282,7 @@ void MainFrame::BindControls()
 	this->Bind(wxEVT_MENU, &MainFrame::onNotesMenuEvents, this, menuBarItems.NotesDefBGColour->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onDiceMenuEvents, this, menuBarItems.DiceRoll->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onDiceMenuEvents, this, menuBarItems.DiceAdv->GetId());
 }
 
 wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
@@ -1520,10 +1523,12 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 	auto panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, ACSize);
 	auto sizer = new wxBoxSizer(wxVERTICAL);
 	panel->SetScrollRate(0, FromDIP(10));
+
 	panel->SetMaxSize(FromDIP(wxSize(this->GetSize().x, 200)));
+
 	auto& charClass = character.getCharClass();
 
-	std::vector<CharClass> tempClasses;
+	/*std::vector<CharClass> tempClasses;
 
 	for (auto i = charClass.begin(); i != charClass.end(); ++i)
 	{
@@ -1540,7 +1545,9 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 
 		if (!classExists)
 			tempClasses.push_back(*i);
-	}
+	}*/
+
+	auto& tempClasses = character.getCombinedClasses();
 	
 	sizer->Add(-1, 5);
 
@@ -4115,9 +4122,21 @@ void MainFrame::onConditionMenuEvents(wxCommandEvent& event)
 
 void MainFrame::onDiceMenuEvents(wxCommandEvent& event)
 {
-	DiceRollerDialog* dialog = new DiceRollerDialog(this, wxID_ANY, "Roll Dice", wxDefaultPosition, FromDIP(wxSize(600,500)), 
-		wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE);
-	dialog->Show();
+	if (event.GetId() == menuBarItems.DiceRoll->GetId())
+	{
+		DiceRollerDialog* dialog = new DiceRollerDialog(this, wxID_ANY, "Roll Dice", wxDefaultPosition, FromDIP(wxSize(600, 500)),
+			wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE);
+		dialog->addDiceRow(1, "d20");
+		dialog->Show();
+	}
+
+	if (event.GetId() == menuBarItems.DiceAdv->GetId())
+	{
+		DiceRollerDialog* dialog = new DiceRollerDialog(this, wxID_ANY, "Roll Dice", wxDefaultPosition, FromDIP(wxSize(600, 500)),
+			wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE);
+		dialog->addDiceRow(2, "d20");
+		dialog->Show();
+	}
 }
 
 void MainFrame::onNotesMenuEvents(wxCommandEvent& event)

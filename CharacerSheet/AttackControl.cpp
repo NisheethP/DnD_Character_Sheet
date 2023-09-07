@@ -124,8 +124,3 @@ std::string AttackControl::AddDialog::getInput(int index)
 		return "";
 	}
 }
-
-AttackControl::RemDialog::RemDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style, const wxString& name):
-	wxDialog(parent, id, title, pos, size, style, name)
-{
-}

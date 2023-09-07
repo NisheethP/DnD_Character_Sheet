@@ -43,9 +43,9 @@ DiceRollerDialog::DiceRollerDialog(
 	History = new wxListBox(this, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(200,-1)));
 	History->SetFont(History->GetFont().Larger());
 	
-	wxPanel* p = createDiceLine(scrollPanel);
+	/*wxPanel* p = createDiceLine(scrollPanel);
 	diceSizer->Add(p, 0, wxRIGHT, 10);
-	diceSizer->Add(-1, 2);
+	diceSizer->Add(-1, 2);*/
 
 	mainSizer->Add(History, 1, wxEXPAND | wxALL, margin);
 	mainSizer->Add(scrollPanel, 0, wxEXPAND | wxALL, margin);
@@ -56,7 +56,7 @@ DiceRollerDialog::DiceRollerDialog(
 	this->Layout();
 }
 
-wxPanel* DiceRollerDialog::createDiceLine(wxWindow* parent)
+wxPanel* DiceRollerDialog::createDiceLine(wxWindow* parent, int pNum, std::string pDieType, int pMod)
 {
 	auto panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 
@@ -82,12 +82,15 @@ wxPanel* DiceRollerDialog::createDiceLine(wxWindow* parent)
 	auto remButton = new wxButton(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
 
 	dice->SetMin(1);
+	dice->SetValue(pNum);
 
 	mod->SetMin(-100);
 	mod->SetMax(100);
-	mod->SetValue(0);
+	mod->SetValue(pMod);
 
-	combo->Select(0);
+	if (!combo->SetStringSelection(pDieType))
+		combo->Select(0);
+
 
 	remButton->SetBitmap(wxArtProvider().GetBitmap(wxART_DELETE, wxART_BUTTON));
 
@@ -108,9 +111,8 @@ wxPanel* DiceRollerDialog::createDiceLine(wxWindow* parent)
 	combo->SetValidator(wxGenericValidator(dieType));
 	mod->SetValidator(wxGenericValidator(modifier));
 	
-	TransferDataFromWindow();
-	*numDie = 1;
-	*modifier = 0;
+	*numDie = pNum;
+	*modifier = pMod;
 	TransferDataToWindow();
 
 	DiceLine.push_back({ dice, combo, mod, remButton });
@@ -165,14 +167,17 @@ void DiceRollerDialog::BindAll()
 	Roll->Bind(wxEVT_BUTTON, &DiceRollerDialog::onRoll, this);
 }
 
-void DiceRollerDialog::onAddRow(wxCommandEvent& event)
+void DiceRollerDialog::addDiceRow(int num, std::string dice, int mod)
 {
-	if (DiceLine.size() > 25)
-		return;
-	wxPanel* p = createDiceLine(Add->GetParent());
+	wxPanel* p = createDiceLine(Add->GetParent(), num, dice, mod);
 	diceSizer->Add(p, 0, wxRIGHT, 10);
 	diceSizer->Add(-1, 2);
 	mainSizer->Layout();
+}
+
+void DiceRollerDialog::onAddRow(wxCommandEvent& event)
+{
+	addDiceRow(1, "d20", 0);
 }
 
 void DiceRollerDialog::onRoll(wxCommandEvent& event)
