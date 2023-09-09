@@ -269,7 +269,7 @@ void MainFrame::BindControls()
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestShort->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestAddSliderToLong->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestAddSliderToShort->GetId());
-	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestRemSliderToShort->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestRemSliderToLong->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestRemSliderToShort->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onConditionMenuEvents, this, menuBarItems.ConditionsAll->GetId());
@@ -1547,7 +1547,7 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 			tempClasses.push_back(*i);
 	}*/
 
-	auto& tempClasses = character.getCombinedClasses();
+	auto tempClasses = character.getCombinedClasses();
 	
 	sizer->Add(-1, 5);
 
@@ -3930,8 +3930,8 @@ void MainFrame::onRestMenuEvents(wxCommandEvent& event)
 		if (x == -1)
 			return;
 
-		for (auto& it : shortRestSliders)
-			if (x == x)
+		for (auto& it : longRestSliders)
+			if (it == x)
 				return;
 
 		longRestSliders.push_back(x);
@@ -3950,8 +3950,8 @@ void MainFrame::onRestMenuEvents(wxCommandEvent& event)
 		if (x == -1)
 			return;
 
-		for (auto& it : longRestSliders)
-			if (x == x)
+		for (auto& it : shortRestSliders)
+			if (it == x)
 				return;
 
 		shortRestSliders.push_back(x);
@@ -3983,7 +3983,7 @@ void MainFrame::onRestMenuEvents(wxCommandEvent& event)
 					if (*it == i)
 					{
 						longRestSliders.erase(it);
-						return;
+						break;
 					}
 				}
 			}
@@ -4018,12 +4018,13 @@ void MainFrame::onRestMenuEvents(wxCommandEvent& event)
 				{
 					if (*it == i)
 					{
-						longRestSliders.erase(it);
-						return;
+						shortRestSliders.erase(it);
+						break;
 					}
 				}
 			}
 		}
+
 		if (shortRestSliders.size() == 0)
 			menuBarItems.RestRemSliderToShort->Enable(false);
 	}

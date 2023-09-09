@@ -3,9 +3,12 @@ return CreateSpellDescription(static_cast<wxPanel*>(parent), *knownPagePanels.di
 
 Features to Add
 	Saving
-	Options for spell slot and spell points
-	Death Saves
 	Inventory (with images?)
 	Long Rest and Short Rest
 	Level Up Options
 	Change Name and other read-only
+	Jack of All Trades
+	Empty Name
+	Name Size
+	Set Class
+	Where did hit dice go!

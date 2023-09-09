@@ -563,7 +563,7 @@ int Character::getCasterLevel()
 	return static_cast<int>(castLevel);
 }
 
-std::vector<CharClass>& Character::getCombinedClasses()
+std::vector<CharClass> Character::getCombinedClasses()
 {
 	std::vector<CharClass> tempClasses;
 

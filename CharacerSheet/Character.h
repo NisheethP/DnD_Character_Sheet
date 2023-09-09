@@ -198,7 +198,7 @@ public:
 	int& getCopper()	{ return copper; }
 
 	int getCasterLevel();
-	std::vector<CharClass>& getCombinedClasses();
+	std::vector<CharClass> getCombinedClasses();
 
 	int getSavingThrow();
 	int getSkillsProfs();
