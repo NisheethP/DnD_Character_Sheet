@@ -53,10 +53,12 @@ class MainFrame : public wxFrame
 
 	wxSize baseColSize;
 	wxSize buttonSize;
+	double acColSizeMod = 1.2;
 
 	wxSizer* masterSizer;
 	wxPanel* masterPanel;
 	wxNotebook* mainNotebook;
+
 
 	struct Uses
 	{

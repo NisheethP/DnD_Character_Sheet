@@ -47,6 +47,7 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	SkillFont(wxFontInfo(wxSize(0, 12))),
 	baseColSize(170, -1),
 	buttonSize(40,-1),
+	acColSizeMod(1.2),
 	masterPanel(new wxPanel(this, wxID_ANY, wxPoint(100, 400), wxDefaultSize)),
 	mainNotebook(new wxNotebook(masterPanel, wxID_ANY))
 {
@@ -333,7 +334,7 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 		{{2,4}, {1,2}},		//15   LANG PROFS
 
 		//Sliders
-		{{7,2}, {4,2}},		//16   SLIDERS
+		{{7,2}, {3,2}},		//16   SLIDERS
 
 		//Conditions
 		{{5,4}, {1,2}},		//17   CONDITIONS
@@ -355,6 +356,7 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 	
 	curItem = items[1];
 	p = CreateACPanel(panel);
+	p->SetMinSize(wxSize(p->GetSize().x * acColSizeMod, p->GetSize().y));
 	p->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
@@ -395,6 +397,7 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 
 	curItem = items[9];
 	p = CreateToolProficiencies(panel);
+	p->SetMinSize(wxSize(p->GetSize().x * acColSizeMod, p->GetSize().y));
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[10];
@@ -418,11 +421,13 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 
 	curItem = items[14];
 	auto p1 = CreateHitDiePanel(panel);
+	p1->SetMinSize(wxSize(p1->GetSize().x* acColSizeMod, -1));
 	p1->SetBackgroundColour(panelBGColour);
 	mainGridSizer->Add(p1, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[15];
 	p = CreateLangProficiencies(panel);
+	p->SetMinSize(wxSize(p->GetSize().x* acColSizeMod, -1));
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[16];
@@ -431,10 +436,12 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 
 	curItem = items[17];
 	p = CreatePlayerConditions(panel);
+	p->SetMinSize(wxSize(p->GetSize().x* acColSizeMod, -1));
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[18];
 	p = mainPagePanels.AttackPanel = new AttackControl(panel, wxID_ANY, wxDefaultPosition, mainPagePanels.AC->GetParent()->GetSize());
+	p->SetMinSize(wxSize(p->GetSize().x* acColSizeMod, -1));
 	setWindowColour(p, panelColour);
 	setWindowColour(mainPagePanels.AttackPanel->getList(), listColour);
 
@@ -3121,6 +3128,24 @@ void MainFrame::onAddRemSlider(wxCommandEvent& event)
 		int x = dialog.getSelected();
 		if (x != -1)
 		{
+			for (auto it = shortRestSliders.begin(); it != shortRestSliders.end(); ++it)
+			{
+				if (*it == x)
+				{
+					shortRestSliders.erase(it);
+					break;
+				}
+			}
+
+			for (auto it = longRestSliders.begin(); it != longRestSliders.end(); ++it)
+			{
+				if (*it == x)
+				{
+					longRestSliders.erase(it);
+					break;
+				}
+			}
+
 			mainPagePanels.Sliders[x].second->Unbind(wxEVT_SLIDER, &MainFrame::onSliderChange, this);
 			mainPagePanels.Sliders[x].first->Destroy();
 			mainPagePanels.Sliders[x].second->Destroy();
@@ -3132,23 +3157,7 @@ void MainFrame::onAddRemSlider(wxCommandEvent& event)
 			mainPagePanels.sliderLine.erase(mainPagePanels.sliderLine.begin() + x);
 			mainPagePanels.SliderVal.erase(mainPagePanels.SliderVal.begin() + x);
 			character.remSlider(x);
-
-			for (auto it = shortRestSliders.begin(); it != shortRestSliders.end(); ++it)
-			{
-				if (*it == x)
-				{
-					shortRestSliders.erase(it);
-				}
-			}
 			
-			for (auto it = longRestSliders.begin(); it != longRestSliders.end(); ++it)
-			{
-				if (*it == x)
-				{
-					longRestSliders.erase(it);
-				}
-			}
-
 			auto panel = mainPagePanels.SlidersButtons.second->GetParent();
 
 			panel->FitInside();

@@ -1,13 +1,15 @@
 #pragma once
 
 #include <wx/wx.h>
+#include <string>
 #include <wx/listctrl.h>
 
 class AttackControl : public wxPanel
 {
 	class AddDialog : public wxDialog
 	{
-		wxTextCtrl* input[3] = { nullptr, nullptr, nullptr };
+		wxTextCtrl* input[4] = { nullptr, nullptr, nullptr, nullptr };
+		wxChoice* diceType = nullptr;
 	public:
 		AddDialog(wxWindow* parent,
 			wxWindowID 	id,
@@ -19,6 +21,12 @@ class AttackControl : public wxPanel
 		);
 
 		std::string getInput(int index);
+		std::string getName() { return input[0]->GetValue().ToStdString(); }
+		int getMod() { return std::stoi(input[1]->GetValue().ToStdString()); }
+		int getDmgDice() { return std::stoi(input[2]->GetValue().ToStdString()); }
+		std::string getDieType() { return diceType->GetString(diceType->GetSelection()).ToStdString(); };
+		std::string getDmgType() { return input[3]->GetValue().ToStdString(); }
+
 	};
 
 	wxButton* Add = nullptr;
@@ -39,5 +47,6 @@ public:
 
 	void onAddButton(wxCommandEvent& event);
 	void onRemButton(wxCommandEvent& event);
+	void onListDClick(wxListEvent& event);
 };
 

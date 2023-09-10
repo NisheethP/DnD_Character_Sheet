@@ -162,7 +162,7 @@ public:
 	//-------------
 	//GET FUNCTIONS
 	//-------------
-	std::string getName() { return characterName; }
+	std::string& getName() { return characterName; }
 	std::string getClass(); 
 
 	std::vector<CharClass>& getCharClass() { return charClass; }
