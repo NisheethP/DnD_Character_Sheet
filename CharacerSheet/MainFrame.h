@@ -363,6 +363,7 @@ public:
 	void onACCheckBoxTick(wxCommandEvent& event);
 	void onGiveTempHPButton(wxCommandEvent& event);
 	void onSetArmorButton(wxCommandEvent& event);
+	void onHealDamageButton(wxCommandEvent& event);
 	void onHealToButton(wxCommandEvent& event);
 	void onHPSpin(wxSpinEvent& event);
 	void onTempHPSpin(wxSpinEvent& event);
