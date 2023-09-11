@@ -30,6 +30,7 @@ class MainFrame : public wxFrame
 	std::vector<std::pair<Conditions, feature>> allConditions;
 	std::vector<std::pair<Conditions, feature>> playerConditions;
 	std::vector<std::pair<Conditions, feature>> not_playerConditions;
+	int curInitiative;
 
 	std::vector<int> shortRestSliders;
 	std::vector<int> longRestSliders;
@@ -187,10 +188,12 @@ class MainFrame : public wxFrame
 		std::vector<wxSpinCtrl*> moneyVals;
 		std::pair<wxButton*, wxButton*> moneyButtons = { nullptr, nullptr };
 
+		std::tuple<wxButton*, wxButton*, wxSpinCtrl*> HealDamage;
 		std::tuple<wxStaticText* ,wxSpinCtrl*, wxButton*> HealToX;
 		std::tuple<wxStaticText*, wxSpinCtrl*> MaxHPBonus;
 
 		std::pair<wxTextCtrl*, wxTextCtrl*> InitMod;
+		wxSpinCtrl* curInit;
 
 		std::vector<std::tuple<wxSpinCtrl*, wxStaticText*>> HitDie;
 

@@ -1442,14 +1442,18 @@ wxPanel* MainFrame::CreateInitiativePanel(wxPanel* parent)
 		wxALIGN_CENTER_HORIZONTAL | wxTE_READONLY);
 	auto& initMod = mainPagePanels.InitMod.second = new wxTextCtrl(panel, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize, 
 		wxALIGN_CENTER_HORIZONTAL | wxTE_READONLY);
+	auto& curInit = mainPagePanels.curInit = new wxSpinCtrl(panel, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 
 	auto initModText = new wxStaticText(panel, wxID_ANY, "Initiative Mod");
-	
+	auto curInitText = new wxStaticText(panel, wxID_ANY, "Current Initiative");
+
 	Init->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 	initMod->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
-
+	curInit->SetValidator(wxGenericValidator(&curInitiative));
+	
 	Init->SetFont(Init->GetFont().Bold().Larger());
 	initMod->SetFont(initMod->GetFont().Bold());
+	curInit->SetFont(curInit->GetFont().Bold());
 
 	int initiative = character.getInitiative();
 
@@ -1457,26 +1461,41 @@ wxPanel* MainFrame::CreateInitiativePanel(wxPanel* parent)
 
 	auto InitBox = new wxStaticBoxSizer(wxHORIZONTAL, panel, "Initiative");
 	auto subSizer = new wxBoxSizer(wxHORIZONTAL);
+	auto subSizer2 = new wxBoxSizer(wxHORIZONTAL);
 	
+	curInit->SetMin(-35);
+	curInit->SetMax(35);
+
 	InitBox->Add(Init, 1, wxEXPAND | wxLEFT | wxRIGHT, 30);
 
 	subSizer->Add(initModText, 0, wxTOP, 5);
 	subSizer->Add(5, -1);
 	subSizer->Add(initMod, 0, wxBOTTOM, 5);
+	
+	subSizer2->Add(curInitText, 0, wxTOP, 5);
+	subSizer2->Add(5, -1);
+	subSizer2->Add(curInit, 0, wxBOTTOM, 5);
 
 	sizer->Add(-1, 5);
 	sizer->Add(InitBox, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
 	sizer->Add(-1,5);
 	sizer->Add(subSizer, 0, wxEXPAND | wxLEFT | wxRIGHT, 20);
 	sizer->Add(-1, 5);
+	sizer->Add(subSizer2, 0, wxEXPAND | wxLEFT | wxRIGHT, 20);
 
 	InitBox->GetStaticBox()->SetForegroundColour(panelColour.second);
 	InitBox->GetStaticBox()->SetFont(InitBox->GetStaticBox()->GetFont().MakeBold().MakeLarger().MakeLarger());
 	
 	setWindowColour(Init, ctrlColour);
 	setWindowColour(initMod, ctrlColour);
+	setWindowColour(curInit, ctrlColour);
+
 	initModText->SetForegroundColour(panelColour.second);
 	initModText->SetFont(initModText->GetFont().MakeBold());
+
+	curInitText->SetForegroundColour(panelColour.second);
+	curInitText->SetFont(initModText->GetFont().MakeBold());
+
 	panel->SetSizer(sizer);
 	return panel;
 }
