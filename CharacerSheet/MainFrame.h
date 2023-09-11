@@ -151,8 +151,8 @@ class MainFrame : public wxFrame
 	struct MainPagePanels
 	{
 		//wxTextCtrl* PlayerName = nullptr;
-		wxStaticText* PlayerName = nullptr;
-		wxStaticText* Classes = nullptr;
+		wxTextCtrl* PlayerName = nullptr;
+		wxTextCtrl* Classes = nullptr;
 
 		std::vector<std::pair<wxStaticText*, wxTextCtrl*>> SavingThrows;
 		std::vector<std::pair<wxStaticText*, wxTextCtrl*>> Skills;

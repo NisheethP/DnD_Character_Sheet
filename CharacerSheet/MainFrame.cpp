@@ -9,6 +9,7 @@
 #include <wx/numdlg.h> 
 #include <wx/choicdlg.h>
 #include <wx/artprov.h>	
+#include <wx/valgen.h>
 #include <wx/fontdlg.h>
 #include <wx/colordlg.h>
 
@@ -45,7 +46,7 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	BigFont1(wxFontInfo(wxSize(0, 15))),
 	BigFont2(wxFontInfo(wxSize(0, 18))),
 	SkillFont(wxFontInfo(wxSize(0, 12))),
-	baseColSize(170, -1),
+	baseColSize(180, -1),
 	buttonSize(40,-1),
 	acColSizeMod(1.2),
 	masterPanel(new wxPanel(this, wxID_ANY, wxPoint(100, 400), wxDefaultSize)),
@@ -755,28 +756,30 @@ wxPanel* MainFrame::CreateNamePanel(wxPanel* parent)
 {
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
 	setWindowColour(panel, mainColour);
-
+	
+	wxBoxSizer* mainSizer = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
-	auto& charName = mainPagePanels.PlayerName = new wxStaticText(panel, wxID_ANY, character.getName());
-	auto charClass = new wxStaticText(panel, wxID_ANY, character.getClass());
+	auto& charName = mainPagePanels.PlayerName = new wxTextCtrl(panel, wxID_ANY, character.getName());
+	auto charClass = mainPagePanels.Classes = new wxTextCtrl(panel, wxID_ANY, character.getClass(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 
-	wxFont nameFont;
-	nameFont.SetPointSize(19);
-	nameFont.SetFamily(wxFONTFAMILY_SCRIPT);
-	nameFont.MakeBold();
-	nameFont.MakeUnderlined();
+	setWindowColour(charName, ctrlColour);
+	setWindowColour(charClass, ctrlColour);
+
+	charClass->SetMaxSize(FromDIP(wxSize(baseColSize.x, 60)));
+	wxFont nameFont(wxFontInfo(16).Family(wxFONTFAMILY_SWISS).Bold().Underlined());
 	
 	charName->SetFont(nameFont);
 	charClass->SetFont(BigFont1);
 
-	sizer->Add(-1, 10);
-	sizer->Add(charName, 0, wxLEFT, 15);
-	sizer->Add(baseColSize.x, 2);
-	sizer->Add(charClass, 0, wxLEFT, 15);
-	sizer->Add(-1, 10);
+	//sizer->Add(-1, 7);
+	sizer->Add(charName, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
+	sizer->Add(baseColSize.x, 3);
+	sizer->Add(charClass, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
+	//sizer->Add(-1, 10);
 
-	panel->SetSizer(sizer);
+	mainSizer->Add(sizer, 0, wxALIGN_CENTER | wxTOP | wxBOTTOM, 5);
+	panel->SetSizer(mainSizer);
 
 	return panel;
 }
