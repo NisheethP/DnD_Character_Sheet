@@ -180,6 +180,7 @@ public:
 	int getModTotHP()	{ return totHP + totHPMod; }
 
 	Stats* getStats() { return &charStats; }
+	Stats getStatsMods() { return charStatMods; }
 	size_t getNumberSpells() { return knownSpells.size(); }
 
 	std::vector<std::string>& getLanguages() { return languages; }

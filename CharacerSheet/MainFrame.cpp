@@ -1478,7 +1478,7 @@ wxPanel* MainFrame::CreateInitiativePanel(wxPanel* parent)
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	
-	auto& Init = mainPagePanels.InitMod.first = new wxTextCtrl(panel, wxID_ANY, std::to_string(character.getStats()->Dex), wxDefaultPosition, wxDefaultSize,
+	auto& Init = mainPagePanels.InitMod.first = new wxTextCtrl(panel, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize,
 		wxALIGN_CENTER_HORIZONTAL | wxTE_READONLY);
 	auto& initMod = mainPagePanels.InitMod.second = new wxTextCtrl(panel, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize, 
 		wxALIGN_CENTER_HORIZONTAL | wxTE_READONLY);
@@ -4059,6 +4059,27 @@ void MainFrame::onRestMenuEvents(wxCommandEvent& event)
 	{
 		DefaultShortSliders();
 		FillWarlockSlots();
+
+		auto combinedClass = character.getCombinedClasses();
+		
+		int posMod = 30, iter = 0;
+		for (auto it = combinedClass.begin(); it != combinedClass.end(); ++it)
+		{
+			wxPoint pos = this->GetPosition();
+			pos.x += FromDIP(iter * posMod);
+			pos.y += FromDIP(iter * posMod);
+
+			auto dialog = new DiceRollerDialog(this, wxID_ANY, it->getClassName(), pos, wxDefaultSize, wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE);
+			
+			int numDie = it->level;
+			auto dieType = getDieTypeStr(it->hitDie);
+			int mod = character.getStatsMods().Con;
+			
+			dialog->addDiceRow(numDie, dieType, mod);
+			dialog->Show();
+			iter++;
+		}
+
 	}
 
 	if (obj == menuBarItems.RestAddSliderToLong->GetId())

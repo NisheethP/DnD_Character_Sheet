@@ -110,7 +110,7 @@ void AttackControl::onListDClick(wxListEvent& event)
 		std::string dice = DMG.substr(numLen);
 		int mod = std::stoi(list->GetItemText(item, 1).ToStdString());
 
-		auto dialog = new DiceRollerDialog(this);
+		auto dialog = new DiceRollerDialog(this, wxID_ANY, "Attack Dice", wxDefaultPosition, wxDefaultSize, wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE);
 
 		dialog->addDiceRow(num, dice, mod);
 		dialog->Show();
