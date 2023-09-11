@@ -241,7 +241,7 @@ bool Character::checkSpellKnown(Spell& pSpell)
 	return false;
 }
 
-int Character::getTotalSpellPoints()
+int Character::getDefaultSpellPoints()
 {
 	int x = 0;
 
@@ -433,6 +433,14 @@ bool Character::remSpell(std::string spellName)
 	}
 
 	return false;
+}
+
+void Character::setMoney(int p, int g, int s, int c)
+{
+	platinum = p;
+	gold = g;
+	silver = s;
+	copper = c;
 }
 
 void Character::addMoney(int p, int g, int s, int c)

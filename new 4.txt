@@ -8,7 +8,9 @@ Features to Add
 	Level Up Options
 	Change Name and other read-only
 	Jack of All Trades
+	
 	Empty Name
 	Name Size
 	Set Class
-	Where did hit dice go!
+	Remove Spellpoint text
+	Add Concentration to Conditions

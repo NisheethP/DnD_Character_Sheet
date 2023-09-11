@@ -224,7 +224,9 @@ public:
 	void setSkillProfs(int x);
 	void setSavingThrowProfs(int x);
 	void setExpertises(int x) { skillExpertises = x; }
+	
 	void setSpellPoints(int x) { SpellPoints = x; curSpellPoints = x; }
+	void getCurSpellPoints(int x) { curSpellPoints = x; }
 
 	void addLanguage(std::string str);
 	bool remLanguage(std::string str);
@@ -235,6 +237,7 @@ public:
 	void addSpell(Spell pSpell);
 	bool remSpell(std::string spellName);
 
+	void setMoney(int p, int g, int s, int c);
 	void addMoney(int p, int g, int s, int c);
 
 	void addFeature(feature pFeat);
@@ -263,7 +266,7 @@ public:
 
 	bool checkSpellKnown(Spell& pSpell);
 
-	int getTotalSpellPoints();
+	int getDefaultSpellPoints();
 
 	int multiclassGetSorcererSlots(int spellLevel);
 

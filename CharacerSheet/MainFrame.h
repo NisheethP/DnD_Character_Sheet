@@ -219,6 +219,7 @@ class MainFrame : public wxFrame
 		wxTextCtrl* SpellSaveMod_Val = nullptr;
 		wxTextCtrl* SelectedSpells_Val = nullptr;
 		
+		wxStaticText* SpellPoints_Text = nullptr;
 		wxTextCtrl* SpellPoints_Val = nullptr;
 		std::vector<wxButton*> spellPointButton;
 
@@ -373,6 +374,7 @@ public:
 	void onToolProfecs(wxCommandEvent& event);
 	void onLangProfecs(wxCommandEvent& event);
 	void onAddRemMoney(wxCommandEvent& event);
+	void onSpinMoney(wxSpinEvent& event);
 	void onConditionListDClick(wxCommandEvent& event);
 
 	void onSpellSplitterResize(wxSplitterEvent& event);

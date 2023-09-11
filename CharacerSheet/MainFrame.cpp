@@ -177,13 +177,12 @@ void MainFrame::CreateMenuBar()
 
 	menuBarItems.ResetSP = ResetMenu->Append(wxID_ANY, "Reset Spell Points");
 	menuBarItems.ResetSlots = ResetMenu->Append(wxID_ANY, "Reset Slots");
-	menuBarItems.ResetSlots = ResetMenu->Append(wxID_ANY, "Uncheck Spells");
+	menuBarItems.ResetUncheckSpells = ResetMenu->Append(wxID_ANY, "Uncheck Spells");
 	ResetMenu->AppendSeparator();
-	menuBarItems.ResetSlots = ResetMenu->Append(wxID_ANY, "Delete Spells");
+	menuBarItems.ResetDeleteSpells = ResetMenu->Append(wxID_ANY, "Delete Spells");
 	
 	menuBarItems.DiceRoll = DiceMenu->Append(wxID_ANY, "Roll Dice");
 	menuBarItems.DiceAdv = DiceMenu->Append(wxID_ANY, "Roll 2d20");
-
 
 	menuBarItems.NotesFont = NotesMenu->Append(wxID_ANY, "Font Settings");
 	NotesMenu->AppendSeparator();
@@ -214,6 +213,7 @@ void MainFrame::BindControls()
 	mainPagePanels.Feature_FullList->Bind(wxEVT_LISTBOX, &MainFrame::onFeatureSelect, this);
 	//mainPagePanels.EL_ToolProf->Bind(wxEVT_LIST_ITEM_FOCUSED, &MainFrame::onToolProfecsSelect, this);
 	mainPagePanels.moneyButtons.first->GetParent()->Bind(wxEVT_BUTTON, &MainFrame::onAddRemMoney, this);
+	mainPagePanels.moneyVals[0]->GetParent()->Bind(wxEVT_SPINCTRL, &MainFrame::onSpinMoney, this);
 	
 	spellDesc.spellSplitter->Bind(wxEVT_SPLITTER_SASH_POS_CHANGED, &MainFrame::onSpellSplitterResize, this);
 	spellDesc.spellSplitter->Bind(wxEVT_SPLITTER_SASH_POS_CHANGING, &MainFrame::onSpellSplitterResize, this);
@@ -265,6 +265,11 @@ void MainFrame::BindControls()
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetExpertises->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSlots->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetWarlockSlots->GetId());
+
+	this->Bind(wxEVT_MENU, &MainFrame::onResetMenuEvents, this, menuBarItems.ResetDeleteSpells->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onResetMenuEvents, this, menuBarItems.ResetSlots->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onResetMenuEvents, this, menuBarItems.ResetSP->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onResetMenuEvents, this, menuBarItems.ResetUncheckSpells->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestLong->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestShort->GetId());
@@ -1722,8 +1727,8 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	auto SelectedSpells_Text = new wxStaticText(panel, wxID_ANY, "Spells\nTicked", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
 	knownPagePanels.SelectedSpells_Val = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 	
-	auto SpellPoints_Text = new wxStaticText(panel, wxID_ANY, "Spell\nPoints", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
-	knownPagePanels.SpellPoints_Val = new wxTextCtrl(panel, wxID_ANY, std::to_string(character.getTotalSpellPoints()), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
+	auto& SpellPoints_Text = knownPagePanels.SpellPoints_Text = new wxStaticText(panel, wxID_ANY, "Spell\nPoints", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+	knownPagePanels.SpellPoints_Val = new wxTextCtrl(panel, wxID_ANY, std::to_string(character.getDefaultSpellPoints()), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 
 	ProfBonus_Text->SetFont(curFont);
 	SpellCastMod_Text->SetFont(curFont);
@@ -1778,18 +1783,15 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 	sizer->Add(verBar, 0, wxEXPAND);
 	sizer->Add(gapBig, -1);
 
-	//if (uses.SpellPoints)
-	{
-		sizer->Add(SpellPoints_Text, 0, wxALIGN_CENTER);
-		sizer->Add(gapSmall, -1);
-		sizer->Add(knownPagePanels.SpellPoints_Val, 0, wxALIGN_CENTER);
+	sizer->Add(SpellPoints_Text, 0, wxALIGN_CENTER);
+	sizer->Add(gapSmall, -1);
+	sizer->Add(knownPagePanels.SpellPoints_Val, 0, wxALIGN_CENTER);
 
-		sizer->Add(gapBig, -1);
-		verBar = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
-		sizer->Add(verBar, 0, wxEXPAND);
-		sizer->Add(gapBig, -1);
-	}	
-
+	sizer->Add(gapBig, -1);
+	verBar = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
+	sizer->Add(verBar, 0, wxEXPAND);
+	sizer->Add(gapBig, -1);
+	
 	knownPagePanels.ProfBonus_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 	knownPagePanels.SpellCastMod_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 	knownPagePanels.SpellSaveMod_Val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
@@ -1800,6 +1802,7 @@ wxPanel* MainFrame::CreateKnownSpellAbilityPanel(wxPanel* parent)
 
 	if (!uses.SpellPoints)
 	{
+		SpellPoints_Text->Hide();
 		knownPagePanels.SpellPoints_Val->Hide();
 		verBar->Hide();
 	}
@@ -2400,7 +2403,7 @@ void MainFrame::updateKnownSpellsLists()
 			slotSpin->SetValue(x);
 		}		
 
-		x = character.getTotalSpellPoints();
+		x = character.getSpellPoints();
 		knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
 
 		if (uses.SpellSlots)
@@ -2417,19 +2420,22 @@ void MainFrame::updateKnownSpellsLists()
 
 		if (uses.SpellPoints)
 		{
+			knownPagePanels.SpellPoints_Text->Show();
 			knownPagePanels.SpellPoints_Val->Show();
 			knownPagePanels.spellPointButton[i]->Show();
 		}
 
 		if (!uses.SpellPoints)
 		{
+			knownPagePanels.SpellPoints_Text->Hide();
 			knownPagePanels.SpellPoints_Val->Hide();
 			knownPagePanels.spellPointButton[i]->Hide();
 		}
 		
 		slotSpin->GetParent()->GetParent()->Layout();
-		Layout();
 	}
+
+	knownPagePanels.SpellPoints_Text->GetParent()->Layout();
 }
 
 void MainFrame::updateMoneyCtrls()
@@ -3651,16 +3657,6 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 		}
 	}
 
-	if (obj == menuBarItems.SetSP->GetId())
-	{
-		std::string title = "Enter number of Spell Points (def ";
-		title += std::to_string(character.getTotalSpellPoints());
-		title += ")";
-		int max = character.getTotalSpellPoints();
-		int x = wxGetNumberFromUser(title, "", "Spell Points", max, 0, 10*max);
-		knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
-	}
-
 	if (obj == menuBarItems.SetSavingThrows->GetId())
 	{
 		std::vector<Skills> skills =
@@ -3795,6 +3791,29 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 		
 	}
 
+	if (obj == menuBarItems.SetSP->GetId())
+	{
+		std::string title = "Enter number of Spell Points (def ";
+		title += std::to_string(character.getDefaultSpellPoints());
+		title += ")";
+		int max = character.getDefaultSpellPoints();
+		int x = wxGetNumberFromUser(title, "", "Spell Points", max, 0, 10 * max);
+		knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
+
+		character.setSpellPoints(x);
+
+		overrides.spellPoint = true;
+		uses.SpellPoints = true;
+
+		if (x == 0)
+			uses.SpellPoints = false;
+
+		if (x == max)
+			overrides.spellPoint = false;
+
+		updateKnownSpellsLists();
+	}
+
 	if (obj == menuBarItems.SetSlots->GetId())
 	{
 		auto dialog = new SpellSlotDialog(this);
@@ -3888,22 +3907,37 @@ void MainFrame::onResetMenuEvents(wxCommandEvent& event)
 
 	if (obj == menuBarItems.ResetSP->GetId())
 	{
-		knownPagePanels.SpellPoints_Val->SetLabel(std::to_string(character.getTotalSpellPoints()));
+		knownPagePanels.SpellPoints_Val->SetLabel(std::to_string(character.getSpellPoints()));
 	}
 
 	if (obj == menuBarItems.ResetSlots->GetId())
 	{
-		
+		FillRegularSlots();
+		FillWarlockSlots();
 	}
 
 	if (obj == menuBarItems.ResetUncheckSpells->GetId())
 	{
 
+		for (auto it = knownPagePanels.SpellSlotLevelList.begin(); it != knownPagePanels.SpellSlotLevelList.end(); ++it)
+		{
+			auto& list = std::get<3>(*it);
+
+			for (int i = 0; i < list->GetCount(); ++i)
+			{
+				list->Check(i, false);
+			}
+		}
 	}
 
 	if (obj == menuBarItems.ResetDeleteSpells->GetId())
 	{
+		auto res = wxMessageDialog(this, "This will remove all known spells. Continue?", "", wxOK | wxCANCEL | wxCANCEL_DEFAULT).ShowModal();
+		if (res == wxID_CANCEL)
+			return;
 
+		for (auto it = knownPagePanels.SpellSlotLevelList.begin(); it != knownPagePanels.SpellSlotLevelList.end(); ++it)
+			std::get<3>(*it)->Clear();
 	}
 
 }
@@ -3919,6 +3953,8 @@ void MainFrame::onRestMenuEvents(wxCommandEvent& event)
 		FillWarlockSlots();
 		DefaultLongSliders();
 		DefaultShortSliders();
+		knownPagePanels.SpellPoints_Val->SetLabel(std::to_string(character.getDefaultSpellPoints()));
+
 	}
 
 	if (obj == menuBarItems.RestShort->GetId())
@@ -4294,7 +4330,6 @@ void MainFrame::onAddRemMoney(wxCommandEvent& event)
 				wxMessageBox("You don't have that much copper");
 			else
 				character.addMoney(-p, -g, -s, -c);
-
 		}
 
 		if (obj == mainPagePanels.moneyButtons.second)
@@ -4302,6 +4337,16 @@ void MainFrame::onAddRemMoney(wxCommandEvent& event)
 	}
 
 	updateMoneyCtrls();
+}
+
+void MainFrame::onSpinMoney(wxSpinEvent& event)
+{
+	int money[4] = { 0,0,0,0 };
+
+	for (int i = 0; i < 4; i++)
+		money[i] = mainPagePanels.moneyVals[i]->GetValue();
+
+	character.setMoney(money[0], money[1], money[2], money[3]);
 }
 
 void MainFrame::onConditionListDClick(wxCommandEvent& event)
