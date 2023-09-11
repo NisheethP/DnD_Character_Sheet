@@ -3,9 +3,6 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-new3.txt
-new4.txt
-
 # User-specific files
 *.rsuser
 *.suo
@@ -365,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /new 4.txt
+/new 3.txt
