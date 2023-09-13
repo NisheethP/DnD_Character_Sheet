@@ -148,6 +148,7 @@
     <ClCompile Include="DeathSavesControl.cpp" />
     <ClCompile Include="DiceRollerDialog.cpp" />
     <ClCompile Include="FeatureDialog.cpp" />
+    <ClCompile Include="ImagePage.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MoneyDialog.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="DeathSavesControl.h" />
     <ClInclude Include="DiceRollerDialog.h" />
     <ClInclude Include="FeatureDialog.h" />
+    <ClInclude Include="ImagePage.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MoneyDialog.h" />

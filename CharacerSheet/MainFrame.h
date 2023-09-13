@@ -25,7 +25,7 @@ using ColourPair = std::pair<wxColour, wxColour>;
 
 class MainFrame : public wxFrame
 {
-	int firstPage = 0;
+	int firstPage = 5;
 
 	std::vector<std::pair<Conditions, feature>> allConditions;
 	std::vector<std::pair<Conditions, feature>> playerConditions;

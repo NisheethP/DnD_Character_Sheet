@@ -32,6 +32,7 @@ class AttackControl : public wxPanel
 	wxButton* Add = nullptr;
 	wxButton* Rem = nullptr;
 	wxListView* list = nullptr;
+
 public:
 	AttackControl(wxWindow* parent,
 		wxWindowID 	id = wxID_ANY,

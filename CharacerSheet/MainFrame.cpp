@@ -39,6 +39,7 @@
 #include "SpellSlotDialog.h"
 #include "WarlockSlotsDialog.h"
 #include "AttackControl.h"
+#include "ImagePage.h"
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900,600)),
@@ -620,6 +621,12 @@ wxScrolled<wxPanel>* MainFrame::CreateInventoryPage(wxNotebook* parent)
 	panel->SetBackgroundColour(mainColour.first);
 	panel->SetScrollRate(0, FromDIP(10));
 
+	auto mainSizer = new wxBoxSizer(wxVERTICAL);
+	ImagePage* img = new ImagePage(panel, wxID_ANY, "Inventory");
+
+	mainSizer->Add(img, 1, wxEXPAND);
+
+	panel->SetSizer(mainSizer);
 	return panel;
 }
 
@@ -4347,6 +4354,7 @@ void MainFrame::onNotesMenuEvents(wxCommandEvent& event)
 	{
 		auto& text = notesPanels.PageText;
 		text->SetBackgroundColour(ctrlColour.first);
+		text->Refresh();
 	}
 }
 
