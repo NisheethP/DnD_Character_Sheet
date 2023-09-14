@@ -4,13 +4,15 @@
 #include <wx/stream.h>
 #include <wx/srchctrl.h>
 #include <wx/image.h>
+
 #include <vector>
+#include <tuple>
 
 class ImagePage : public wxPanel
 {
 	std::string FolderName = "";
 
-	std::vector<std::pair<std::string, wxImage*>> images;
+	std::vector<std::tuple<int, std::string, wxImage>> images;
 	int curImageIndex = 0;
 	wxStaticBitmap* curImage;
 	

@@ -8,6 +8,8 @@
 
 #include"Util.h"
 
+using std::get;
+
 ImagePage::ImagePage(wxWindow* parent,
 	wxWindowID 	id,
 	std::string pFolderName,
@@ -37,6 +39,10 @@ ImagePage::ImagePage(wxWindow* parent,
 	Rem->SetBitmap(wxArtProvider().GetBitmap(wxART_MINUS, wxART_BUTTON));
 
 	Search = new wxSearchCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize);
+	Search->SetDescriptiveText("File Name");
+	Search->ShowCancelButton(true);
+	Search->ShowSearchButton(true);
+
 
 	this->List = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE);
 	
@@ -54,18 +60,10 @@ ImagePage::ImagePage(wxWindow* parent,
 	Title->SetForegroundColour(*wxWHITE);
 
 	curImage = new wxStaticBitmap(imgPanel, wxID_ANY, wxArtProvider().GetIcon(wxART_MISSING_IMAGE));
-
+	
+	setCurImage(-1);
 	if (images.size() != 0)
-	{
-		wxImage img(*images[0].second);
-		double w = img.GetWidth();
-		double h = img.GetHeight();
-		double newHeight = h/w;
-		newHeight *= imgWidth;
-
-		img.Rescale(imgWidth, newHeight);
-		curImage->SetBitmap(img);
-	}
+		setCurImage(0);
 
 	//curImage->SetMaxSize(FromDIP(wxSize(200,400)));
 
@@ -139,16 +137,16 @@ bool ImagePage::loadExistingImages()
 	for (auto it = allFiles.begin(); it != allFiles.end(); ++it)
 	{
 		auto title = it->ToStdString();
-		wxImage* image = new wxImage();
+		wxImage image;
 		
 		wxFileInputStream input_stream(title);
 
-		wxPNGHandler().LoadFile(image, input_stream);
+		wxPNGHandler().LoadFile(&image, input_stream);
 
 		int len = FolderName.size() + 1;
 		title = title.substr(len);
 		title = title.substr(0, title.size() - 4);
-		images.push_back({ title, image });
+		images.push_back({images.size(), title, image });
 	}
 
 	return true;
@@ -160,7 +158,7 @@ void ImagePage::updateList()
 
 	for (auto it = images.begin(); it != images.end(); ++it)
 	{
-		auto str = it->first;
+		auto str = get<1>(*it);
 		str = str.substr(0,str.size());
 		List->Append(str);
 	}
@@ -177,13 +175,13 @@ void ImagePage::setCurImage(int index)
 	if (index >= images.size())
 		return;
 	
-	wxImage img(*images[index].second);
+	wxImage img(get<2>(images[index]));
 	double w = img.GetWidth();
 	double h = img.GetHeight();
 	double newHeight = h / w;
 	newHeight *= imgWidth;
 
-	img.Rescale(imgWidth, newHeight);
+	img.Rescale(imgWidth, newHeight, wxIMAGE_QUALITY_BILINEAR);
 	curImage->SetBitmap(img);
 }
 
@@ -199,10 +197,46 @@ void ImagePage::onRemButton(wxCommandEvent& event)
 
 void ImagePage::onSearchType(wxCommandEvent& event)
 {
+	auto str = Search->GetValue().ToStdString();
+	
+	if (str == "")
+	{
+		updateList();
+		return;
+	}
+	
+	Util::toLowerString(str);
+	List->Clear();
+	
+	for (auto it = images.begin(); it != images.end(); ++it)
+	{
+		auto title = get<1>(*it);
+		Util::toLowerString(title);
+		if (title.find(str) != std::string::npos)
+			List->Append(get<1>(*it));
+	}
 }
 
 void ImagePage::onSearchEnter(wxCommandEvent& event)
 {
+	/*auto str = Search->GetValue().ToStdString();
+	
+	if (str == "")
+	{
+		List->SetSelection(0);
+		return;
+	}
+		
+	if (List->GetCount() == 1)
+	{
+		List->Select(0);
+		return;
+	}
+
+	Util::toLowerString(str);
+	
+	int x = List->FindString(str);
+	List->Select(x);*/
 }
 
 void ImagePage::onListSelect(wxCommandEvent& event)
@@ -211,13 +245,13 @@ void ImagePage::onListSelect(wxCommandEvent& event)
 
 	for (int it = 0; it < images.size(); ++it)
 	{
-		auto title = images[it].first;
+		auto title = get<1>(images[it]);
 		Util::toLowerString(title);
 		Util::toLowerString(str);
 		if (title == str)
 		{
 			setCurImage(it);
-			Title->SetLabel(images[it].first);
+			Title->SetLabel(get<1>(images[it]));
 		}
 	}
 }
