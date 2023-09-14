@@ -1609,25 +1609,6 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 
 	auto& charClass = character.getCharClass();
 
-	/*std::vector<CharClass> tempClasses;
-
-	for (auto i = charClass.begin(); i != charClass.end(); ++i)
-	{
-		int charLevel = i->level;
-		bool classExists = false;
-		for (auto j = tempClasses.begin(); j < tempClasses.end(); ++j)
-		{
-			if (j->classType == i->classType)
-			{
-				j->level += i->level;
-				classExists = true;
-			}
-		}
-
-		if (!classExists)
-			tempClasses.push_back(*i);
-	}*/
-
 	auto tempClasses = character.getCombinedClasses();
 	
 	sizer->Add(-1, 5);
@@ -1635,7 +1616,7 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 	for (auto it = tempClasses.begin(); it != tempClasses.end(); ++it)
 	{
 		auto text = new wxStaticText(panel, wxID_ANY, "");
-		auto spin = new wxSpinCtrl(panel, wxID_ANY, "0", wxDefaultPosition, FromDIP(wxSize(40,-1)), wxALIGN_CENTER_HORIZONTAL);
+		auto spin = new wxSpinCtrl(panel, wxID_ANY, "0", wxDefaultPosition, FromDIP(wxSize(50,-1)), wxALIGN_CENTER_HORIZONTAL);
 		
 		setWindowColour(text, panelColour);
 		setWindowColour(spin, ctrlColour);
@@ -1678,6 +1659,8 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 
 		text->SetLabel(tempStr);
 		
+		text->SetFont(text->GetFont().Bold());
+
 		spin->SetMax(it->level);
 		spin->SetMin(0);
 		spin->SetValue(it->level);
@@ -1963,7 +1946,7 @@ wxPanel* MainFrame::CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel)
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
 	panel->SetBackgroundColour(mainColour.first);
 
-	wxSize baseSize(250, -1);
+	wxSize baseSize(270, -1);
 	wxSize curSize = baseSize;
 	curSize.x /= 4;
 	curSize.x -= 20;
