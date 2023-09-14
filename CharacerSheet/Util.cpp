@@ -12,6 +12,14 @@ void Util::toLowerString(std::string& str)
 		*it = std::tolower(*it);
 }
 
+std::string Util::toLowerStringRet(std::string str)
+{
+	for (auto it = str.begin(); it != str.end(); ++it)
+		*it = std::tolower(*it);
+
+	return str;
+}
+
 std::wstring Util::to_wstring(std::string str)
 {
 
