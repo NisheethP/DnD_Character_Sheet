@@ -104,6 +104,10 @@ enum Conditions
 class Character
 {
 private:
+	friend class boost::serialization::access;
+
+	template<class Archive>
+	void serialize(Archive& ar, const unsigned int version);
 
 	unsigned int charConditions;
 
@@ -278,3 +282,48 @@ Skills getSkllfromStr(const std::string& str);
 std::string getNumStr(int x);
 
 std::string getDieTypeStr(DieType die);
+
+template<class Archive>
+inline void Character::serialize(Archive& ar, const unsigned int version)
+{
+	ar& charConditions;
+	ar& characterName;
+	ar& characterClassStr;
+
+	ar& charClass;
+	ar& hitDice;
+
+	ar& languages;
+	ar& toolProf;
+	ar& features;
+	ar& inventory;
+	ar& sliders;
+	
+	ar& knownSpells;
+
+	ar& totalLevel;
+	ar& charStats;
+	ar& charStatMods;
+	ar& skillProficiencies;
+	ar& skillExpertises;
+	
+	ar& charSlots;
+	ar& curCharSlots;
+	ar& SpellPoints;
+	ar& curSpellPoints;
+	
+	ar& AC;
+	ar& initMod;
+	ar& totHP;
+	ar& totHPMod;
+	ar& curHP;
+	ar& profBonus;
+	ar& speed;
+	
+	ar& platinum;
+	ar& gold;
+	ar& silver;
+	ar& copper;
+
+	ar& tempHP;
+}

@@ -179,8 +179,8 @@ void Character::initSlots()
 
 	for (int i = 0; i <= 9; ++i)
 	{
-		int reg = charSlots.getNumSlots(castLevel, i);
-		int war = charSlots.getNumWarlockSlots(totWarlock, i);
+		int reg = charSlots.getNumSlots(i, castLevel);
+		int war = charSlots.getNumWarlockSlots(i, totWarlock);
 		
 		charSlots.slots.push_back({ reg, war });
 	}
@@ -802,8 +802,7 @@ std::string getSkillStr(const Skills& skill)
 
 Skills getSkllfromStr(const std::string& str)
 {
-	std::string lstr = str;
-	Util::toLowerString(lstr);
+	std::string lstr = Util::toLowerStringRet(str);
 	if (lstr == "acrobatics")
 		return Skills::Acrobatics;
 
@@ -875,6 +874,8 @@ Skills getSkllfromStr(const std::string& str)
 
 	if (lstr == "wisdom")
 		return Skills::Wisdom;
+
+	return Skills::none;
 }
 
 std::string getNumStr(int x)

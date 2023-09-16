@@ -66,7 +66,6 @@ void SpellSlot::initAllSlots()
 
 void SpellSlot::initAllWarlock()
 {
-	AllWarlockSlots.push_back({-4,0});	//0
 	AllWarlockSlots.push_back({1,1});	//1
 	AllWarlockSlots.push_back({2,1});	//2
 	AllWarlockSlots.push_back({2,2});	//3
@@ -89,7 +88,7 @@ void SpellSlot::initAllWarlock()
 	AllWarlockSlots.push_back({4,5});	//20
 }
 
-int SpellSlot::getNumSlots(int char_Level, int spell_Level)
+int SpellSlot::getNumSlots(int spell_Level, int char_Level)
 {
 	if (spell_Level == 0)
 		return -4;
@@ -97,6 +96,9 @@ int SpellSlot::getNumSlots(int char_Level, int spell_Level)
 	if (spell_Level < 1 || spell_Level > 9)
 		return -2;
 	
+	if (char_Level == 0)
+		return -1;
+
 	if (char_Level < 1 || char_Level > 20)
 		return -3;
 
@@ -105,9 +107,22 @@ int SpellSlot::getNumSlots(int char_Level, int spell_Level)
 
 int SpellSlot::getNumWarlockSlots(int spellLevel, int charLevel)
 {
+	if (spellLevel == 0)
+		return -4;
+
+	if (spellLevel < 1 || spellLevel > 9)
+		return -2;
+
+	if (charLevel == 0)
+		return -1;
+
+	if (charLevel < 1 || charLevel > 20)
+		return -3;
+
 	int num = -1;
-	if (spellLevel == AllWarlockSlots[charLevel].second)
-		num = AllWarlockSlots[charLevel].first;
+	
+	if (spellLevel == AllWarlockSlots[charLevel-1].second)
+		num = AllWarlockSlots[charLevel-1].first;
 	
 	return num;
 }

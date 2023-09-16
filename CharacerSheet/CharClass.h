@@ -32,6 +32,18 @@ enum class DieType
 
 class CharClass
 {
+	friend class boost::serialization::access;
+
+	template<class Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& usesSpellPoint;
+		ar& casterType;
+		ar& classType;
+		ar& level;
+		ar& hitDie;
+	}
+
 	bool usesSpellPoint = false;
 
 public:
@@ -54,7 +66,7 @@ public:
 
 	void setSpellPoint(bool x) { usesSpellPoint = x; }
 
-	CharClass(ClassType pClass, int pLevel, CasterType type = CasterType::None);
+	CharClass(ClassType pClass = ClassType::none, int pLevel = 1, CasterType type = CasterType::None);
 
 	bool operator== (CharClass& c2);
 };

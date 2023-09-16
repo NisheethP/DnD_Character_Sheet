@@ -9,7 +9,28 @@ using ColourPair = std::pair<wxColour, wxColour>;
 
 class MainFrame : public wxFrame
 {
-	int firstPage = 5;
+	friend class boost::serialization::access;
+	
+	template<class Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& curInitiative;
+		
+		ar& shortRestSliders;
+		ar& longRestSliders;
+
+		ar& character;
+		
+		ar& uses.SpellPoints;
+		ar& uses.SpellSlots;
+
+		ar& overrides.spellPoint;
+		ar& overrides.spellSlot;
+	}
+
+	std::string saveFolder = "Character Saves";
+	std::string fileName;
+	int firstPage = 0;
 
 	std::vector<std::pair<Conditions, feature>> allConditions;
 	std::vector<std::pair<Conditions, feature>> playerConditions;
@@ -44,7 +65,6 @@ class MainFrame : public wxFrame
 	wxPanel* masterPanel;
 	wxNotebook* mainNotebook;
 
-
 	struct Uses
 	{
 		bool SpellPoints = false;
@@ -60,6 +80,9 @@ class MainFrame : public wxFrame
 	//
 	struct MenuBarItems
 	{
+		wxMenuItem* FileNew;
+
+
 		wxMenuItem* SetName;
 		wxMenuItem* SetStats;
 		wxMenuItem* SetSkillProfs;
@@ -322,6 +345,8 @@ public:
 	void updateFeaturesList();
 	void updateNotes();
 
+	void updateAll();
+
 	void calcCheckedSpells();
 
 	void DrawMain();
@@ -365,6 +390,7 @@ public:
 	void onAddRemMoney(wxCommandEvent& event);
 	void onSpinMoney(wxSpinEvent& event);
 	void onConditionListDClick(wxCommandEvent& event);
+	void onCurInitiativeChange(wxSpinEvent& event);
 
 	void onSpellSplitterResize(wxSplitterEvent& event);
 
@@ -380,6 +406,7 @@ public:
 	void onNotesSelect(wxCommandEvent& event);
 	void onNotesDClick(wxCommandEvent& event);
 
+	void onFileMenuEvents(wxCommandEvent& event);
 	void onSetMenuEvents(wxCommandEvent& event);
 	void onResetMenuEvents(wxCommandEvent& event);
 	void onRestMenuEvents(wxCommandEvent& event);

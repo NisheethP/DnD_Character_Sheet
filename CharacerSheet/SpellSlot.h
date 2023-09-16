@@ -13,6 +13,42 @@
 
 class SpellSlot
 {
+	friend class boost::serialization::access;
+
+	template<class Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		try
+		{
+			ar& slots;
+		}
+		catch (const boost::archive::archive_exception& x)
+		{
+			x.code;
+			wxMessageBox("Slots");
+		}
+
+		/*try
+		{
+			ar& AllWarlockSlots;
+		}
+		catch (const boost::archive::archive_exception& x)
+		{
+			x.code;
+			wxMessageBox("Warlock");
+		}
+
+		try
+		{
+			ar& AllSlots;
+		}
+		catch (const boost::archive::archive_exception& x)
+		{
+			x.code;
+			wxMessageBox("AllSlots");
+		}*/
+	}
+
 	using vector_int_2d = std::vector<std::vector<int>>;
 	
 	///[CHAR LEVEL] <NUMBER,LEVEL>

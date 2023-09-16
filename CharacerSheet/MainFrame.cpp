@@ -21,7 +21,8 @@
 #include "ImagePage.h"
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
-	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900,600)),
+	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900, 600)),
+	fileName(""),
 	character(pChar),
 	BigFont1(wxFontInfo(wxSize(0, 15))),
 	BigFont2(wxFontInfo(wxSize(0, 18))),
@@ -231,11 +232,18 @@ void MainFrame::BindControls()
 
 	mainPagePanels.EL_Conditions->Bind(wxEVT_LIST_ITEM_ACTIVATED, &MainFrame::onConditionListDClick, this);
 
+	mainPagePanels.curInit->Bind(wxEVT_SPINCTRL, &MainFrame::onCurInitiativeChange, this);
+
 	notesPanels.AddPage->Bind(wxEVT_BUTTON, &MainFrame::onNotesAddRem, this);
 	notesPanels.RemPage->Bind(wxEVT_BUTTON, &MainFrame::onNotesAddRem, this);
 	notesPanels.PageText->Bind(wxEVT_TEXT, &MainFrame::onNotesType, this);
 	notesPanels.PageList->Bind(wxEVT_LISTBOX, &MainFrame::onNotesSelect, this);
 	notesPanels.PageList->Bind(wxEVT_LISTBOX_DCLICK, &MainFrame::onNotesDClick, this);
+
+	this->Bind(wxEVT_MENU, &MainFrame::onFileMenuEvents, this, wxID_NEW);
+	this->Bind(wxEVT_MENU, &MainFrame::onFileMenuEvents, this, wxID_OPEN);
+	this->Bind(wxEVT_MENU, &MainFrame::onFileMenuEvents, this, wxID_SAVE);
+	this->Bind(wxEVT_MENU, &MainFrame::onFileMenuEvents, this, wxID_SAVEAS);
 
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSP->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetMaxHP->GetId());
@@ -2647,6 +2655,20 @@ void MainFrame::updateSkills()
 	}
 }
 
+void MainFrame::updateAll()
+{
+	updateFeaturesList();
+	updateNotes();
+	updateInitiative();
+	updateKnownSpellMods();
+	updateKnownSpellsLists();
+	updateMoneyCtrls();
+	updateHP();
+	updatePlayerConds();
+	updateSavingThrows();
+	updateSkills();
+}
+
 void MainFrame::SpellDesc::fillAllSpellTree(std::vector<Spell>& allSpells)
 {
 	for (auto it = allSpells.begin(); it != allSpells.end(); ++it)
@@ -3536,8 +3558,7 @@ void MainFrame::onKnownSpellsAddRemSpell(wxCommandEvent& event)
 				}
 			}
 
-			//knownPagePanels.selectedSpells;
-			delete dialog;
+			dialog->Destroy();
 			return;
 		}	
 	}
@@ -3556,7 +3577,7 @@ void MainFrame::onKnownSpellsAddRemSpell(wxCommandEvent& event)
 				return;
 
 			list->Delete(item);
-
+			character.remSpell(list->GetString(item).ToStdString());
 			calcCheckedSpells();
 
 			return;
@@ -3692,6 +3713,58 @@ void MainFrame::onNotesDClick(wxCommandEvent& event)
 	if (res.ToStdString() == "")
 		res = str;
 	notesPanels.PageList->SetString(i, res);
+}
+
+void MainFrame::onFileMenuEvents(wxCommandEvent& event)
+{
+	auto obj = event.GetId();
+
+	if (obj == wxID_NEW)
+	{
+
+	}
+
+	if (obj == wxID_OPEN)
+	{
+		{
+			// create and open an archive for input
+			std::ifstream ifs(saveFolder + "\\" + character.getName(), std::ios::binary);
+			if (!ifs.is_open())
+				wxMessageBox("OPEN file not opened");
+
+			boost::archive::binary_iarchive ia(ifs);
+			ia >> *this;
+			// archive and stream closed when destructors are called
+
+			ifs.close();
+		}
+		TransferDataToWindow();
+		updateAll();
+	}
+
+	if (obj == wxID_SAVE)
+	{
+
+		if (!wxDirExists(saveFolder))
+			wxMkDir(saveFolder);
+
+		std::ofstream ofs(saveFolder + "\\" + character.getName());
+		if (!ofs.is_open())
+			wxMessageBox("SAVE file not opened");
+		{
+			boost::archive::binary_oarchive oa(ofs);
+			// write class instance to archive
+			oa << *this;
+			// archive and stream closed when destructors are called
+		}
+
+		ofs.close();
+	}
+
+	if (obj == wxID_SAVEAS)
+	{
+
+	}
 }
 
 void MainFrame::onSetMenuEvents(wxCommandEvent& event)
@@ -4482,6 +4555,12 @@ void MainFrame::onConditionListDClick(wxCommandEvent& event)
 	}
 	
 	dialog->Show();
+}
+
+void MainFrame::onCurInitiativeChange(wxSpinEvent& event)
+{
+	TransferDataFromWindow();
+	this->curInitiative;
 }
 
 //------------------------------

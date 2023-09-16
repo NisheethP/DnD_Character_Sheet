@@ -21,6 +21,24 @@ enum class spellComp
 
 class Spell
 {
+	friend class boost::serialization::access;
+
+	template<class Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& Name;
+		ar& level;
+		ar& school;
+		ar& castingTime;
+		ar& range;
+		ar& range_feet;
+		ar& components;
+		ar& duration;
+		ar& description;
+		ar& applicableClases;
+		ar& matsLength;
+	}
+
 	//Name;Level;Type;Casting time;Range;Components;Duration;Description;Applicable classes
 	std::string Name;
 	int level;
