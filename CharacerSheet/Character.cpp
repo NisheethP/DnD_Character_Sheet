@@ -1,6 +1,6 @@
-#include "Character.h"
+#include "PreCompiledHeader.h"
 
-#include <cmath>
+#include "Character.h"
 #include "Util.h"
 
 Stats::Stats(int pStr, int pDex, int pCon, int pInt, int pWis, int pCha):

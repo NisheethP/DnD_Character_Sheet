@@ -1,3 +1,5 @@
+#include "PreCompiledHeader.h"
+
 #include "SpellSelectDialog.h"
 
 SpellSelectDialog::SpellSelectDialog(

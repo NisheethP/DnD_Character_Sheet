@@ -116,6 +116,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>PreCompiledHeader.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -152,6 +154,10 @@
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MoneyDialog.cpp" />
+    <ClCompile Include="PreCompiledHeader.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PreCompiledHeader.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="SkillProfDialog.cpp" />
     <ClCompile Include="SliderDialog.cpp" />
     <ClCompile Include="SliderRemDialog.cpp" />
@@ -177,6 +183,7 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MoneyDialog.h" />
+    <ClInclude Include="PreCompiledHeader.h" />
     <ClInclude Include="SkillProfDialog.h" />
     <ClInclude Include="SliderDialog.h" />
     <ClInclude Include="SliderRemDialog.h" />

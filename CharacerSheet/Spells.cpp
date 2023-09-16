@@ -1,6 +1,6 @@
-#include "Spells.h"
+#include "PreCompiledHeader.h"
 
-#include <cmath>
+#include "Spells.h"
 
 //Name;Level;Type;Casting time;Range;Components;Duration;Description;Applicable classes
 

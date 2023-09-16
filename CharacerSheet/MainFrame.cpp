@@ -1,25 +1,4 @@
-#include <wx/sizer.h>
-#include <wx/gbsizer.h>
-#include <wx/spinctrl.h>
-#include <wx/statline.h>
-#include <wx/notebook.h>
-#include <wx/treectrl.h>
-#include <wx/html/htmlwin.h>
-#include <wx/wrapsizer.h>
-#include <wx/numdlg.h> 
-#include <wx/choicdlg.h>
-#include <wx/artprov.h>	
-#include <wx/valgen.h>
-#include <wx/fontdlg.h>
-#include <wx/colordlg.h>
-
-#include <wx/file.h>
-#include <wx/textfile.h>
-#include <wx/wfstream.h>
-#include <wx/txtstrm.h>
-#include <wx/tokenzr.h>
-
-#include <string>
+#include "PreCompiledHeader.h"
 
 #include "MainFrame.h"
 #include "Util.h"
@@ -623,6 +602,21 @@ wxScrolled<wxPanel>* MainFrame::CreateInventoryPage(wxNotebook* parent)
 
 	auto mainSizer = new wxBoxSizer(wxVERTICAL);
 	ImagePage* img = new ImagePage(panel, wxID_ANY, "Inventory");
+
+	mainSizer->Add(img, 1, wxEXPAND);
+
+	panel->SetSizer(mainSizer);
+	return panel;
+}
+
+wxScrolled<wxPanel>* MainFrame::CreateAnimalCardsPage(wxNotebook* parent)
+{
+	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxVSCROLL);
+	panel->SetBackgroundColour(mainColour.first);
+	panel->SetScrollRate(0, FromDIP(10));
+
+	auto mainSizer = new wxBoxSizer(wxVERTICAL);
+	ImagePage* img = new ImagePage(panel, wxID_ANY, "Animal Cards");
 
 	mainSizer->Add(img, 1, wxEXPAND);
 
@@ -2233,8 +2227,12 @@ void MainFrame::CreatePages(wxNotebook* parent)
 	parent->AddPage(SlotsTablePage, "SpellSlotTable");
 
 	wxWindow* Inventory = CreateInventoryPage(parent);
-	Inventory->SetBackgroundColour(wxColour(0x19, 0x19, 0x22));
+	setWindowColour(Inventory, mainColour);
 	parent->AddPage(Inventory, "Inventory");
+
+	wxWindow* AnimalCards = CreateAnimalCardsPage(parent);
+	setWindowColour(AnimalCards, mainColour);
+	parent->AddPage(AnimalCards, "Animal Cards");
 
 	wxWindow* TestPage = CreateTestPanel(parent);
 	TestPage->SetBackgroundColour(wxColour(0x19, 0x19, 0x22));

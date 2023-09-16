@@ -1,11 +1,6 @@
+#include "PreCompiledHeader.h"
+
 #include "ImagePage.h"
-
-#include <wx/filedlg.h>
-#include <wx/wfstream.h>
-#include <wx/artprov.h>
-#include <wx/dir.h>
-#include <wx/listbox.h>
-
 #include"Util.h"
 
 using std::get;
@@ -53,10 +48,10 @@ ImagePage::ImagePage(wxWindow* parent,
 
 	auto searchSizer = new wxBoxSizer(wxHORIZONTAL);
 	auto rightSizer = new wxBoxSizer(wxVERTICAL);
-	auto leftSizer = new wxStaticBoxSizer(wxVERTICAL, imgPanel, "");
+	auto leftSizer = new wxBoxSizer(wxVERTICAL);
 
-	Title = new wxStaticText(imgPanel, wxID_ANY, "This is the title");
-	Title->SetFont(wxFontInfo(16).Bold().Underlined());
+	Title = new wxStaticText(imgPanel, wxID_ANY, "No Images");
+	Title->SetFont(wxFontInfo(18).Bold().Underlined());
 	Title->SetForegroundColour(*wxWHITE);
 
 	curImage = new wxStaticBitmap(imgPanel, wxID_ANY, wxArtProvider().GetIcon(wxART_MISSING_IMAGE));
@@ -86,11 +81,12 @@ ImagePage::ImagePage(wxWindow* parent,
 	mainSizer->Add(10, -1);
 	mainSizer->Add(rightSizer, 0, wxEXPAND);
 
+	Rem->Destroy();
 	this->SetSizer(mainSizer);
 	this->Layout();
 
 	Add->Bind(wxEVT_BUTTON, &ImagePage::onAddButton, this);
-	Rem->Bind(wxEVT_BUTTON, &ImagePage::onRemButton, this);
+	//Rem->Bind(wxEVT_BUTTON, &ImagePage::onRemButton, this);
 	Search->Bind(wxEVT_TEXT, &ImagePage::onSearchType, this);
 	Search->Bind(wxEVT_SEARCHCTRL_SEARCH_BTN, &ImagePage::onSearchEnter, this);
 	List->Bind(wxEVT_LISTBOX, &ImagePage::onListSelect, this);
@@ -98,7 +94,7 @@ ImagePage::ImagePage(wxWindow* parent,
 
 bool ImagePage::takeImage()
 {
-	wxFileDialog openFileDialog(this, "Load Image", "", "", "PNG Files (*.png)|*.png|JPEG Files (*.jpeg)|*.jpeg", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+	wxFileDialog openFileDialog(this, "Load Image", FolderName, "", "PNG Files (*.png)|*.png|JPEG Files (*.jpeg)|*.jpeg", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if (openFileDialog.ShowModal() == wxID_CANCEL)
 		return false;
@@ -193,6 +189,26 @@ void ImagePage::onAddButton(wxCommandEvent& event)
 
 void ImagePage::onRemButton(wxCommandEvent& event)
 {
+	wxDir dir(FolderName);
+	
+	wxFileDialog openFileDialog(this, "Select Image to remove", FolderName + "\\", "", "PNG Files (*.png)|*.png", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+	if (openFileDialog.ShowModal() == wxID_CANCEL)
+		return;
+
+	auto str = openFileDialog.GetFilename();
+	wxRemoveFile(openFileDialog.GetPath());
+
+	for (auto it = images.begin(); it != images.end(); ++it)
+	{
+		if (get<1>(*it) == str)
+		{
+			images.erase(it);
+			return;
+		}
+	}
+
+	updateList();
 }
 
 void ImagePage::onSearchType(wxCommandEvent& event)

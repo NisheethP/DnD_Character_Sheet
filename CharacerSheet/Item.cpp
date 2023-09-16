@@ -1,3 +1,5 @@
+#include "PreCompiledHeader.h"
+
 #include "Item.h"
 
 Item::Item() :

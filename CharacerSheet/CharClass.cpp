@@ -1,3 +1,5 @@
+#include "PreCompiledHeader.h"
+
 #include "CharClass.h"
 
 std::string CharClass::getClassName()

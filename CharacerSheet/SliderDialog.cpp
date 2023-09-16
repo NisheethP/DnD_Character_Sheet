@@ -1,6 +1,7 @@
+#include "PreCompiledHeader.h"
+
 #include "SliderDialog.h"
 
-#include <wx/grid.h>
 
 SliderDialog::SliderDialog(wxWindow* parent, wxWindowID id, const wxString& heading, const wxPoint& pos, const wxSize& size, long style, const wxString& name):
 	wxDialog(parent, id, heading, pos, size, style, name)

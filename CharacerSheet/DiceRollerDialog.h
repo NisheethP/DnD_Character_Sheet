@@ -1,11 +1,5 @@
 #pragma once
 
-#include <wx/wx.h>
-#include <wx/spinctrl.h>
-
-#include <vector>
-#include <tuple>
-
 class DiceRollerDialog : public wxDialog
 {
 	wxListBox* History = nullptr;

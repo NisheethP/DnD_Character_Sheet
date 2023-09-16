@@ -1,3 +1,4 @@
+#include "PreCompiledHeader.h"
 #include "StatsDialog.h"
 
 StatsDialog::StatsDialog(

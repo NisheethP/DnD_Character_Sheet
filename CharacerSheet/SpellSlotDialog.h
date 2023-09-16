@@ -1,7 +1,5 @@
 #pragma once
 
-#include <wx/wx.h>
-
 class SpellSlotDialog : public wxDialog
 {
 	int slots[9] = { 0,0,0,0,0,0,0,0,0 };

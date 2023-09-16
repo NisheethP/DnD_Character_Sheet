@@ -1,7 +1,5 @@
 #pragma once
 
-#include <wx/wx.h>
-
 #include "Character.h"
 
 class ConditionDialog : public wxDialog

@@ -1,5 +1,6 @@
+#include "PreCompiledHeader.h"
+
 #include "MoneyDialog.h"
-#include <wx/gbsizer.h>
 
 
 MoneyDialog::MoneyDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style, const wxString& name):

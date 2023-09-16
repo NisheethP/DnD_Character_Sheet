@@ -1,11 +1,6 @@
-#include "DiceRollerDialog.h"
+#include "PreCompiledHeader.h"
 
-#include <wx/artprov.h>
-#include <wx/scrolwin.h>
-#include <wx/image.h>
-#include <wx/valgen.h>
-#include <random>
-#include <chrono>
+#include "DiceRollerDialog.h"
 
 DiceRollerDialog::DiceRollerDialog(
 	wxWindow* parent,

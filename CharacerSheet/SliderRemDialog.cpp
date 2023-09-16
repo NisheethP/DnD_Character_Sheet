@@ -1,3 +1,5 @@
+#include "PreCompiledHeader.h"
+
 #include "SliderRemDialog.h"
 
 SliderRemDialog::SliderRemDialog(

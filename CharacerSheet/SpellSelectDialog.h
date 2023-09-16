@@ -1,8 +1,5 @@
 #pragma once
 
-#include <wx/wx.h>
-#include <wx/srchctrl.h>
-
 class SpellSelectDialog : public wxDialog
 {
 	wxSearchCtrl* search = nullptr;

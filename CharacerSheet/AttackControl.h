@@ -1,9 +1,5 @@
 #pragma once
 
-#include <wx/wx.h>
-#include <string>
-#include <wx/listctrl.h>
-
 class AttackControl : public wxPanel
 {
 	class AddDialog : public wxDialog

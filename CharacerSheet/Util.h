@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 namespace Util
 {
 	void toLowerString(std::string& str);

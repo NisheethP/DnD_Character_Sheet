@@ -1,7 +1,7 @@
+#include "PreCompiledHeader.h"
+
 #include "SpellSlotDialog.h"
 
-#include <wx/valgen.h>
-#include <wx/spinctrl.h>
 
 SpellSlotDialog::SpellSlotDialog(wxWindow* parent, wxWindowID id, const wxString& heading, const wxPoint& pos, const wxSize& size, long style, const wxString& name) :
 	wxDialog(parent, id, heading, pos, size, style, name)

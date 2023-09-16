@@ -1,8 +1,5 @@
 #pragma once
 
-#include <wx/wx.h>
-#include <wx/spinctrl.h>
-
 class StatsDialog : public wxDialog
 {
 	// STR-DEX-CON-INT-WIS-CHA

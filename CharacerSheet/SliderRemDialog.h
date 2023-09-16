@@ -1,8 +1,5 @@
 #pragma once
 
-#include <wx/wx.h>
-#include <wx/listctrl.h>
-
 class SliderRemDialog : public wxDialog
 {
 	wxListView* list = nullptr;

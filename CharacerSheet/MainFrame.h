@@ -1,23 +1,7 @@
 #pragma once
 
-#include <wx/wx.h>
-#include <wx/spinctrl.h>
-#include <wx/notebook.h>
-#include <wx/srchctrl.h>
-#include <wx/treectrl.h>
-#include <wx/listctrl.h>
-#include <wx/listbox.h>
-#include <wx/editlbox.h>
-#include <wx/statline.h>
-#include <wx/html/htmlwin.h>
-#include <wx/splitter.h>
-
 #include "AttackControl.h"
-
 #include "Character.h"
-#include <vector>
-#include <tuple>
-#include <map>
 #include "Spells.h"
 
 
@@ -265,6 +249,7 @@ public:
 	wxScrolled<wxPanel>* CreateKnownSpellsPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateSpellSlotsTable(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateInventoryPage(wxNotebook* parent);
+	wxScrolled<wxPanel>* CreateAnimalCardsPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateNotesPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateTestPanel(wxNotebook* parent);
 

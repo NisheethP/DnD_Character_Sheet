@@ -5,12 +5,6 @@
 #include "Spells.h"
 #include "SpellSlot.h"
 
-#include <string>
-#include <vector>
-
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-
 class feature
 {
 	friend class boost::serialization::access;

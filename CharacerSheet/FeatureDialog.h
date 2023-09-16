@@ -1,8 +1,5 @@
 #pragma once
 
-#include <wx/wx.h>
-
-
 class FeatureDialog : public wxDialog
 {
 

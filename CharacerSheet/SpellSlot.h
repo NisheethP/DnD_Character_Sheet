@@ -1,9 +1,6 @@
 #pragma once
 
-#include <vector>
-#include <tuple>
 #include "CharClass.h"
-
 
 ///=================
 ///RETURN CODES

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <wx/wx.h>
-#include <wx/radiobut.h>
-#include <vector>
 
 class DeathSavesControl : public wxWindow
 {

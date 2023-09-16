@@ -1,7 +1,6 @@
-#include "DeathSavesControl.h"
+#include "PreCompiledHeader.h"
 
-#include <wx/graphics.h>
-#include <wx/dcbuffer.h>
+#include "DeathSavesControl.h"
 
 DeathSavesControl::DeathSavesControl(wxWindow* parent, wxWindowID id, wxColour fg, wxColour bg, const wxPoint& pos, const wxSize& size, long style, const wxString& name):
 	wxWindow(parent, id, pos, size, style, name),

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-
-
 enum class ClassType
 {
 	Barbarian,

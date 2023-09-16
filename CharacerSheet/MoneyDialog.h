@@ -1,10 +1,5 @@
 #pragma once
 
-#include <wx/wx.h>
-#include <wx/spinctrl.h>
-
-#include <vector>
-
 class MoneyDialog : public wxDialog
 {
 

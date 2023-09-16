@@ -1,6 +1,6 @@
+#include "PreCompiledHeader.h"
 #include "WarlockSlotsDialog.h"
-#include <wx/spinctrl.h>
-#include <wx/valgen.h>
+
 
 WarlockSlotsDialog::WarlockSlotsDialog(wxWindow* parent, wxWindowID id, const wxString& heading, const wxPoint& pos, const wxSize& size, long style, const wxString& name) :
 	wxDialog(parent, id, heading, pos, size, style, name),

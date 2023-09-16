@@ -1,3 +1,5 @@
+#include "PreCompiledHeader.h"
+
 #include "Util.h"
 #include <locale>
 #include <codecvt>

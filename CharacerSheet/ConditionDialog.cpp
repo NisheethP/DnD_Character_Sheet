@@ -1,3 +1,5 @@
+#include "PreCompiledHeader.h"
+
 #include "ConditionDialog.h"
 
 ConditionDialog::ConditionDialog(

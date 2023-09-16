@@ -1,3 +1,5 @@
+#include "PreCompiledHeader.h"
+
 #include "AddCondDialog.h"
 
 AddCondDialog::AddCondDialog(

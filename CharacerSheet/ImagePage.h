@@ -1,13 +1,5 @@
 #pragma once
 
-#include <wx/wx.h>
-#include <wx/stream.h>
-#include <wx/srchctrl.h>
-#include <wx/image.h>
-
-#include <vector>
-#include <tuple>
-
 class ImagePage : public wxPanel
 {
 	std::string FolderName = "";

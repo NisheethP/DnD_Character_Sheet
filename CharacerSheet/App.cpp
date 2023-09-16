@@ -1,9 +1,8 @@
+#include "PreCompiledHeader.h"
+
 #include "App.h"
 #include "MainFrame.h"
 
-#include <vector>
-#include <sstream>
-#include <fstream>
 
 wxIMPLEMENT_APP(App);
 

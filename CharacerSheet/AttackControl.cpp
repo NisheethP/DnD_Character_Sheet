@@ -1,7 +1,8 @@
+#include "PreCompiledHeader.h"
+
 #include "AttackControl.h"
 #include "DiceRollerDialog.h"
 
-#include <wx/artprov.h>
 
 AttackControl::AttackControl(
 	wxWindow* parent,
