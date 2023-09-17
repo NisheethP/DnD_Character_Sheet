@@ -3705,7 +3705,6 @@ void MainFrame::onNotesAddRem(wxCommandEvent& event)
 	if (obj == notesPanels.AddPage)
 	{
 		int numPages = notesPanels.pages.size();
-		notesPanels.curPageNum = numPages - 1;
 		auto name = wxGetTextFromUser("Enter Page name");
 
 		if (name == "")
@@ -3714,7 +3713,10 @@ void MainFrame::onNotesAddRem(wxCommandEvent& event)
 		notesPanels.pages.push_back("");
 		notesPanels.pageNames.push_back(name.ToStdString());
 		notesPanels.PageList->Append(name);
-				
+		
+		notesPanels.PageList->SetSelection(numPages);
+		notesPanels.curPageNum = numPages;
+
 		updateNotes();		
 	}
 
@@ -3738,7 +3740,8 @@ void MainFrame::onNotesAddRem(wxCommandEvent& event)
 		{
 			notesPanels.curPageNum = 0;
 			int i = notesPanels.PageList->GetSelection();
-
+			
+			notesPanels.curPageNum = i - 1;
 			notesPanels.PageList->Delete(i);
 			notesPanels.pageNames.erase(notesPanels.pageNames.begin() + i);
 			notesPanels.pages.erase(notesPanels.pages.begin() + i);
