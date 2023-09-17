@@ -212,6 +212,8 @@ void MainFrame::BindControls()
 	get<0>(mainPagePanels.HealDamage)->Bind(wxEVT_BUTTON, &MainFrame::onHealDamageButton, this);
 	get<1>(mainPagePanels.HealDamage)->Bind(wxEVT_BUTTON, &MainFrame::onHealDamageButton, this);
 	get<2>(mainPagePanels.HealToX)->Bind(wxEVT_BUTTON, &MainFrame::onHealToButton, this);
+	get<1>(mainPagePanels.HealToX)->Bind(wxEVT_SPINCTRL, &MainFrame::onHealToButton, this);
+
 	mainPagePanels.HP->Bind(wxEVT_SPINCTRL, &MainFrame::onHPSpin, this);
 	//mainPagePanels.HP->Bind(wxEVT_TEXT, &MainFrame::onHPText, this);
 
@@ -584,7 +586,7 @@ wxScrolled<wxPanel>* MainFrame::CreateSpellSlotsTable(wxNotebook* parent)
 		SlotsTable->InsertItem(i, std::to_string(i+1));
 		for (int j = 1; j <= 9; ++j)
 		{
-			int x = character.getSpellSlots().getNumSlots(i + 1, j);
+			int x = character.getSpellSlots().getNumSlots(j, i + 1);
 			std::string temp = "";
 			if (x == -1)
 				temp = "-";
@@ -659,6 +661,7 @@ wxScrolled<wxPanel>* MainFrame::CreateNotesPage(wxNotebook* parent)
 	notesPanels.PageList->Append("Page 1");
 	notesPanels.PageList->SetSelection(0);
 	notesPanels.pages.push_back("");
+	notesPanels.pageNames.push_back("Page 1");
 	TextBox->SetFont(TextBox->GetFont().Larger());
 
 	panel->SetSizer(mainSizer);
@@ -1404,6 +1407,7 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 	auto& damageButton = get<1>(mainPagePanels.HealDamage) = new wxButton(panel, wxID_ANY, "DAMAGE", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
 	auto& healDamageSpin = get<2>(mainPagePanels.HealDamage) = new wxSpinCtrl(panel, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize,
 		wxSP_ARROW_KEYS | wxALIGN_CENTER_HORIZONTAL);
+	auto& halfDamageButton = get<3>(mainPagePanels.HealDamage) = new wxButton(panel, wxID_ANY, "1/2 DMG", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
 
 	healButton->SetMinSize(damageButton->GetSize());
 
@@ -1419,11 +1423,14 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 	wxBoxSizer* sizer0 = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer* sizer1 = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer* sizer2 = new wxBoxSizer(wxHORIZONTAL);
-
+	wxBoxSizer* dmgSizer = new wxBoxSizer(wxVERTICAL);
 	int gap = 5;
+
+	healToSpin->SetValidator(wxGenericValidator(&healToPercentageValue));
 
 	healButton->SetFont(healButton->GetFont().Bold());
 	damageButton->SetFont(damageButton->GetFont().Bold());
+	halfDamageButton->SetFont(damageButton->GetFont().Bold());
 	healDamageSpin->SetFont(healDamageSpin->GetFont().Bold());
 
 	healToText->SetFont(healToText->GetFont().Bold());
@@ -1434,13 +1441,17 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 	hpSpin->SetMax(1e5);
 	hpSpin->SetMin(0);
 	
-	sizer1->Add(gap, -1);
+	dmgSizer->Add(damageButton, 0, wxALIGN_CENTER);
+	dmgSizer->Add(-1, 2);
+	dmgSizer->Add(halfDamageButton, 0, wxALIGN_CENTER);
+
+	sizer0->Add(gap, -1);
 	sizer0->Add(healButton, 0, wxALIGN_CENTER);
-	sizer1->Add(gap, -1);
+	sizer0->Add(gap, -1);
 	sizer0->Add(healDamageSpin, 0, wxALIGN_CENTER);
-	sizer1->Add(gap, -1);
-	sizer0->Add(damageButton, 0, wxALIGN_CENTER);
-	sizer1->Add(gap, -1);
+	sizer0->Add(gap, -1);
+	sizer0->Add(dmgSizer, 0, wxALIGN_CENTER);
+	sizer0->Add(gap, -1);
 
 	sizer1->Add(gap,-1);
 	sizer1->Add(healToText, 0, wxALIGN_CENTER);
@@ -1466,10 +1477,12 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 	int maxColour = 0xFF, subColour = 0xBB;
 	healButton->SetForegroundColour(wxColour(subColour, maxColour, subColour));
 	damageButton->SetForegroundColour(wxColour(maxColour, subColour, subColour));
+	halfDamageButton->SetForegroundColour(wxColour(maxColour, subColour, subColour));
 
 	wxColour buttonColour(0x22, 0x22, 0x22);
 	healButton->SetBackgroundColour(buttonColour);
 	damageButton->SetBackgroundColour(buttonColour);
+	halfDamageButton->SetBackgroundColour(buttonColour);
 
 	setWindowColour(healDamageSpin, ctrlColour);
 	setWindowColour(healToSpin, ctrlColour);
@@ -2410,7 +2423,16 @@ void MainFrame::updateFeaturesList()
 
 void MainFrame::updateNotes()
 {
-	notesPanels.PageList->SetSelection(notesPanels.curPageNum);
+	auto& list = notesPanels.PageList;
+
+	list->Freeze();
+	
+	list->Clear();
+	for (auto it = notesPanels.pageNames.begin(); it != notesPanels.pageNames.end(); ++it)
+		list->Append(*it);
+	list->Thaw();
+
+	list->SetSelection(notesPanels.curPageNum);
 	notesPanels.PageText->SetValue(notesPanels.pages[notesPanels.curPageNum]);
 }
 
@@ -2444,26 +2466,26 @@ void MainFrame::updateKnownSpellsLists()
 		auto& spSlots = character.getCurSpellSlots();
 		auto& maxSlots = character.getSpellSlots();
 
-		int x = spSlots.slots[i].first;
-		int y = maxSlots.slots[i].first;
+		int curSlots = spSlots.slots[i].first;
+		int maxSlotsNumber = maxSlots.slots[i].first;
 		
 		if (spSlots.slots[i].second != -1)
-			x += spSlots.slots[i].second;
+			curSlots += spSlots.slots[i].second;
 		
-		if (y == -1)
+		if (maxSlotsNumber == -1)
 			slotSpin->SetMax(0);
 
 		if (spSlots.slots[i].second != -1)
-			y += spSlots.slots[i].second;
+			maxSlotsNumber += spSlots.slots[i].second;
 		
-		if (x > 0)
+		if (curSlots > 0)
 		{
-			slotSpin->SetMax(y);
-			slotSpin->SetValue(x);
+			slotSpin->SetMax(maxSlotsNumber);
+			slotSpin->SetValue(curSlots);
 		}		
 
-		x = character.getSpellPoints();
-		knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
+		curSlots = character.getCurSpellPoints();
+		knownPagePanels.SpellPoints_Val->SetValue(std::to_string(curSlots));
 
 		if (uses.SpellSlots)
 		{
@@ -2492,8 +2514,6 @@ void MainFrame::updateKnownSpellsLists()
 		}
 		
 		slotSpin->GetParent()->GetParent()->Layout();
-
-		
 	}
 
 	for (int i = 0; i < 10; ++i)
@@ -2675,6 +2695,7 @@ void MainFrame::updateSkills()
 
 void MainFrame::updateAll()
 {
+	TransferDataToWindow();
 	updateFeaturesList();
 	updateNotes();
 	updateInitiative();
@@ -3143,6 +3164,11 @@ void MainFrame::onHealDamageButton(wxCommandEvent& event)
 void MainFrame::onHealToButton(wxCommandEvent& event)
 {
 	HealToPerc();
+}
+
+void MainFrame::onHealToSpin(wxCommandEvent& event)
+{
+	healToPercentageValue = std::get<1>(mainPagePanels.HealToX)->GetValue();
 }
 
 void MainFrame::onHPSpin(wxSpinEvent& event)
@@ -3686,6 +3712,7 @@ void MainFrame::onNotesAddRem(wxCommandEvent& event)
 			name = "Page " + std::to_string(numPages + 1);
 
 		notesPanels.pages.push_back("");
+		notesPanels.pageNames.push_back(name.ToStdString());
 		notesPanels.PageList->Append(name);
 				
 		updateNotes();		
@@ -3704,6 +3731,7 @@ void MainFrame::onNotesAddRem(wxCommandEvent& event)
 			notesPanels.curPageNum = 0;
 			notesPanels.pages[0] = "";
 			notesPanels.PageList->SetString(0, "Page 1");
+			notesPanels.pageNames[0] = "Page 1";
 		}
 
 		else
@@ -3712,6 +3740,7 @@ void MainFrame::onNotesAddRem(wxCommandEvent& event)
 			int i = notesPanels.PageList->GetSelection();
 
 			notesPanels.PageList->Delete(i);
+			notesPanels.pageNames.erase(notesPanels.pageNames.begin() + i);
 			notesPanels.pages.erase(notesPanels.pages.begin() + i);
 		}
 		

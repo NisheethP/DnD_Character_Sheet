@@ -1,12 +1,15 @@
 #include "PreCompiledHeader.h"
 #include "SpellSlot.h"
 
+SpellSlot::vector_int_2d SpellSlot::AllSlots;
+std::vector<std::pair <int, int>> SpellSlot::AllWarlockSlots;
+
+
 
 SpellSlot::SpellSlot()
 {
 	initAllSlots();
 	initAllWarlock();
-
 }
 
 void SpellSlot::initAllSlots()

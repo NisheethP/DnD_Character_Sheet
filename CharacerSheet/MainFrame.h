@@ -26,10 +26,15 @@ class MainFrame : public wxFrame
 
 		ar& overrides.spellPoint;
 		ar& overrides.spellSlot;
+
+		ar& healToPercentageValue;
+		ar& notesPanels.pages; 
+		ar& notesPanels.pageNames;
 	}
 
 	std::string saveFolder = "Character Saves";
 	std::string fileName;
+	int healToPercentageValue;
 	int firstPage = 0;
 
 	std::vector<std::pair<Conditions, feature>> allConditions;
@@ -195,7 +200,7 @@ class MainFrame : public wxFrame
 		std::vector<wxSpinCtrl*> moneyVals;
 		std::pair<wxButton*, wxButton*> moneyButtons = { nullptr, nullptr };
 
-		std::tuple<wxButton*, wxButton*, wxSpinCtrl*> HealDamage;
+		std::tuple<wxButton*, wxButton*, wxSpinCtrl*, wxButton*> HealDamage;
 		std::tuple<wxStaticText* ,wxSpinCtrl*, wxButton*> HealToX;
 		std::tuple<wxStaticText*, wxSpinCtrl*> MaxHPBonus;
 
@@ -253,6 +258,7 @@ class MainFrame : public wxFrame
 	struct NotesPanels
 	{
 		std::vector<std::string> pages;
+		std::vector<std::string> pageNames;
 		wxButton* AddPage = nullptr;
 		wxButton* RemPage = nullptr;
 		wxListBox* PageList = nullptr;
@@ -376,6 +382,7 @@ public:
 	void onSetArmorButton(wxCommandEvent& event);
 	void onHealDamageButton(wxCommandEvent& event);
 	void onHealToButton(wxCommandEvent& event);
+	void onHealToSpin(wxCommandEvent& event);
 	void onHPSpin(wxSpinEvent& event);
 	void onTempHPSpin(wxSpinEvent& event);
 	void onInitMod(wxCommandEvent& event);

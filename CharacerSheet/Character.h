@@ -328,6 +328,6 @@ inline void Character::serialize(Archive& ar, const unsigned int version)
 
 	ar& tempHP;
 
-	//ar& charSlots;
-	//ar& curCharSlots;
+	ar& charSlots;
+	ar& curCharSlots;
 }

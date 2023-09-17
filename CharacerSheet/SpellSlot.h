@@ -35,10 +35,10 @@ class SpellSlot
 	using vector_int_2d = std::vector<std::vector<int>>;
 	
 	///[CHAR LEVEL] <NUMBER,LEVEL>
-	std::vector<std::pair <int, int>> AllWarlockSlots;
+	static std::vector<std::pair <int, int>> AllWarlockSlots;
 	
 	/// [CHAR LEVEL][SPELL LEVEL]
-	vector_int_2d AllSlots;
+	static vector_int_2d AllSlots;
 
 public:
 	enum class slotType
@@ -54,8 +54,8 @@ public:
 
 	SpellSlot();
 
-	void initAllSlots();
-	void initAllWarlock();
+	static void initAllSlots();
+	static void initAllWarlock();
 	int getNumSlots(int spell_Level, int char_Level);
 	int getNumWarlockSlots(int spellLevel, int charLevel);
 
