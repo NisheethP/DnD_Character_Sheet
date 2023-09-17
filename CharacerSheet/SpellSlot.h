@@ -18,7 +18,7 @@ class SpellSlot
 	template<class Archive>
 	void serialize(Archive& ar, const unsigned int version)
 	{
-		try
+		/*try
 		{
 			ar& slots;
 		}
@@ -27,26 +27,9 @@ class SpellSlot
 			x.code;
 			wxMessageBox("Slots");
 		}
-
-		/*try
-		{
-			ar& AllWarlockSlots;
-		}
-		catch (const boost::archive::archive_exception& x)
-		{
-			x.code;
-			wxMessageBox("Warlock");
-		}
-
-		try
-		{
-			ar& AllSlots;
-		}
-		catch (const boost::archive::archive_exception& x)
-		{
-			x.code;
-			wxMessageBox("AllSlots");
-		}*/
+		*/
+		ar& AllWarlockSlots;
+		ar& AllSlots;
 	}
 
 	using vector_int_2d = std::vector<std::vector<int>>;

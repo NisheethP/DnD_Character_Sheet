@@ -2440,9 +2440,10 @@ void MainFrame::updateKnownSpellsLists()
 {
 	for (int i = 1; i < 10; ++i)
 	{
-		auto slotSpin = std::get<1>(knownPagePanels.SpellSlotLevelList[i]);
+		auto& slotSpin = std::get<1>(knownPagePanels.SpellSlotLevelList[i]);
 		auto& spSlots = character.getCurSpellSlots();
 		auto& maxSlots = character.getSpellSlots();
+
 		int x = spSlots.slots[i].first;
 		int y = maxSlots.slots[i].first;
 		
@@ -2491,6 +2492,19 @@ void MainFrame::updateKnownSpellsLists()
 		}
 		
 		slotSpin->GetParent()->GetParent()->Layout();
+
+		
+	}
+
+	for (int i = 0; i < 10; ++i)
+	{
+		auto& list = std::get<3>(knownPagePanels.SpellSlotLevelList[i]);
+
+		for (auto it = character.getKnownSpells().begin(); it != character.getKnownSpells().end(); ++it)
+		{
+			if (it->getLevel() == i)
+				list->Append(it->getName());
+		}
 	}
 
 	knownPagePanels.SpellPoints_Text->GetParent()->Layout();
@@ -2508,14 +2522,16 @@ void MainFrame::updateMoneyCtrls()
 		mainPagePanels.moneyVals[i]->SetValue(money[i]);
 }
 
+void MainFrame::updateTempHP()
+{
+	mainPagePanels.TempHP->SetValue(character.getTempHP());
+}
+
 void MainFrame::updateHP()
 {
 	std::string str = "HP | " + std::to_string(character.getTotHP());
-	int x = std::get<1>(mainPagePanels.MaxHPBonus)->GetValue();
-
-	character.setTotHPBonus(x);
-
-	if (x != 0)
+	
+	if (character.getHPBonus() != 0)
 		str += " (" + std::to_string(character.getModTotHP()) + ")";
 
 	mainPagePanels.HPText->SetLabel(str);
@@ -2523,6 +2539,8 @@ void MainFrame::updateHP()
 	mainPagePanels.HP->SetMax(character.getModTotHP());
 
 	mainPagePanels.HP->SetValue(character.getCurHP());
+
+	std::get<1>(mainPagePanels.MaxHPBonus)->SetValue(std::to_string(character.getHPBonus()));
 }
 
 void MainFrame::updatePlayerConds()
@@ -2667,6 +2685,7 @@ void MainFrame::updateAll()
 	updatePlayerConds();
 	updateSavingThrows();
 	updateSkills();
+	updateTempHP();
 }
 
 void MainFrame::SpellDesc::fillAllSpellTree(std::vector<Spell>& allSpells)
@@ -3069,8 +3088,8 @@ void MainFrame::onGiveTempHPButton(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
 	int x = wxGetNumberFromUser("Enter temporary HP:", "", "", 0L, 0L, 100L);
-	mainPagePanels.TempHP->SetValue(x);
 	character.giveTempHP(x);
+	updateTempHP();
 }
 
 void MainFrame::onSetArmorButton(wxCommandEvent& event)
@@ -3156,6 +3175,9 @@ void MainFrame::onInitMod(wxCommandEvent& event)
 
 void MainFrame::onMaxHPChange(wxCommandEvent& event)
 {
+	int x = std::get<1>(mainPagePanels.MaxHPBonus)->GetValue();
+	character.setTotHPBonus(x);
+	
 	updateHP();
 }
 
@@ -3576,8 +3598,8 @@ void MainFrame::onKnownSpellsAddRemSpell(wxCommandEvent& event)
 			if (item == -1)
 				return;
 
-			list->Delete(item);
 			character.remSpell(list->GetString(item).ToStdString());
+			list->Delete(item);
 			calcCheckedSpells();
 
 			return;

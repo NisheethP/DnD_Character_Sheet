@@ -334,6 +334,7 @@ public:
 	void updateKnownSpellMods();
 	void updateKnownSpellsLists();
 
+	void updateTempHP();
 	void updateHP();
 	void updateStats();
 	void updateInitiative();
@@ -344,7 +345,7 @@ public:
 	void updatePlayerConds();
 	void updateFeaturesList();
 	void updateNotes();
-
+	
 	void updateAll();
 
 	void calcCheckedSpells();

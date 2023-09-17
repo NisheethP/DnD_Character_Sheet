@@ -175,7 +175,9 @@ public:
 	unsigned int getConditions() {return charConditions;}
 	int getInitiative() { return initMod + getSkillMod(Dexterity); }
 	int getInitMod()	{ return initMod; }
+	int getHPBonus()	{ return totHPMod; }
 	int getModTotHP()	{ return totHP + totHPMod; }
+	int getTempHP()		{ return tempHP; }
 
 	Stats* getStats() { return &charStats; }
 	Stats getStatsMods() { return charStatMods; }
@@ -286,6 +288,7 @@ std::string getDieTypeStr(DieType die);
 template<class Archive>
 inline void Character::serialize(Archive& ar, const unsigned int version)
 {
+
 	ar& charConditions;
 	ar& characterName;
 	ar& characterClassStr;
@@ -307,8 +310,6 @@ inline void Character::serialize(Archive& ar, const unsigned int version)
 	ar& skillProficiencies;
 	ar& skillExpertises;
 	
-	ar& charSlots;
-	ar& curCharSlots;
 	ar& SpellPoints;
 	ar& curSpellPoints;
 	
@@ -326,4 +327,7 @@ inline void Character::serialize(Archive& ar, const unsigned int version)
 	ar& copper;
 
 	ar& tempHP;
+
+	//ar& charSlots;
+	//ar& curCharSlots;
 }
