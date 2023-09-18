@@ -105,6 +105,9 @@
     <ClCompile Include="PreCompiledHeader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FileLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainFrame.h">
@@ -177,6 +180,9 @@
       <Filter>Header Files\Character</Filter>
     </ClInclude>
     <ClInclude Include="PreCompiledHeader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

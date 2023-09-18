@@ -3,6 +3,7 @@
 #include "AttackControl.h"
 #include "Character.h"
 #include "Spells.h"
+#include "FileLogger.h"
 
 
 using ColourPair = std::pair<wxColour, wxColour>;
@@ -36,6 +37,9 @@ class MainFrame : public wxFrame
 	std::string fileName;
 	int healToPercentageValue;
 	int firstPage = 0;
+
+	FileLogger healthLog;
+	bool isLoggingHealth = false;
 
 	std::vector<std::pair<Conditions, feature>> allConditions;
 	std::vector<std::pair<Conditions, feature>> playerConditions;
@@ -85,8 +89,7 @@ class MainFrame : public wxFrame
 	//
 	struct MenuBarItems
 	{
-		wxMenuItem* FileNew;
-
+		wxMenuItem* FileHealthLogger;
 
 		wxMenuItem* SetName;
 		wxMenuItem* SetStats;

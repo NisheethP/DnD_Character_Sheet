@@ -122,6 +122,8 @@ void MainFrame::CreateMenuBar()
 	fileMenu->AppendSeparator();
 	fileMenu->Append(wxID_SAVE);
 	fileMenu->Append(wxID_SAVEAS);
+	fileMenu->AppendSeparator();
+	menuBarItems.FileHealthLogger = fileMenu->Append(wxID_ANY, "Log Health to file");
 
 	menuBarItems.SetName = SetMenu->Append(wxID_ANY, "Set Name");
 	menuBarItems.SetMaxHP = SetMenu->Append(wxID_ANY, "Set Max HP");
@@ -211,6 +213,7 @@ void MainFrame::BindControls()
 
 	get<0>(mainPagePanels.HealDamage)->Bind(wxEVT_BUTTON, &MainFrame::onHealDamageButton, this);
 	get<1>(mainPagePanels.HealDamage)->Bind(wxEVT_BUTTON, &MainFrame::onHealDamageButton, this);
+	get<3>(mainPagePanels.HealDamage)->Bind(wxEVT_BUTTON, &MainFrame::onHealDamageButton, this);
 	get<2>(mainPagePanels.HealToX)->Bind(wxEVT_BUTTON, &MainFrame::onHealToButton, this);
 	get<1>(mainPagePanels.HealToX)->Bind(wxEVT_SPINCTRL, &MainFrame::onHealToButton, this);
 
@@ -246,6 +249,7 @@ void MainFrame::BindControls()
 	this->Bind(wxEVT_MENU, &MainFrame::onFileMenuEvents, this, wxID_OPEN);
 	this->Bind(wxEVT_MENU, &MainFrame::onFileMenuEvents, this, wxID_SAVE);
 	this->Bind(wxEVT_MENU, &MainFrame::onFileMenuEvents, this, wxID_SAVEAS);
+	this->Bind(wxEVT_MENU, &MainFrame::onFileMenuEvents, this, menuBarItems.FileHealthLogger->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSP->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetMaxHP->GetId());
@@ -3130,9 +3134,9 @@ void MainFrame::onSetArmorButton(wxCommandEvent& event)
 void MainFrame::onHealDamageButton(wxCommandEvent& event)
 {
 	auto obj = event.GetEventObject();
+	std::string LogString = "";
 	if (obj == std::get<0>(mainPagePanels.HealDamage))
 	{
-		auto& button = std::get<0>(mainPagePanels.HealDamage);
 		auto& spin = std::get<2>(mainPagePanels.HealDamage);
 
 		int num = spin->GetValue();
@@ -3142,28 +3146,87 @@ void MainFrame::onHealDamageButton(wxCommandEvent& event)
 			character.setCurHP(character.getModTotHP());
 		else
 			character.setCurHP(curHp + num);
+
+		LogString = "Healed for " + std::to_string(num) + "; ";
 	}
 
 	if (obj == std::get<1>(mainPagePanels.HealDamage))
 	{
-		auto& button = std::get<0>(mainPagePanels.HealDamage);
 		auto& spin = std::get<2>(mainPagePanels.HealDamage);
 
 		int num = spin->GetValue();
 		int curHp = character.getCurHP();
+		int tempHP = character.getTempHP();
+
+		if (tempHP > 0)
+		{
+			if (tempHP - num < 0)
+			{
+				character.giveTempHP(0);
+				num -= tempHP;
+			}
+			else
+				character.giveTempHP(tempHP - num);
+		}
 
 		if (curHp - num < 0)
 			character.setCurHP(0);
 		else
 			character.setCurHP(curHp - num);
+	
+		LogString = "Damaged for " + std::to_string(num) + "; ";
+	}
+
+	if (obj == std::get<3>(mainPagePanels.HealDamage))
+	{
+		auto& spin = std::get<2>(mainPagePanels.HealDamage);
+
+		int num = spin->GetValue();
+		
+		LogString = "Damaged for " + std::to_string(num) + "; Took only ";
+
+		num = std::floor(num * 0.5f);
+		int curHp = character.getCurHP();
+		int tempHP = character.getTempHP();
+
+		if (tempHP > 0)
+		{
+			if (tempHP - num < 0)
+			{
+				character.giveTempHP(0);
+				num -= tempHP;
+			}
+			else
+				character.giveTempHP(tempHP - num);
+		}
+
+		if (curHp - num < 0)
+			character.setCurHP(0);
+		else
+			character.setCurHP(curHp - num);
+
+		LogString += std::to_string(num) + " from Resistance; ";
+	}
+
+	if (isLoggingHealth)
+	{
+		LogString += "HP = " + std::to_string(character.getCurHP());
+		healthLog << LogString;
 	}
 
 	mainPagePanels.HP->SetValue(character.getCurHP());
+	updateTempHP();
 }
 
 void MainFrame::onHealToButton(wxCommandEvent& event)
 {
 	HealToPerc();
+
+	if (isLoggingHealth)
+	{
+		std::string LogString = "Healed to " + std::to_string(std::get<1>(mainPagePanels.HealToX)->GetValue()) + "%; HP = " + std::to_string(character.getCurHP());
+		healthLog << LogString;
+	}
 }
 
 void MainFrame::onHealToSpin(wxCommandEvent& event)
@@ -3175,6 +3238,12 @@ void MainFrame::onHPSpin(wxSpinEvent& event)
 {
 	int x = mainPagePanels.HP->GetValue();
 	character.setCurHP(x);
+
+	if (isLoggingHealth)
+	{
+		std::string LogString = "HP Changed; HP = " + std::to_string(character.getCurHP());
+		healthLog << LogString;
+	}
 }
 
 void MainFrame::onTempHPSpin(wxSpinEvent& event)
@@ -3818,6 +3887,34 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 	if (obj == wxID_SAVEAS)
 	{
 
+	}
+
+	if (obj == menuBarItems.FileHealthLogger->GetId())
+	{
+		wxFileDialog openFileDialog(this, "Save Log File", "", "", "Text File (*.txt)|*.txt", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+		
+		if (openFileDialog.ShowModal() == wxID_CANCEL)
+			return;
+
+		auto folder = openFileDialog.GetPath().ToStdString();
+		auto fileName = openFileDialog.GetFilename().ToStdString();
+		folder = folder.substr(0, folder.size() - fileName.size()-1);
+
+		healthLog.setFolder(folder);
+		healthLog.setFileName(fileName);
+		
+		healthLog.OpenFile();
+
+		if (!healthLog.isOpen())
+		{
+			wxMessageBox("Log File wasn't opened");
+			return;
+		}
+
+		isLoggingHealth = true;
+		healthLog.Clear();
+		std::string log = "Health Log begun. Initial HP " + std::to_string(character.getCurHP());
+		healthLog << log;
 	}
 }
 
