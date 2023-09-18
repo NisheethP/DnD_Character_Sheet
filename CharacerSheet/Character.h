@@ -146,7 +146,7 @@ private:
 
 	std::vector<Slider> sliders;
 
-	std::vector<Spell> knownSpells;
+	std::vector<std::string> knownSpells;
 
 	int totalLevel;
 	Stats charStats;
@@ -209,7 +209,7 @@ public:
 	std::vector<std::string>& getLanguages()	{ return languages; }
 	std::vector<std::string>& getToolProf()		{ return toolProf; }
 	std::vector<feature>& getFeatures()			{ return features; }
-	std::vector<Spell>& getKnownSpells()		{ return knownSpells; }
+	std::vector<std::string>& getKnownSpells()	{ return knownSpells; }
 
 	SpellSlot& getSpellSlots()		{ return charSlots; }
 	SpellSlot& getCurSpellSlots()	{ return curCharSlots; }
@@ -327,7 +327,6 @@ inline void Character::serialize(Archive& ar, const unsigned int version)
 	ar& toolProf;
 	ar& features;
 	ar& inventory;
-	ar& sliders;
 	
 	ar& knownSpells;
 
@@ -355,6 +354,8 @@ inline void Character::serialize(Archive& ar, const unsigned int version)
 
 	ar& tempHP;
 
-	//ar& charSlots;
-	//ar& curCharSlots;
+	ar& charSlots;
+	ar& curCharSlots;
+
+	ar& sliders;
 }

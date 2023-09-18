@@ -2410,7 +2410,7 @@ void MainFrame::updateKnownDispSpell(std::string str)
 
 	for (auto it = knownSpell.begin(); it != knownSpell.end(); ++it)
 	{
-		name = it->getName();
+		name = *it;
 
 		for (auto i = name.begin(); i != name.end(); ++i)
 		{
@@ -2419,7 +2419,12 @@ void MainFrame::updateKnownDispSpell(std::string str)
 
 		if (name == str)
 		{
-			knownPagePanels.dispSpell = &(*it);
+			for (auto& spell : allSpells)
+			{
+				if (spell.getName() == *it)
+					knownPagePanels.dispSpell = &spell;
+			}
+
 			return;
 		}
 
@@ -2565,8 +2570,12 @@ void MainFrame::updateKnownSpellsLists()
 
 		for (auto it = character.getKnownSpells().begin(); it != character.getKnownSpells().end(); ++it)
 		{
-			if (it->getLevel() == i)
-				list->Append(it->getName());
+			for (auto& spell : allSpells)
+			{
+				if (spell.getName() == *it)
+					if (spell.getLevel() == i)
+						list->Append(*it);
+			}
 		}
 	}
 
@@ -2918,6 +2927,7 @@ void MainFrame::makeSlider(std::string title, int val, int min, int max, int def
 	auto sizer = panel->GetSizer();
 
 	auto slider = new wxSlider(panel, wxID_ANY, def, min, max, wxDefaultPosition, wxDefaultSize, wxSL_MIN_MAX_LABELS | wxSL_TICKS);
+	slider->SetValue(val);
 
 	auto text = new wxStaticText(panel, wxID_ANY, title, wxDefaultPosition, wxDefaultSize);
 	auto horLine = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(1.5 * baseColSize.x, -1)));
@@ -3911,7 +3921,7 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 			if (!ifs.is_open())
 				wxMessageBox("OPEN file not opened");
 
-			boost::archive::binary_iarchive ia(ifs);
+			boost::archive::text_iarchive ia(ifs);
 			ia >> *this;
 			// archive and stream closed when destructors are called
 
@@ -3926,18 +3936,18 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 
 		if (!wxDirExists(saveFolder))
 			wxMkDir(saveFolder);
-
-		std::ofstream ofs(saveFolder + "\\" + character.getName());
-		if (!ofs.is_open())
-			wxMessageBox("SAVE file not opened");
 		{
-			boost::archive::binary_oarchive oa(ofs);
+			std::ofstream ofs(saveFolder + "\\" + character.getName());
+			if (!ofs.is_open())
+				wxMessageBox("SAVE file not opened");
+			
+			boost::archive::text_oarchive oa(ofs);
 			// write class instance to archive
 			oa << *this;
 			// archive and stream closed when destructors are called
-		}
 
-		ofs.close();
+			ofs.close();
+		}
 	}
 
 	if (obj == wxID_SAVEAS)

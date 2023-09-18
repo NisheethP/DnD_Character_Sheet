@@ -235,7 +235,7 @@ bool Character::checkSpellKnown(Spell& pSpell)
 {
 	for (auto& i : knownSpells)
 	{
-		if (i == pSpell)
+		if (i == pSpell.getName())
 			return true;
 	}
 	return false;
@@ -416,7 +416,7 @@ void Character::addSpell(Spell pSpell)
 		return;
 	else
 	{
-		knownSpells.push_back(pSpell);
+		knownSpells.push_back(pSpell.getName());
 	}
 }
 
@@ -425,7 +425,7 @@ bool Character::remSpell(std::string spellName)
 	Util::toLowerString(spellName);
 	for (auto it = knownSpells.begin(); it != knownSpells.end(); ++it)
 	{
-		if (it->getName() == spellName)
+		if (*it == spellName)
 		{
 			knownSpells.erase(it);
 			return true;
@@ -640,7 +640,8 @@ Slider Character::getSlider(std::string name)
 		if (Util::toLowerStringRet(curSlider.name) == Util::toLowerStringRet(name))
 			return curSlider;
 	}
-	// TODO: insert return statement here
+	
+	return { "", 0,0,0,0 };
 }
 
 void Character::temp()

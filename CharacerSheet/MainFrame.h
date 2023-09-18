@@ -19,9 +19,6 @@ class MainFrame : public wxFrame
 		
 		ar& shortRestSliders;
 		ar& longRestSliders;
-
-		ar& character;
-		
 		ar& uses.SpellPoints;
 		ar& uses.SpellSlots;
 
@@ -30,8 +27,10 @@ class MainFrame : public wxFrame
 
 		ar& healToPercentageValue;
 
-		ar& notesPanels.pages; 
+		ar& notesPanels.pages;
 		ar& notesPanels.pageNames;
+
+		ar& character;
 	}
 
 	std::string saveFolder = "Character Saves";
