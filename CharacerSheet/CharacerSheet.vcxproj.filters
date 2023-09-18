@@ -108,6 +108,9 @@
     <ClCompile Include="FileLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ItemDisplayControl.cpp">
+      <Filter>Source Files\Controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainFrame.h">
@@ -184,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="FileLogger.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemDisplayControl.h">
+      <Filter>Header Files\Controls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

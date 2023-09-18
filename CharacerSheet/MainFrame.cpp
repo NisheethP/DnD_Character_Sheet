@@ -608,6 +608,19 @@ wxScrolled<wxPanel>* MainFrame::CreateSpellSlotsTable(wxNotebook* parent)
 	return panel;
 }
 
+wxScrolled<wxPanel>* MainFrame::createInventoryListPage(wxNotebook* parent)
+{
+	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxVSCROLL);
+	panel->SetBackgroundColour(mainColour.first);
+	panel->SetScrollRate(0, FromDIP(10));
+
+	auto mainSizer = new wxBoxSizer(wxVERTICAL);
+	
+
+	panel->SetSizer(mainSizer);
+	return panel;
+}
+
 wxScrolled<wxPanel>* MainFrame::CreateInventoryPage(wxNotebook* parent)
 {
 	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxVSCROLL);
@@ -2443,6 +2456,29 @@ void MainFrame::updateNotes()
 	notesPanels.PageText->SetValue(notesPanels.pages[notesPanels.curPageNum]);
 }
 
+void MainFrame::updateSliders()
+{
+	for (auto& i : mainPagePanels.Sliders)
+	{
+		i.first->Destroy();
+		i.second->Destroy();
+	}
+
+	for (auto& i : mainPagePanels.sliderLine)
+		i->Destroy();
+
+	for (auto i : mainPagePanels.SliderVal)
+		i->Destroy();
+
+	mainPagePanels.Sliders.clear();
+	mainPagePanels.SliderDefaults.clear();
+	mainPagePanels.sliderLine.clear();
+	mainPagePanels.SliderVal.clear();
+
+	for (auto& charSliders : character.getSliders())
+		makeSlider(charSliders.name, charSliders.value, charSliders.min, charSliders.max, charSliders.defaultValue);
+}
+
 void MainFrame::updateKnownSpellMods()
 {
 	int spellMod, spellSaveMod;
@@ -2600,7 +2636,6 @@ void MainFrame::updateStats()
 		mainPagePanels.Stat_TextCtrls[i].second->SetValue(std::to_string(character.getSkillMod(skillNames[i])));
 	}
 	
-	wxMessageBox("HP is not updated. Please update manually");
 	updateInitiative();
 	updateKnownSpellMods();
 	updateSavingThrows();
@@ -2714,6 +2749,8 @@ void MainFrame::updateAll()
 	updateSavingThrows();
 	updateSkills();
 	updateTempHP();
+	updateStats();
+	updateSliders();
 }
 
 void MainFrame::SpellDesc::fillAllSpellTree(std::vector<Spell>& allSpells)
@@ -2873,6 +2910,57 @@ int MainFrame::getNumSpells(int level)
 		return -1;
 
 	return allSpellsLevel[level].size();
+}
+
+void MainFrame::makeSlider(std::string title, int val, int min, int max, int def)
+{
+	auto panel = mainPagePanels.SlidersButtons.second->GetParent();
+	auto sizer = panel->GetSizer();
+
+	auto slider = new wxSlider(panel, wxID_ANY, def, min, max, wxDefaultPosition, wxDefaultSize, wxSL_MIN_MAX_LABELS | wxSL_TICKS);
+
+	auto text = new wxStaticText(panel, wxID_ANY, title, wxDefaultPosition, wxDefaultSize);
+	auto horLine = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(1.5 * baseColSize.x, -1)));
+
+	auto value = new wxTextCtrl(panel, wxID_ANY, std::to_string(val), wxDefaultPosition, FromDIP(wxSize(50, -1)), wxALIGN_CENTER_HORIZONTAL);
+
+	value->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+
+	text->SetForegroundColour(panelColour.second);
+	slider->SetForegroundColour(mainColour.second);
+	setWindowColour(value, ctrlColour);
+
+	auto font = text->GetFont();
+	font.MakeLarger();
+	font.MakeBold();
+	font.MakeUnderlined();
+	text->SetFont(font);
+
+	value->SetFont(value->GetFont().MakeBold().MakeLarger());
+
+	auto subSizer = new wxBoxSizer(wxHORIZONTAL);
+
+	auto sizeFlag = wxALIGN_CENTER;
+
+	subSizer->Add(text, 0, sizeFlag);
+	subSizer->Add(value, 0, sizeFlag | wxLEFT, 5);
+	subSizer->Add(slider, 1, wxEXPAND | wxLEFT, 10);
+	//subSizer->Add(-1,5);
+
+	sizer->Add(-1, 3);
+	sizer->Add(subSizer, 0, wxEXPAND | wxRIGHT, 20);
+	sizer->Add(horLine, 0, wxEXPAND);
+	sizer->Add(-1, 3);
+
+	mainPagePanels.Sliders.push_back({ text, slider });
+	mainPagePanels.SliderDefaults.push_back(def);
+	mainPagePanels.sliderLine.push_back(horLine);
+	mainPagePanels.SliderVal.push_back(value);
+
+	panel->Layout();
+
+	slider->Bind(wxEVT_SLIDER, &MainFrame::onSliderChange, this);
+	value->Bind(wxEVT_TEXT, &MainFrame::onSliderValChange, this);
 }
 
 void MainFrame::makeSavingThrowPair(wxStaticText* savingThrowName, wxTextCtrl* savingThrowValue, Skills curSkill)
@@ -3205,7 +3293,7 @@ void MainFrame::onHealDamageButton(wxCommandEvent& event)
 			else
 			{
 				character.giveTempHP(tempHP - num);
-				num = 0;25
+				num = 0;
 			}
 		}
 
@@ -3304,53 +3392,12 @@ void MainFrame::onAddRemSlider(wxCommandEvent& event)
 		int min = dialog.getMin();
 		int max = dialog.getMax();
 		int def = dialog.getDef();
-		auto slider = new wxSlider(panel, wxID_ANY, def, min, max, wxDefaultPosition, wxDefaultSize, wxSL_MIN_MAX_LABELS | wxSL_TICKS);
-
-		auto text = new wxStaticText(panel, wxID_ANY, title, wxDefaultPosition, wxDefaultSize);
-		auto horLine = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(1.5*baseColSize.x,-1)));
-
-		auto value = new wxTextCtrl(panel, wxID_ANY, std::to_string(def), wxDefaultPosition, FromDIP(wxSize(50, -1)), wxALIGN_CENTER_HORIZONTAL);
-
-		value->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
-
-		text->SetForegroundColour(panelColour.second);
-		slider->SetForegroundColour(mainColour.second);
-		setWindowColour(value, ctrlColour);
-
-		auto font = text->GetFont();
-		font.MakeLarger();
-		font.MakeBold();
-		font.MakeUnderlined();
-		text->SetFont(font);
-
-		value->SetFont(value->GetFont().MakeBold().MakeLarger());
-
-		auto subSizer = new wxBoxSizer(wxHORIZONTAL);
-
-		auto sizeFlag = wxALIGN_CENTER;
-
-		subSizer->Add(text, 0, sizeFlag);
-		subSizer->Add(value, 0, sizeFlag | wxLEFT, 5);
-		subSizer->Add(slider, 1, wxEXPAND | wxLEFT, 10);
-		//subSizer->Add(-1,5);
-
-		sizer->Add(-1, 3);
-		sizer->Add(subSizer, 0, wxEXPAND | wxRIGHT, 20);
-		sizer->Add(horLine, 0, wxEXPAND);
-		sizer->Add(-1, 3);
-
-		mainPagePanels.Sliders.push_back({text, slider});
-		mainPagePanels.SliderDefaults.push_back(def);
-		mainPagePanels.sliderLine.push_back(horLine);
-		mainPagePanels.SliderVal.push_back(value);
-
-		character.addSlider({title, slider->GetValue()});
+		
+		makeSlider(title, def, min, max, def);
+		character.addSlider({title, def, min, max, def});
 
 		panel->FitInside();
 		panel->Layout();
-
-		slider->Bind(wxEVT_SLIDER, &MainFrame::onSliderChange, this);
-		value->Bind(wxEVT_TEXT, &MainFrame::onSliderValChange, this);
 		
 		menuBarItems.RestAddSliderToLong->Enable();
 		menuBarItems.RestAddSliderToShort->Enable();
@@ -3973,6 +4020,7 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 			auto stat = dialog.getStats();
 			character.setStats(Stats(stat[0], stat[1], stat[2], stat[3], stat[4], stat[5]));
 			updateStats();
+			wxMessageBox("HP is not updated. Please update manually");
 		}
 	}
 
@@ -4242,7 +4290,7 @@ void MainFrame::onResetMenuEvents(wxCommandEvent& event)
 		{
 			auto& list = std::get<3>(*it);
 
-			for (int i = 0; i < list->GetCount(); ++i)
+			for (unsigned int i = 0; i < list->GetCount(); ++i)
 			{
 				list->Check(i, false);
 			}

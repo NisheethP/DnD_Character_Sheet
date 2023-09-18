@@ -154,6 +154,7 @@
     <ClCompile Include="FileLogger.cpp" />
     <ClCompile Include="ImagePage.cpp" />
     <ClCompile Include="Item.cpp" />
+    <ClCompile Include="ItemDisplayControl.cpp" />
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MoneyDialog.cpp" />
     <ClCompile Include="PreCompiledHeader.cpp">
@@ -184,6 +185,7 @@
     <ClInclude Include="FileLogger.h" />
     <ClInclude Include="ImagePage.h" />
     <ClInclude Include="Item.h" />
+    <ClInclude Include="ItemDisplayControl.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MoneyDialog.h" />
     <ClInclude Include="PreCompiledHeader.h" />

@@ -102,6 +102,27 @@ enum Conditions
 	Fatigued			= 1 << 16
 };
 
+struct Slider
+{
+	friend class boost::serialization::access;
+
+	template<class Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& name;
+		ar& value;
+		ar& min;
+		ar& max;
+		ar& defaultValue;
+	}
+
+	std::string name;
+	int value;
+	int min;
+	int max;
+	int defaultValue;
+};
+
 class Character
 {
 private:
@@ -122,7 +143,8 @@ private:
 	std::vector<std::string> toolProf;
 	std::vector<feature> features;
 	std::vector<Item> inventory;
-	std::vector <std::pair<std::string, int>> sliders;
+
+	std::vector<Slider> sliders;
 
 	std::vector<Spell> knownSpells;
 
@@ -180,14 +202,14 @@ public:
 	int getModTotHP()	{ return totHP + totHPMod; }
 	int getTempHP()		{ return tempHP; }
 
-	Stats* getStats() { return &charStats; }
-	Stats getStatsMods() { return charStatMods; }
-	size_t getNumberSpells() { return knownSpells.size(); }
+	Stats* getStats()			{ return &charStats; }
+	Stats getStatsMods()		{ return charStatMods; }
+	size_t getNumberSpells()	{ return knownSpells.size(); }
 
-	std::vector<std::string>& getLanguages() { return languages; }
-	std::vector<std::string>& getToolProf() { return toolProf; }
-	std::vector<feature>& getFeatures() { return features; }
-	std::vector<Spell>& getKnownSpells() { return knownSpells; }
+	std::vector<std::string>& getLanguages()	{ return languages; }
+	std::vector<std::string>& getToolProf()		{ return toolProf; }
+	std::vector<feature>& getFeatures()			{ return features; }
+	std::vector<Spell>& getKnownSpells()		{ return knownSpells; }
 
 	SpellSlot& getSpellSlots()		{ return charSlots; }
 	SpellSlot& getCurSpellSlots()	{ return curCharSlots; }
@@ -205,6 +227,10 @@ public:
 	int getSavingThrow();
 	int getSkillsProfs();
 	int getExpertises() { return skillExpertises; }
+
+	const std::vector<Slider>& getSliders() const { return sliders; }
+	Slider getSlider(int index) { return sliders[index]; }
+	Slider getSlider(std::string name);
 
 	//-------------
 	//SET FUNCTIONS
@@ -245,7 +271,7 @@ public:
 	void addFeature(feature pFeat);
 	void removeFeature(feature pFeat);
 	
-	void addSlider(std::pair<std::string, int> param);
+	void addSlider(Slider param);
 	bool updateSlider(std::string str, int val);
 	void remSlider(int index);
 
@@ -329,6 +355,6 @@ inline void Character::serialize(Archive& ar, const unsigned int version)
 
 	ar& tempHP;
 
-	ar& charSlots;
-	ar& curCharSlots;
+	//ar& charSlots;
+	//ar& curCharSlots;
 }

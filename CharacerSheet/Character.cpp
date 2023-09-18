@@ -465,7 +465,7 @@ void Character::removeFeature(feature pFeat)
 	}
 }
 
-void Character::addSlider(std::pair<std::string, int> param)
+void Character::addSlider(Slider param)
 {
 	sliders.push_back(param);
 }
@@ -474,9 +474,9 @@ bool Character::updateSlider(std::string str, int val)
 {
 	for (auto it = sliders.begin(); it != sliders.end(); ++it)
 	{
-		if (str == it->first)
+		if (str == it->name)
 		{
-			it->second = val;
+			it->value = val;
 			return true;
 		}
 	}
@@ -631,6 +631,16 @@ int Character::getSkillsProfs()
 		ST |= Charisma;
 
 	return skillProficiencies & ~ST;
+}
+
+Slider Character::getSlider(std::string name)
+{
+	for (auto& curSlider : sliders)
+	{
+		if (Util::toLowerStringRet(curSlider.name) == Util::toLowerStringRet(name))
+			return curSlider;
+	}
+	// TODO: insert return statement here
 }
 
 void Character::temp()

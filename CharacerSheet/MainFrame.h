@@ -29,6 +29,7 @@ class MainFrame : public wxFrame
 		ar& overrides.spellSlot;
 
 		ar& healToPercentageValue;
+
 		ar& notesPanels.pages; 
 		ar& notesPanels.pageNames;
 	}
@@ -280,6 +281,7 @@ public:
 	wxScrolled<wxPanel>* CreateSpellsPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateKnownSpellsPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateSpellSlotsTable(wxNotebook* parent);
+	wxScrolled<wxPanel>* createInventoryListPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateInventoryPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateAnimalCardsPage(wxNotebook* parent);
 	wxScrolled<wxPanel>* CreateNotesPage(wxNotebook* parent);
@@ -354,13 +356,15 @@ public:
 	void updatePlayerConds();
 	void updateFeaturesList();
 	void updateNotes();
-	
+	void updateSliders();
+
 	void updateAll();
 
 	void calcCheckedSpells();
 
 	void DrawMain();
 
+	void makeSlider(std::string title, int val, int min, int max, int def);
 	void makeSavingThrowPair(wxStaticText* savingThrowName, wxTextCtrl* savingThrowValue, Skills curSkill);
 	void makeSkillPair(wxStaticText* skillName, wxTextCtrl* skillValue, Skills curSkill);
 	void makeAddRemList(wxStaticText*& title, wxButton*& add, wxButton*& rem, wxListBox*& list, wxSizer* sizer, wxPanel* parent);
