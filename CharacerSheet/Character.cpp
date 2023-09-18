@@ -287,8 +287,8 @@ void Character::setStats(int str, int dex, int con, int pInt, int wis, int cha)
 
 void Character::setCurHP(int x)
 {
-	if (x > totHP)
-		curHP = totHP;
+	if (x > getModTotHP())
+		curHP = getModTotHP();
 	else
 		curHP = x;
 }

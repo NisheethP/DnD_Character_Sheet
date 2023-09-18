@@ -1410,7 +1410,7 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 	auto& healButton = get<0>(mainPagePanels.HealDamage) = new wxButton(panel, wxID_ANY, " HEAL ", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
 	auto& damageButton = get<1>(mainPagePanels.HealDamage) = new wxButton(panel, wxID_ANY, "DAMAGE", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
 	auto& healDamageSpin = get<2>(mainPagePanels.HealDamage) = new wxSpinCtrl(panel, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize,
-		wxSP_ARROW_KEYS | wxALIGN_CENTER_HORIZONTAL);
+		wxSP_ARROW_KEYS | wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
 	auto& halfDamageButton = get<3>(mainPagePanels.HealDamage) = new wxButton(panel, wxID_ANY, "1/2 DMG", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
 
 	healButton->SetMinSize(damageButton->GetSize());
@@ -1435,7 +1435,7 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 	healButton->SetFont(healButton->GetFont().Bold());
 	damageButton->SetFont(damageButton->GetFont().Bold());
 	halfDamageButton->SetFont(damageButton->GetFont().Bold());
-	healDamageSpin->SetFont(healDamageSpin->GetFont().Bold());
+	healDamageSpin->SetFont(healDamageSpin->GetFont().Bold().Larger());
 
 	healToText->SetFont(healToText->GetFont().Bold());
 	hpText->SetFont(hpText->GetFont().Bold());
@@ -1443,16 +1443,16 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 	healToSpin->SetMax(100);
 	healToSpin->SetMin(0);
 	hpSpin->SetMax(1e5);
-	hpSpin->SetMin(0);
+	hpSpin->SetMin(-character.getTotHP());
 	
 	dmgSizer->Add(damageButton, 0, wxALIGN_CENTER);
 	dmgSizer->Add(-1, 2);
 	dmgSizer->Add(halfDamageButton, 0, wxALIGN_CENTER);
 
 	sizer0->Add(gap, -1);
-	sizer0->Add(healButton, 0, wxALIGN_CENTER);
+	sizer0->Add(healButton, 0, wxEXPAND);
 	sizer0->Add(gap, -1);
-	sizer0->Add(healDamageSpin, 0, wxALIGN_CENTER);
+	sizer0->Add(healDamageSpin, 0, wxEXPAND);
 	sizer0->Add(gap, -1);
 	sizer0->Add(dmgSizer, 0, wxALIGN_CENTER);
 	sizer0->Add(gap, -1);
@@ -1495,6 +1495,9 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 	setWindowColour(healToText, panelColour);
 
 	mainSizer->Add(sizer, 0, wxALIGN_CENTER);
+
+	healToSpin->SetValue(100);
+	
 	panel->SetSizer(mainSizer);
 	return panel;
 }
@@ -3166,7 +3169,10 @@ void MainFrame::onHealDamageButton(wxCommandEvent& event)
 				num -= tempHP;
 			}
 			else
+			{
 				character.giveTempHP(tempHP - num);
+				num = 0;
+			}
 		}
 
 		if (curHp - num < 0)
@@ -3197,7 +3203,10 @@ void MainFrame::onHealDamageButton(wxCommandEvent& event)
 				num -= tempHP;
 			}
 			else
+			{
 				character.giveTempHP(tempHP - num);
+				num = 0;25
+			}
 		}
 
 		if (curHp - num < 0)
