@@ -926,3 +926,8 @@ bool feature::operator==(const feature& rhs)
 
 	return false;
 }
+
+bool feature::operator!=(const feature& rhs)
+{
+	return !(*this == rhs);
+}

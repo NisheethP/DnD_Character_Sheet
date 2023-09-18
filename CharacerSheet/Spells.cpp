@@ -119,6 +119,11 @@ bool Spell::operator==(const Spell& spell)
 	return false;
 }
 
+bool Spell::operator!=(const Spell& spell)
+{
+	return !(*this == spell);
+}
+
 std::string Spell::getMaterialsFromDesc()
 {
 	if (matsLength != 0)
@@ -126,9 +131,6 @@ std::string Spell::getMaterialsFromDesc()
 	else
 		return "";
 }
-
-
-
 
 //---------------------
 //CONVERSION FUNCITONS

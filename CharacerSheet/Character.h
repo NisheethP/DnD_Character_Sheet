@@ -20,6 +20,7 @@ public:
 	std::string description;
 	
 	bool operator==(const feature& rhs);
+	bool operator!=(const feature& rhs);
 };
 
 enum Skills

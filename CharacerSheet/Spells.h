@@ -88,6 +88,7 @@ public:
 
 	bool checkName(std::string pName)	{ return Name == pName; }
 	bool operator==(const Spell& spell);
+	bool operator!=(const Spell& spell);
 
 
 	std::string getMaterialsFromDesc();
