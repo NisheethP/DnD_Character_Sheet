@@ -90,6 +90,7 @@ class MainFrame : public wxFrame
 	struct MenuBarItems
 	{
 		wxMenuItem* FileHealthLogger;
+		wxMenuItem* FileLevelUp;
 
 		wxMenuItem* SetName;
 		wxMenuItem* SetStats;
@@ -356,6 +357,9 @@ public:
 	void updateFeaturesList();
 	void updateNotes();
 	void updateSliders();
+	void updateLangProfs();
+	void updateToolProfs();
+	void updateConditions();
 
 	void updateAll();
 

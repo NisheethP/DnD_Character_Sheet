@@ -70,3 +70,5 @@ public:
 
 	bool operator== (CharClass& c2);
 };
+
+std::string getStringFromClass(ClassType type);

@@ -19,6 +19,7 @@
 #include "WarlockSlotsDialog.h"
 #include "AttackControl.h"
 #include "ImagePage.h"
+#include "LevelUpDialog.h"
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900, 600)),
@@ -124,6 +125,8 @@ void MainFrame::CreateMenuBar()
 	fileMenu->Append(wxID_SAVEAS);
 	fileMenu->AppendSeparator();
 	menuBarItems.FileHealthLogger = fileMenu->Append(wxID_ANY, "Log Health to file");
+	fileMenu->AppendSeparator();
+	menuBarItems.FileLevelUp = fileMenu->Append(wxID_ANY, "&Level Up\tCTRL+L");
 
 	menuBarItems.SetName = SetMenu->Append(wxID_ANY, "Set Name");
 	menuBarItems.SetMaxHP = SetMenu->Append(wxID_ANY, "Set Max HP");
@@ -250,6 +253,7 @@ void MainFrame::BindControls()
 	this->Bind(wxEVT_MENU, &MainFrame::onFileMenuEvents, this, wxID_SAVE);
 	this->Bind(wxEVT_MENU, &MainFrame::onFileMenuEvents, this, wxID_SAVEAS);
 	this->Bind(wxEVT_MENU, &MainFrame::onFileMenuEvents, this, menuBarItems.FileHealthLogger->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onFileMenuEvents, this, menuBarItems.FileLevelUp->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSP->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetMaxHP->GetId());
@@ -2484,6 +2488,61 @@ void MainFrame::updateSliders()
 		makeSlider(charSliders.name, charSliders.value, charSliders.min, charSliders.max, charSliders.defaultValue);
 }
 
+void MainFrame::updateLangProfs()
+{
+	auto& list = std::get<3>(mainPagePanels.LangProf);
+	list->Clear();
+	for (auto& it : character.getLanguages())
+		list->Append(it);
+}
+
+void MainFrame::updateToolProfs()
+{
+	auto& list = std::get<3>(mainPagePanels.ToolProf);
+	list->Clear();
+	for (auto& it : character.getToolProf())
+		list->Append(it);
+}
+
+void MainFrame::updateConditions()
+{
+	int conditions = character.getConditions();
+	playerConditions.clear();
+	not_playerConditions.clear();
+	for (auto it = allConditions.begin(); it != allConditions.end(); ++it)
+	{
+		if (it->first == Conditions::NoCondition)
+			continue;
+
+		if (it->first == Conditions::Incapacitated)
+			continue;
+
+		bool has = it->first & conditions;
+		if (has)
+		{
+			playerConditions.push_back(*it);
+			auto list = mainPagePanels.EL_Conditions->GetListCtrl();
+			int count = list->GetItemCount();
+			bool alreayInserted = false;
+
+			for (int i = 0; i < count; ++i)
+			{
+				std::string str = list->GetItemText(i).ToStdString();
+				if (str == it->second.title)
+					alreayInserted = true;
+			}
+
+			if (!alreayInserted)
+				list->InsertItem(count - 1, it->second.title);
+
+		}
+		if (!has)
+			not_playerConditions.push_back(*it);
+	}
+
+
+}
+
 void MainFrame::updateKnownSpellMods()
 {
 	int spellMod, spellSaveMod;
@@ -2760,6 +2819,9 @@ void MainFrame::updateAll()
 	updateTempHP();
 	updateStats();
 	updateSliders();
+	updateConditions();
+	updateLangProfs();
+	updateToolProfs();
 }
 
 void MainFrame::SpellDesc::fillAllSpellTree(std::vector<Spell>& allSpells)
@@ -2957,10 +3019,9 @@ void MainFrame::makeSlider(std::string title, int val, int min, int max, int def
 	subSizer->Add(slider, 1, wxEXPAND | wxLEFT, 10);
 	//subSizer->Add(-1,5);
 
-	sizer->Add(-1, 3);
 	sizer->Add(subSizer, 0, wxEXPAND | wxRIGHT, 20);
-	sizer->Add(horLine, 0, wxEXPAND);
-	sizer->Add(-1, 3);
+	sizer->Add(horLine, 0, wxEXPAND | wxBOTTOM, 3);
+	
 
 	mainPagePanels.Sliders.push_back({ text, slider });
 	mainPagePanels.SliderDefaults.push_back(def);
@@ -3982,6 +4043,13 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 		std::string log = "Health Log begun. Initial HP " + std::to_string(character.getCurHP());
 		healthLog << log;
 	}
+
+	if (obj == menuBarItems.FileLevelUp->GetId())
+	{
+		LevelUpDialog dialog(this);
+
+		dialog.ShowModal();
+	}
 }
 
 void MainFrame::onSetMenuEvents(wxCommandEvent& event)
@@ -4672,7 +4740,12 @@ void MainFrame::onToolProfecs(wxCommandEvent& event)
 	if (obj == std::get<2>(mainPagePanels.ToolProf))
 	{
 		int i = list->GetSelection();
-		character.remTool(list->GetString(i).ToStdString());
+		std::string tool = list->GetString(i).ToStdString();
+		
+		if (tool == "")
+			return;
+
+		character.remTool(tool);
 		list->Delete(i);
 		
 	}
@@ -4699,7 +4772,12 @@ void MainFrame::onLangProfecs(wxCommandEvent& event)
 	if (obj == std::get<2>(mainPagePanels.LangProf))
 	{
 		int i = list->GetSelection();
-		character.remLanguage(list->GetString(i).ToStdString());
+		std::string lang = list->GetString(i).ToStdString();
+
+		if (lang == "")
+			return;
+
+		character.remLanguage(lang);
 		list->Delete(i);
 	}
 }

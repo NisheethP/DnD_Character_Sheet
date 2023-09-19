@@ -4,52 +4,7 @@
 
 std::string CharClass::getClassName()
 {
-	switch (classType)
-	{
-	case ClassType::Barbarian:
-		return "Barbarian";
-		break;
-	case ClassType::Bard:
-		return "Bard";
-		break;
-	case ClassType::Cleric:
-		return "Cleric";
-		break;
-	case ClassType::Druid:
-		return "Druid";
-		break;
-	case ClassType::Fighter:
-		return "Fighter";
-		break;
-	case ClassType::Monk:
-		return "Monk";
-		break;
-	case ClassType::Paladin:
-		return "Paladin";
-		break;
-	case ClassType::Ranger:
-		return "Ranger";
-		break;
-	case ClassType::Rogue:
-		return "Rogue";
-		break;
-	case ClassType::Sorcerer:
-		return "Sorcerer";
-		break;
-	case ClassType::Warlock:
-		return "Warlock";
-		break;
-	case ClassType::Wizard:
-		return "Wizard";
-		break;
-	case ClassType::Artificer:
-		return "Artificer";
-		break;
-	default:
-		return "Error";
-		break;
-	}
-	return std::string();
+	return getStringFromClass(classType);
 }
 
 DieType CharClass::getHitDie()
@@ -58,46 +13,32 @@ DieType CharClass::getHitDie()
 	{
 	case ClassType::Barbarian:
 		return DieType::d12;
-		break;
 	case ClassType::Bard:
 		return DieType::d8;
-		break;
 	case ClassType::Cleric:
 		return DieType::d8;
-		break;
 	case ClassType::Druid:
 		return DieType::d8;
-		break;
 	case ClassType::Fighter:
 		return DieType::d10;
-		break;
 	case ClassType::Monk:
 		return DieType::d8;
-		break;
 	case ClassType::Paladin:
 		return DieType::d10;
-		break;
 	case ClassType::Ranger:
 		return DieType::d10;
-		break;
 	case ClassType::Rogue:
 		return DieType::d8;
-		break;
 	case ClassType::Sorcerer:
 		return DieType::d6;
-		break;
 	case ClassType::Warlock:
 		return DieType::d8;
-		break;
 	case ClassType::Wizard:
 		return DieType::d6;
-		break;
 	case ClassType::Artificer:
 		return DieType::d8;
-		break;
 	default:
 		return DieType::error;
-		break;
 	}
 }
 
@@ -117,4 +58,40 @@ bool CharClass::operator==(CharClass& c2)
 	p = p && this->hitDie == c2.hitDie;
 	
 	return p;
+}
+
+std::string getStringFromClass(ClassType type)
+{
+	switch (type)
+	{
+	case ClassType::Barbarian:
+		return "Barbarian";
+	case ClassType::Bard:
+		return "Bard";
+	case ClassType::Cleric:
+		return "Cleric";
+	case ClassType::Druid:
+		return "Druid";
+	case ClassType::Fighter:
+		return "Fighter";
+	case ClassType::Monk:
+		return "Monk";
+	case ClassType::Paladin:
+		return "Paladin";
+	case ClassType::Ranger:
+		return "Ranger";
+	case ClassType::Rogue:
+		return "Rogue";
+	case ClassType::Sorcerer:
+		return "Sorcerer";
+	case ClassType::Warlock:
+		return "Warlock";
+	case ClassType::Wizard:
+		return "Wizard";
+	case ClassType::Artificer:
+		return "Artificer";
+	default:
+		return "Error";
+	}
+	return "SWITCH FAIL";
 }

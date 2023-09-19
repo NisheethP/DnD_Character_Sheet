@@ -155,6 +155,7 @@
     <ClCompile Include="ImagePage.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="ItemDisplayControl.cpp" />
+    <ClCompile Include="LevelUpDialog.cpp" />
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MoneyDialog.cpp" />
     <ClCompile Include="PreCompiledHeader.cpp">
@@ -186,6 +187,7 @@
     <ClInclude Include="ImagePage.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemDisplayControl.h" />
+    <ClInclude Include="LevelUpDialog.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MoneyDialog.h" />
     <ClInclude Include="PreCompiledHeader.h" />
