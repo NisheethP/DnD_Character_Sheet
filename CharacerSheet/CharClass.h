@@ -69,6 +69,8 @@ public:
 	CharClass(ClassType pClass = ClassType::none, int pLevel = 1, CasterType type = CasterType::None);
 
 	bool operator== (CharClass& c2);
+
+	void updateHitDie() { hitDie = getHitDie(); }
 };
 
 std::string getStringFromClass(ClassType type);

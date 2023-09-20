@@ -168,6 +168,7 @@ bool Character::checkExpert(const Skills& skill)
 
 void Character::initSlots()
 {
+	charSlots.slots.clear();
 	int castLevel = getCasterLevel();
 	int totWarlock = 0;
 
@@ -293,37 +294,40 @@ void Character::setCurHP(int x)
 		curHP = x;
 }
 
-void Character::giveClass(ClassType pClassType, int pLevel, CharClass::CasterType type)
+void Character::giveClass(ClassType pClassType, int pLevel, CharClass::CasterType type, bool updateSlots)
 {
-	for (auto i = charClass.begin(); i != charClass.end(); ++i)
-	{
-		if (pClassType == i->classType)
-		{
-			i->level = pLevel;
-			calcTotLevel();
-			return;
-		}
-	}
-
-	charClass.push_back(CharClass(pClassType, pLevel, type));
-	calcTotLevel();
+	CharClass tempClass(pClassType, pLevel, type);
+	giveClass(tempClass, updateSlots);
 }
 
-void Character::giveClass(CharClass pClass)
+void Character::giveClass(CharClass pClass, bool updateSlots)
 {
+
+	bool existingClass = false;
 	for (auto i = charClass.begin(); i != charClass.end(); ++i)
 	{
 		if (pClass == *i)
 		{
 			i->level += pClass.level;
-			calcTotLevel();
-
-			return;
+			existingClass = true;
+			break;
 		}
 	}
 
-	charClass.push_back(pClass);
+	if (existingClass == false)
+		charClass.push_back(pClass);
+
 	calcTotLevel();
+
+	if (updateSlots)
+	{
+		initSlots();
+		curCharSlots = charSlots;
+		SpellPoints = getDefaultSpellPoints();
+		curSpellPoints = SpellPoints;
+	}
+
+	profBonus = getProficiency(totalLevel);
 }
 
 void Character::setSkillProfs(int x)

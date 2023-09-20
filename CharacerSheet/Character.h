@@ -237,15 +237,15 @@ public:
 	//-------------
 	void setTotHP(int x) { totHP = x; }
 	void setName(std::string name) { characterName = name; }
-	void setStats(Stats stat);
 	void setSpeed(int x) { speed = x; }
+	void setStats(Stats stat);
 	void setStats(int str = 10, int dex = 10, int con = 10, int pInt = 10, int wis = 10, int cha = 10);
 	void setCurHP(int x);
 	void addTotHP(int x) { totHP += x; }
 	void setTotHPBonus(int x) { totHPMod = x; }
 	void setAC(int x) { AC = x; }
-	void giveClass(ClassType pClassType, int pLevel = 1, CharClass::CasterType type = CharClass::CasterType::None);
-	void giveClass(CharClass pClass);
+	void giveClass(ClassType pClassType, int pLevel = 1, CharClass::CasterType type = CharClass::CasterType::None, bool updateSlots = false);
+	void giveClass(CharClass pClass, bool updateSlots = false);
 	void setInitMod(int x) { initMod = x; }
 
 	void setSpellSlots(SpellSlot slots) { charSlots = slots; curCharSlots = slots; }

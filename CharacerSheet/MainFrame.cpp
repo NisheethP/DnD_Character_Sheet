@@ -1650,8 +1650,6 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 
 	auto tempClasses = character.getCombinedClasses();
 	
-	sizer->Add(-1, 5);
-
 	for (auto it = tempClasses.begin(); it != tempClasses.end(); ++it)
 	{
 		auto text = new wxStaticText(panel, wxID_ANY, "");
@@ -1704,11 +1702,10 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 		spin->SetMin(0);
 		spin->SetValue(it->level);
 
-		subSizer->Add(spin, 0);
+		subSizer->Add(spin, 0, wxTOP | wxBOTTOM, 5);
 		subSizer->Add(3, -1);
-		subSizer->Add(text, 0);
+		subSizer->Add(text, 0, wxTOP | wxBOTTOM, 5);
 
-		sizer->Add(-1, 5);
 		sizer->Add(subSizer, 0, wxEXPAND | wxLEFT, 15);
 
 		mainPagePanels.HitDie.push_back({ spin , text});
@@ -2543,6 +2540,84 @@ void MainFrame::updateConditions()
 
 }
 
+void MainFrame::updateHitDie()
+{
+	auto panel = std::get<0>(mainPagePanels.HitDie[0])->GetParent();
+	auto sizer = panel->GetSizer();
+
+	for (auto& die : mainPagePanels.HitDie)
+	{
+		std::get<0>(die)->Destroy();
+		std::get<1>(die)->Destroy();
+	}
+
+	mainPagePanels.HitDie.clear();
+
+	auto tempClasses = character.getCombinedClasses();
+
+	for (auto it = tempClasses.begin(); it != tempClasses.end(); ++it)
+	{
+		auto text = new wxStaticText(panel, wxID_ANY, "");
+		auto spin = new wxSpinCtrl(panel, wxID_ANY, "0", wxDefaultPosition, FromDIP(wxSize(50, -1)), wxALIGN_CENTER_HORIZONTAL);
+
+		setWindowColour(text, panelColour);
+		setWindowColour(spin, ctrlColour);
+
+		auto subSizer = new wxBoxSizer(wxHORIZONTAL);
+
+		std::string name = it->getClassName();
+		DieType die = it->getHitDie();
+		std::string tempStr = "";
+		tempStr = " of " + std::to_string(it->level);
+
+		switch (die)
+		{
+		case DieType::d6:
+			tempStr += "d6";
+			break;
+		case DieType::d8:
+			tempStr += "d8";
+			break;
+		case DieType::d10:
+			tempStr += "d10";
+			break;
+		case DieType::d12:
+			tempStr += "d12";
+			break;
+		case DieType::d4:
+		case DieType::d20:
+		case DieType::d100:
+			tempStr += "d(4,20,100)";
+			break;
+		case DieType::error:
+			tempStr += "d(ERR)";
+			break;
+		default:
+			tempStr += "d(DEF)";
+			break;
+		}
+
+		tempStr += " - " + name;
+
+		text->SetLabel(tempStr);
+
+		text->SetFont(text->GetFont().Bold());
+
+		spin->SetMax(it->level);
+		spin->SetMin(0);
+		spin->SetValue(it->level);
+
+		subSizer->Add(spin, 0, wxTOP | wxBOTTOM, 5);
+		subSizer->Add(3, -1);
+		subSizer->Add(text, 0, wxTOP | wxBOTTOM, 5);
+
+		sizer->Add(subSizer, 0, wxEXPAND | wxLEFT, 15);
+
+		mainPagePanels.HitDie.push_back({ spin , text });
+	}
+	panel->Layout();
+}
+
 void MainFrame::updateKnownSpellMods()
 {
 	int spellMod, spellSaveMod;
@@ -2651,6 +2726,12 @@ void MainFrame::updateMoneyCtrls()
 	
 	for (int i = 0; i < 4; i++)
 		mainPagePanels.moneyVals[i]->SetValue(money[i]);
+}
+
+void MainFrame::updateName()
+{
+	mainPagePanels.PlayerName->SetValue(character.getName());
+	mainPagePanels.Classes->SetValue(character.getClass());
 }
 
 void MainFrame::updateTempHP()
@@ -2822,6 +2903,8 @@ void MainFrame::updateAll()
 	updateConditions();
 	updateLangProfs();
 	updateToolProfs();
+	updateHitDie();
+	updateName();
 }
 
 void MainFrame::SpellDesc::fillAllSpellTree(std::vector<Spell>& allSpells)
@@ -4048,7 +4131,21 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 	{
 		LevelUpDialog dialog(this);
 
-		dialog.ShowModal();
+		if (dialog.ShowModal() == wxID_CANCEL)
+			return;
+
+		character.giveClass(dialog.getClass(), !overrides.spellSlot);
+		Stats newStats = *character.getStats();
+		newStats.Str += dialog.getStat(0);
+		newStats.Dex += dialog.getStat(1);
+		newStats.Con += dialog.getStat(2);
+		newStats.Int += dialog.getStat(3);
+		newStats.Wis += dialog.getStat(4);
+		newStats.Cha += dialog.getStat(5);
+		character.setStats(newStats);
+
+		character.setTotHP(character.getTotHP() + dialog.getExtraHP());
+		updateAll();
 	}
 }
 

@@ -345,6 +345,7 @@ public:
 	void updateKnownSpellMods();
 	void updateKnownSpellsLists();
 
+	void updateName();
 	void updateTempHP();
 	void updateHP();
 	void updateStats();
@@ -360,6 +361,7 @@ public:
 	void updateLangProfs();
 	void updateToolProfs();
 	void updateConditions();
+	void updateHitDie();
 
 	void updateAll();
 
