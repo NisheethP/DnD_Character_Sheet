@@ -94,11 +94,12 @@ const std::string FileLogger::getPath() const
 const std::string FileLogger::getCurTime() const
 {
 	using namespace std;
-
 	
-	auto const time = std::chrono::current_zone()->to_local(std::chrono::system_clock::now());
+	const auto time = chrono::current_zone()->to_local(chrono::system_clock::now());
+	
+	auto timeSec = chrono::time_point_cast<chrono::seconds>(time);
 
-	string timeStr = std::format("{:%T}", time);
+	string timeStr = format("{:%T}", timeSec);
 
 	return timeStr;
 }
