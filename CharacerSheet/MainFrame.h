@@ -199,6 +199,7 @@ class MainFrame : public wxFrame
 		std::tuple<wxStaticText*, wxButton*, wxButton*, wxListBox*> LangProf = {nullptr, nullptr, nullptr, nullptr};
 		wxEditableListBox* EL_Conditions = nullptr;
 
+		wxTextCtrl* profBonus = nullptr;
 		std::vector<std::pair<wxTextCtrl*, wxTextCtrl*>> Stat_TextCtrls;
 
 		std::vector<wxSpinCtrl*> moneyVals;
@@ -348,6 +349,7 @@ public:
 	void updateName();
 	void updateTempHP();
 	void updateHP();
+	void updateProficiencies();
 	void updateStats();
 	void updateInitiative();
 	void updateSavingThrows();

@@ -1036,7 +1036,7 @@ wxPanel* MainFrame::CreateStats(wxPanel* parent)
 	}
 	
 	wxStaticBoxSizer* profBox = new wxStaticBoxSizer(wxVERTICAL, panel, "Proficiency Bonus");
-	wxTextCtrl* profVal = new wxTextCtrl(panel, wxID_ANY, to_string(character.getProfBonus()), wxDefaultPosition, 
+	wxTextCtrl* profVal = mainPagePanels.profBonus = new wxTextCtrl(panel, wxID_ANY, to_string(character.getProfBonus()), wxDefaultPosition, 
 		wxSize(30, -1), wxTE_READONLY | wxTE_CENTER);
 
 	profBox->GetStaticBox()->SetForegroundColour(mainColour.second);
@@ -2755,6 +2755,12 @@ void MainFrame::updateHP()
 	std::get<1>(mainPagePanels.MaxHPBonus)->SetValue(std::to_string(character.getHPBonus()));
 }
 
+void MainFrame::updateProficiencies()
+{
+	int bonus = character.getProfBonus();
+	mainPagePanels.profBonus->SetValue(std::to_string(bonus));
+}
+
 void MainFrame::updatePlayerConds()
 {
 	playerConditions.clear();
@@ -2887,6 +2893,7 @@ void MainFrame::updateSkills()
 void MainFrame::updateAll()
 {
 	TransferDataToWindow();
+	updateProficiencies();
 	updateFeaturesList();
 	updateNotes();
 	updateInitiative();
