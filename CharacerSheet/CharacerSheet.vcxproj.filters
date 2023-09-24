@@ -114,6 +114,9 @@
     <ClCompile Include="LevelUpDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NewCharacterWizard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainFrame.h">
@@ -195,6 +198,9 @@
       <Filter>Header Files\Controls</Filter>
     </ClInclude>
     <ClInclude Include="LevelUpDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NewCharacterWizard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

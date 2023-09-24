@@ -20,6 +20,7 @@
 #include "AttackControl.h"
 #include "ImagePage.h"
 #include "LevelUpDialog.h"
+#include "NewCharacterWizard.h"
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900, 600)),
@@ -1049,7 +1050,6 @@ wxPanel* MainFrame::CreateStats(wxPanel* parent)
 	setWindowColour(profVal, ctrlColour);
 
 	mainSizer->Add(profBox, 0, wxALIGN_CENTER | wxLEFT | wxRIGHT, margin);
-
 
 	for (int i = 0; i < 6; ++i)
 		mainSizer->Add(boxes[i], 1, wxALIGN_CENTER | wxLEFT | wxRIGHT, margin);
@@ -4061,6 +4061,8 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 
 	if (obj == wxID_NEW)
 	{
+		NewCharacterWizard dialog(this, wxID_ANY, "New Character", wxNullBitmap, wxDefaultPosition, wxDEFAULT_DIALOG_STYLE);
+		dialog.RunWizard(dialog.GetFirstPage());
 
 	}
 

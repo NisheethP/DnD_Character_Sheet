@@ -158,6 +158,7 @@
     <ClCompile Include="LevelUpDialog.cpp" />
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MoneyDialog.cpp" />
+    <ClCompile Include="NewCharacterWizard.cpp" />
     <ClCompile Include="PreCompiledHeader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PreCompiledHeader.h</PrecompiledHeaderFile>
@@ -190,6 +191,7 @@
     <ClInclude Include="LevelUpDialog.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MoneyDialog.h" />
+    <ClInclude Include="NewCharacterWizard.h" />
     <ClInclude Include="PreCompiledHeader.h" />
     <ClInclude Include="SkillProfDialog.h" />
     <ClInclude Include="SliderDialog.h" />

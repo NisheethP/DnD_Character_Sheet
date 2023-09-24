@@ -32,6 +32,7 @@
 #include <wx/fontdlg.h>
 #include <wx/choicdlg.h>
 #include <wx/numdlg.h> 
+#include <wx/wizard.h>
 
 
 //WX FILE STUFF
