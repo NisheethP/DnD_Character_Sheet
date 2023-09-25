@@ -3,34 +3,25 @@
 namespace WizardPages
 {
 
-	class ClassLevelSelectionPage : public wxWizardPageSimple
+	class ClassLevelStatSelectionPage : public wxWizardPageSimple
 	{
-		wxComboBox* charClass = nullptr;
-		wxComboBox* classType = nullptr;
+		wxChoice* charClass = nullptr;
+		wxChoice* classType = nullptr;
 		wxSpinCtrl* charLevel = nullptr;
 
-	public:
-		ClassLevelSelectionPage(wxWizard* parent,
-			wxWizardPage* prev = NULL,
-			wxWizardPage* next = NULL,
-			const wxBitmap& bitmap = wxNullBitmap);
-
-		std::string getCharClass() { return charClass->GetValue().ToStdString(); }
-		std::string getClassType() { return classType->GetValue().ToStdString(); }
-		int getCharLevel() { return charLevel->GetValue(); }
-	};
-
-	class StatSelectionPage : public wxWizardPageSimple
-	{
 		wxSpinCtrl* StatInput[6];
+
 	public:
-		StatSelectionPage(wxWizard* parent,
+		ClassLevelStatSelectionPage(wxWizard* parent,
 			wxWizardPage* prev = NULL,
 			wxWizardPage* next = NULL,
 			const wxBitmap& bitmap = wxNullBitmap);
+
+		std::string getCharClass() { return charClass->GetStringSelection().ToStdString(); }
+		std::string getClassType() { return classType->GetStringSelection().ToStdString(); }
+		int getCharLevel() { return charLevel->GetValue(); }
 
 		int getStat(int index);
-
 	};
 
 	class HP_SpeedSelectionPage : public wxWizardPageSimple
@@ -40,6 +31,7 @@ namespace WizardPages
 		std::vector<wxSpinCtrl*> HP_Spin;
 		std::vector<wxStaticText*> levelHP_Text;
 		wxSpinCtrl* Speed_Spin = nullptr;
+		wxFlexGridSizer* HP_Sizer = nullptr;
 	public:
 		HP_SpeedSelectionPage(wxWizard* parent,
 			int p_level = 1,
@@ -47,15 +39,19 @@ namespace WizardPages
 			wxWizardPage* next = NULL,
 			const wxBitmap& bitmap = wxNullBitmap);
 
-		void onComboBoxChange(wxCommandEvent& event);
+		void arrange();
+		void onChoiceChange(wxCommandEvent& event);
+		void setLevel(int p_level) { level = p_level; }
+		void Create();
+		void setHP_Mode(int x) { HP_Mode->SetSelection(x); }
 	};
 }
 
 class NewCharacterWizard : public wxWizard
 {
-	WizardPages::ClassLevelSelectionPage* page1 = nullptr;
-	WizardPages::StatSelectionPage* page2 = nullptr;
-	WizardPages::HP_SpeedSelectionPage* page3 = nullptr;
+	WizardPages::ClassLevelStatSelectionPage* page1 = nullptr;
+	//WizardPages::StatSelectionPage* page2 = nullptr;
+	WizardPages::HP_SpeedSelectionPage* page2 = nullptr;
 	wxWizardPageSimple* page4 = nullptr;
 
 public:
@@ -69,4 +65,7 @@ public:
 	);
 
 	wxWizardPage* GetFirstPage() const { return page1; }
+
+	void onPageChanging(wxWizardEvent& event);
+
 };
