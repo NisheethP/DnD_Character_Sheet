@@ -17,11 +17,11 @@ NewCharacterWizard::NewCharacterWizard(
 	wxFrame* frame = static_cast<wxFrame*>(parent);
 
 	page1 = new ClassLevelStatSelectionPage(this);
-	//page2 = new StatSelectionPage(this);
 	page2 = new HP_SpeedSelectionPage(this, 20);
+	page3 = new ProficienciesPage(this);
 
 	page1->Chain(page2);
-	//page2->Chain(page3);
+	page2->Chain(page3);
 
 	GetPageAreaSizer()->Add((wxWizardPageSimple*)page1);
 	
@@ -31,8 +31,7 @@ NewCharacterWizard::NewCharacterWizard(
 
 void NewCharacterWizard::onPageChanging(wxWizardEvent& event)
 {
-	auto nextPage = GetCurrentPage()->GetNext();
-	if (nextPage == page2)
+	if (GetCurrentPage() == page1)
 	{
 		page2->setHP_Mode(1);
 		page2->setLevel(page1->getCharLevel());
@@ -43,6 +42,41 @@ void NewCharacterWizard::onPageChanging(wxWizardEvent& event)
 
 	GetPageAreaSizer()->Fit(page2);
 	GetPageAreaSizer()->Layout();
+}
+
+Character NewCharacterWizard::getCharacter()
+{
+	std::vector<CharClass> classes;
+
+	std::string classStr = page1->getCharClass();
+	std::string classTypeStr = page1->getClassType();
+
+	CharClass::CasterType type;
+	std::string choices[4];
+	
+	choices[0] = "None";
+	choices[1] = "One-Third Caster";
+	choices[2] = "Half Caster";
+	choices[3] = "Full Caster";
+
+	if (classTypeStr == choices[0])
+		type = CharClass::CasterType::None;
+	else if (classTypeStr == choices[1])
+		type = CharClass::CasterType::None;
+	else if (classTypeStr == choices[2])
+		type = CharClass::CasterType::None;
+	else if (classTypeStr == choices[3])
+		type = CharClass::CasterType::None;
+
+	classes.push_back(CharClass(getClassFromString(classStr), page1->getCharLevel(), type));
+	int skills = page3->getSkills();
+	int st = page3->getSavingThrows();
+
+	float conMod = page1->getStat(2) - 10.0f;
+	conMod = std::floor(conMod / 2.0f);
+
+
+	return Character(page1->getCharName(), classes, page1->getAllStats(), page2->getTotalHP(conMod), 30, skills | st, 0);
 }
 
 //======================
@@ -91,8 +125,15 @@ ClassLevelStatSelectionPage::ClassLevelStatSelectionPage(
 	charLevel->SetMax(20);
 	charLevel->SetValue(1);
 
+	auto charNameText = new wxStaticText(this, wxID_ANY, "Name", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+	charName = new wxTextCtrl(this, wxID_ANY, "Name");
+
 	int gap = 1;
-	auto sizer = new wxFlexGridSizer(10, 2, gap, gap);
+	auto sizer = new wxFlexGridSizer(11, 2, gap, gap);
+
+
+	sizer->Add(charNameText);
+	sizer->Add(charName, 0, wxTOP | wxLEFT, gap);
 
 	sizer->Add(classText);
 	sizer->Add(charClass, 0, wxTOP | wxLEFT, gap);
@@ -144,6 +185,14 @@ int WizardPages::ClassLevelStatSelectionPage::getStat(int index)
 		return -1;
 	}
 }
+
+Stats WizardPages::ClassLevelStatSelectionPage::getAllStats()
+{
+	int x[6];
+	for (int i = 0; i < 6; ++i)
+		x[i] = StatInput[i]->GetValue();
+	return Stats(x[0], x[1], x[2], x[3], x[4], x[5]);
+}
 //======================
 /// HP SPEED SELECTION
 //======================
@@ -163,7 +212,7 @@ HP_SpeedSelectionPage::HP_SpeedSelectionPage(
 	auto hor_Sizer2 = new wxBoxSizer(wxHORIZONTAL);
 	HP_Sizer = new wxFlexGridSizer(level + 1, 4, gap, gap);
 
-	wxString choices[2] = {"Total" , "Level by Level"};
+	wxString choices[2] = {"Total (with CON mod)" , "Level by Level (w/o CON mod)"};
 
 	auto HP_Mode_Text = new wxStaticText(this, wxID_ANY, "HP method");
 	HP_Mode = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 2, choices);
@@ -272,4 +321,113 @@ void WizardPages::HP_SpeedSelectionPage::Create()
 	}
 	
 	Layout();
+}
+
+int WizardPages::HP_SpeedSelectionPage::getTotalHP(int conMod)
+{
+	int sel = HP_Mode->GetSelection();
+
+	if (sel == 0)
+		return HP_Spin[0]->GetValue();
+	
+	int totHP = 0;
+	for (auto i = HP_Spin.begin() + 1; i != HP_Spin.end(); ++i)
+		totHP += (*i)->GetValue() + conMod;
+
+	return totHP;
+}
+
+//======================
+/// PROFICIENCIES PAGE
+//======================
+
+WizardPages::ProficienciesPage::ProficienciesPage(
+	wxWizard* parent, 
+	int p_level, 
+	wxWizardPage* prev, 
+	wxWizardPage* next, 
+	const wxBitmap& bitmap)
+	:
+	wxWizardPageSimple(parent, prev, next, bitmap)
+{
+	std::vector<std::string> choicesVector;
+
+	for (int i = Skills::Strength; i <= Skills::Charisma; i =  i << 1)
+	{
+		Skills tempSkill = static_cast<Skills>(i);
+		choicesVector.push_back(getSkillStr(tempSkill));
+	}
+
+	wxString* choices = new wxString[choicesVector.size()];
+	std::copy(choicesVector.begin(), choicesVector.end(), choices);
+
+	saving_throws = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, choicesVector.size(), choices);
+
+	delete[] choices;
+	choicesVector.clear();
+
+	for (int i = Skills::Acrobatics; i <= Skills::Survival; i = i << 1)
+	{
+		Skills tempSkill = static_cast<Skills>(i);
+		choicesVector.push_back(getSkillStr(tempSkill));
+	}
+	
+	choices = new wxString[choicesVector.size()];
+	std::copy(choicesVector.begin(), choicesVector.end(), choices);
+
+	skills = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, choicesVector.size(), choices);
+
+	auto sizer = new wxBoxSizer(wxHORIZONTAL);
+	auto skillSizer = new wxBoxSizer(wxVERTICAL);
+	auto stSizer = new wxBoxSizer(wxVERTICAL);
+
+	auto skillText = new wxStaticText(this, wxID_ANY, "Skills");
+	auto stText = new wxStaticText(this, wxID_ANY, "SavingThrows");
+
+	stSizer->Add(stText);
+	stSizer->Add(saving_throws);
+
+	skillSizer->Add(skillText);
+	skillSizer->Add(skills);
+
+	sizer->Add(stSizer, 1, wxEXPAND | wxALL, 5);
+	sizer->Add(skillSizer, 1, wxEXPAND | wxALL, 5);
+
+	SetSizer(sizer);
+}
+
+int WizardPages::ProficienciesPage::getSkills()
+{
+	wxArrayInt checked;
+	int numChecked = skills->GetCheckedItems(checked);
+
+	int profec = 0;
+
+	for (int i = 0; i < numChecked; ++i)
+	{
+		std::string str = skills->GetString(checked[i]).ToStdString();
+		str = str.substr(0, str.size() - 1);
+		auto skill = getSkillfromStr(str);
+		profec |= skill;
+	}
+
+	return profec;
+}
+
+int WizardPages::ProficienciesPage::getSavingThrows()
+{
+	wxArrayInt checked;
+	int numChecked = saving_throws->GetCheckedItems(checked);
+
+	int profec = 0;
+
+	for (int i = 0; i < numChecked; ++i)
+	{
+		std::string str = saving_throws->GetString(checked[i]).ToStdString();
+		str = str.substr(0, str.size() - 1);
+		auto skill = getSkillfromStr(str);
+		profec |= skill;
+	}
+
+	return profec;
 }

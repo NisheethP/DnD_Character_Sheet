@@ -1,10 +1,13 @@
 #pragma once
 
+#include "Character.h"
+
 namespace WizardPages
 {
 
 	class ClassLevelStatSelectionPage : public wxWizardPageSimple
 	{
+		wxTextCtrl* charName = nullptr;
 		wxChoice* charClass = nullptr;
 		wxChoice* classType = nullptr;
 		wxSpinCtrl* charLevel = nullptr;
@@ -17,11 +20,13 @@ namespace WizardPages
 			wxWizardPage* next = NULL,
 			const wxBitmap& bitmap = wxNullBitmap);
 
-		std::string getCharClass() { return charClass->GetStringSelection().ToStdString(); }
-		std::string getClassType() { return classType->GetStringSelection().ToStdString(); }
+		std::string getCharName()	{ return charName->GetValue().ToStdString(); }
+		std::string getCharClass()	{ return charClass->GetStringSelection().ToStdString(); }
+		std::string getClassType()	{ return classType->GetStringSelection().ToStdString(); }
 		int getCharLevel() { return charLevel->GetValue(); }
 
 		int getStat(int index);
+		Stats getAllStats();
 	};
 
 	class HP_SpeedSelectionPage : public wxWizardPageSimple
@@ -44,15 +49,31 @@ namespace WizardPages
 		void setLevel(int p_level) { level = p_level; }
 		void Create();
 		void setHP_Mode(int x) { HP_Mode->SetSelection(x); }
+
+		int getTotalHP(int conMod);
+	};
+
+	class ProficienciesPage : public wxWizardPageSimple
+	{
+		wxCheckListBox* saving_throws = nullptr;
+		wxCheckListBox* skills = nullptr;
+	public:
+		ProficienciesPage(wxWizard* parent,
+			int p_level = 1,
+			wxWizardPage* prev = NULL,
+			wxWizardPage* next = NULL,
+			const wxBitmap& bitmap = wxNullBitmap);
+
+		int getSkills();
+		int getSavingThrows();
 	};
 }
 
 class NewCharacterWizard : public wxWizard
 {
 	WizardPages::ClassLevelStatSelectionPage* page1 = nullptr;
-	//WizardPages::StatSelectionPage* page2 = nullptr;
 	WizardPages::HP_SpeedSelectionPage* page2 = nullptr;
-	wxWizardPageSimple* page4 = nullptr;
+	WizardPages::ProficienciesPage* page3 = nullptr;
 
 public:
 	NewCharacterWizard(
@@ -67,5 +88,7 @@ public:
 	wxWizardPage* GetFirstPage() const { return page1; }
 
 	void onPageChanging(wxWizardEvent& event);
+
+	Character getCharacter();
 
 };

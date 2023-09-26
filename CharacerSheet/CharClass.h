@@ -74,3 +74,4 @@ public:
 };
 
 std::string getStringFromClass(ClassType type);
+ClassType getClassFromString(std::string);

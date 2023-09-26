@@ -19,13 +19,14 @@ bool App::OnInit()
 	//characterClass.push_back(CharClass(ClassType::Wizard, 3));
 
 	Character character(
-		"Eli",																					// Name
-		characterClass,																			// Class and Levels
-		Stats(9, 16, 16, 14, 12, 20),															// Stats
-		78,																						// HP
-		30,																						// Speed
-		Arcana | History | Insight | Religion |													// Skill Proficiencies
-		Constitution | Charisma																	// Saving Throw Proficiencies
+		"Eli",															// Name
+		characterClass,													// Class and Levels
+		Stats(9, 16, 16, 14, 12, 20),									// Stats
+		78,																// HP
+		30,																// Speed
+		Arcana | History | Insight | Religion |							// Skill Proficiencies
+		Constitution | Charisma,										// Saving Throw Proficiencies
+		0																// Expertises
 	);
 
 	character.setAC(13);

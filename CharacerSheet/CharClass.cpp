@@ -95,3 +95,19 @@ std::string getStringFromClass(ClassType type)
 	}
 	return "SWITCH FAIL";
 }
+
+ClassType getClassFromString(std::string str)
+{
+	std::vector<ClassType> ClassTypes;
+	for (int i = (int)ClassType::Barbarian; i != (int)ClassType::Artificer; ++i)
+		ClassTypes.push_back(static_cast<ClassType>(i));
+	ClassTypes.push_back(ClassType::Artificer);
+
+	for (auto& i : ClassTypes)
+	{
+		if (str == getStringFromClass(i))
+			return i;
+	}
+
+	return ClassType::none;
+}

@@ -81,6 +81,7 @@ Character::Character(std::string pName, std::vector<CharClass>& pCharClass, Stat
 	totalLevel(0),
 	charStats(pStats),
 	skillProficiencies(pProf),
+	skillExpertises(pExp),
 	totHP(pHP),
 	totHPMod(0),
 	curHP(pHP),
@@ -815,7 +816,7 @@ std::string getSkillStr(const Skills& skill)
 	}
 }
 
-Skills getSkllfromStr(const std::string& str)
+Skills getSkillfromStr(const std::string& str)
 {
 	std::string lstr = Util::toLowerStringRet(str);
 	if (lstr == "acrobatics")

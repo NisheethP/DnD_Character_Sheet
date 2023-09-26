@@ -307,7 +307,7 @@ int getStatfromSkill(const Skills& skill, const Stats& stat);
 
 
 std::string getSkillStr(const Skills& skill);
-Skills getSkllfromStr(const std::string& str);
+Skills getSkillfromStr(const std::string& str);
 std::string getNumStr(int x);
 
 std::string getDieTypeStr(DieType die);

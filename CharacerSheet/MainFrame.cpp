@@ -4064,6 +4064,8 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 		NewCharacterWizard dialog(this, wxID_ANY, "New Character", wxNullBitmap, wxDefaultPosition, wxDEFAULT_DIALOG_STYLE);
 		dialog.RunWizard(dialog.GetFirstPage());
 
+		character = dialog.getCharacter();
+		updateAll();
 	}
 
 	if (obj == wxID_OPEN)
