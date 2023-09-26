@@ -182,10 +182,11 @@ class MainFrame : public wxFrame
 		wxSpinCtrl* TempHP = nullptr;
 
 		//AC Stuff
+		wxTextCtrl* AC_Base = nullptr;
+		wxTextCtrl* AC_Mod = nullptr;
 		wxTextCtrl* AC = nullptr;
 		wxCheckBox* AC_Shield = nullptr;
 		wxCheckBox* AC_MageArmor = nullptr;
-		wxCheckListBox* AC_Mod = nullptr;
 		wxButton* AC_AddArmor = nullptr;
 
 		wxStaticText* Feature_Title = nullptr;
@@ -376,6 +377,7 @@ public:
 	void makeSkillPair(wxStaticText* skillName, wxTextCtrl* skillValue, Skills curSkill);
 	void makeAddRemList(wxStaticText*& title, wxButton*& add, wxButton*& rem, wxListBox*& list, wxSizer* sizer, wxPanel* parent);
 
+	void calcAC();
 	void HealToPerc();
 	void FillRegularSlots();
 	void FillWarlockSlots();
@@ -391,6 +393,7 @@ public:
 	void onSpellSearch(wxCommandEvent& event);
 	void onSpellTreeSelect(wxTreeEvent& event);
 	
+	void onACValChange(wxCommandEvent& event);
 	void onACCheckBoxTick(wxCommandEvent& event);
 	void onGiveTempHPButton(wxCommandEvent& event);
 	void onSetArmorButton(wxCommandEvent& event);

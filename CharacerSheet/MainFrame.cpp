@@ -29,7 +29,7 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	BigFont1(wxFontInfo(wxSize(0, 15))),
 	BigFont2(wxFontInfo(wxSize(0, 18))),
 	SkillFont(wxFontInfo(wxSize(0, 12))),
-	baseColSize(180, -1),
+	baseColSize(190, -1),
 	buttonSize(40,-1),
 	acColSizeMod(1.2),
 	masterPanel(new wxPanel(this, wxID_ANY, wxPoint(100, 400), wxDefaultSize)),
@@ -195,6 +195,8 @@ void MainFrame::BindControls()
 	spellDesc.spellSearch->Bind(wxEVT_SEARCHCTRL_SEARCH_BTN, &MainFrame::onSpellSearch, this);
 	spellDesc.spellList->Bind(wxEVT_TREE_SEL_CHANGED, &MainFrame::onSpellTreeSelect, this);
 
+	mainPagePanels.AC_Base->Bind(wxEVT_TEXT, &MainFrame::onACValChange, this);
+	mainPagePanels.AC_Mod->Bind(wxEVT_TEXT, &MainFrame::onACValChange, this);
 	mainPagePanels.AC->GetParent()->Bind(wxEVT_CHECKBOX, &MainFrame::onACCheckBoxTick, this);
 	mainPagePanels.GiveTempHPButton->Bind(wxEVT_BUTTON, &MainFrame::onGiveTempHPButton, this);
 	mainPagePanels.Feature_AddButton->GetParent()->Bind(wxEVT_BUTTON, &MainFrame::onFeatureButton, this);
@@ -813,7 +815,7 @@ wxScrolled<wxPanel>* MainFrame::CreateTestPanel(wxNotebook* parent)
 //------------------------------
 wxPanel* MainFrame::CreateNamePanel(wxPanel* parent)
 {
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize, wxBORDER_THEME);
 	setWindowColour(panel, mainColour);
 	
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -845,29 +847,51 @@ wxPanel* MainFrame::CreateNamePanel(wxPanel* parent)
 
 wxPanel* MainFrame::CreateACPanel(wxPanel* parent)
 {
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize*1.3);
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize*1.3, wxBORDER_THEME);
 	wxColour headPlateColor(wxColour(200, 100, 100));
 	setWindowColour(panel, mainColour);
 
-	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
-	wxBoxSizer* subSizer1 = new wxBoxSizer(wxHORIZONTAL);
-	wxBoxSizer* subSizer2 = new wxBoxSizer(wxVERTICAL);
+	auto mainSizer = new wxBoxSizer(wxVERTICAL);
+	auto subSizer1 = new wxBoxSizer(wxHORIZONTAL);
+	auto subSizer2 = new wxBoxSizer(wxVERTICAL);
+	auto leftSizer = new wxFlexGridSizer(2, 2, 5, 5);
 
 	wxStaticText* AC_Label = new wxStaticText(panel, wxID_ANY, "AC", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 
 	wxStaticLine* horLine = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 
-	mainPagePanels.AC = new wxTextCtrl(panel, wxID_ANY, std::to_string(character.getAC()), wxDefaultPosition, wxDefaultSize, wxTE_CENTER);
+	wxStaticText* AC_BaseLabel = new wxStaticText(panel, wxID_ANY, "Base", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
+	wxStaticText* AC_ModLabel = new wxStaticText(panel, wxID_ANY, "Mod", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
+
+	AC_BaseLabel->SetFont(BigFont1);
+	AC_ModLabel->SetFont(BigFont1);
+
+	mainPagePanels.AC_Base = new wxTextCtrl(panel, wxID_ANY, "10", wxDefaultPosition, wxDefaultSize, wxTE_CENTER);
+	mainPagePanels.AC_Mod = new wxTextCtrl(panel, wxID_ANY, std::to_string(character.getSkillMod(Dexterity)), wxDefaultPosition, wxDefaultSize, wxTE_CENTER);
+	
+	mainPagePanels.AC = new wxTextCtrl(panel, wxID_ANY, std::to_string(character.getAC()), wxDefaultPosition, wxDefaultSize, wxTE_CENTER | wxTE_READONLY);
+	
 	mainPagePanels.AC_Shield = new wxCheckBox(panel, wxID_ANY, "Shield (+2)");
 	mainPagePanels.AC_MageArmor = new wxCheckBox(panel, wxID_ANY, "Mage Armor");
 	//mainPagePanels.AC_AddArmor = new wxButton(panel, wxID_ANY, "Set Armor");
 
 	setWindowColour(mainPagePanels.AC, ctrlColour);
+	setWindowColour(mainPagePanels.AC_Base, ctrlColour);
+	setWindowColour(mainPagePanels.AC_Mod, ctrlColour);
 
 	mainSizer->Add(AC_Label, 1, wxEXPAND | wxTOP, 5);
 	mainSizer->Add(horLine, 0, wxEXPAND | wxTOP | wxBOTTOM, 1);
 	mainSizer->Add(-1, 5);
 	
+	mainPagePanels.AC_Base->SetMaxSize(wxSize(50,-1));
+	mainPagePanels.AC_Mod->SetMaxSize(wxSize(50,-1));
+	mainPagePanels.AC->SetMaxSize(wxSize(200,-1));
+	leftSizer->Add(AC_BaseLabel, 0);
+	leftSizer->Add(mainPagePanels.AC_Base, 0, wxEXPAND);
+	leftSizer->Add(AC_ModLabel, 0);
+	leftSizer->Add(mainPagePanels.AC_Mod, 0, wxEXPAND);
+
+	subSizer1->Add(leftSizer, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
 	subSizer1->Add(mainPagePanels.AC, 1, wxEXPAND | wxLEFT | wxRIGHT, 5);
 	subSizer2->Add(mainPagePanels.AC_Shield);
 	subSizer2->Add(-1, 2);
@@ -880,9 +904,13 @@ wxPanel* MainFrame::CreateACPanel(wxPanel* parent)
 	mainSizer->Add(-1, 5);
 
 	AC_Label->SetFont(BigFont1);
-	mainPagePanels.AC->SetFont(BigFont1.Larger())
-		;
+	mainPagePanels.AC->SetFont(BigFont1.Larger());
+	mainPagePanels.AC_Mod->SetFont(BigFont1.Larger());
+	mainPagePanels.AC_Base->SetFont(BigFont1.Larger());
+	
 	mainPagePanels.AC->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+	mainPagePanels.AC_Base->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+	mainPagePanels.AC_Mod->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
 	panel->SetSizerAndFit(mainSizer);
 	panel->Layout();
@@ -892,7 +920,7 @@ wxPanel* MainFrame::CreateACPanel(wxPanel* parent)
 
 wxPanel* MainFrame::CreateHPPanel(wxPanel* parent)
 {
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize, wxBORDER_THEME);
 	setWindowColour(panel, mainColour);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -927,7 +955,7 @@ wxPanel* MainFrame::CreateHPPanel(wxPanel* parent)
 
 wxPanel* MainFrame::CreateTempHPPanel(wxPanel* parent)
 {
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize, wxBORDER_THEME);
 	setWindowColour(panel, mainColour);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -966,7 +994,7 @@ wxPanel* MainFrame::CreateTempHPPanel(wxPanel* parent)
 
 wxPanel* MainFrame::CreateSpeedPanel(wxPanel* parent)
 {
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize, wxBORDER_THEME);
 	setWindowColour(panel, mainColour);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -1001,7 +1029,7 @@ wxPanel* MainFrame::CreateStats(wxPanel* parent)
 	int margin = 15;
 	using std::to_string;
 
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize, wxBORDER_THEME);
 	setWindowColour(panel, mainColour);
 
 	//wxStaticText* profBonus = new wxStaticText(panel, wxID_ANY, "Proficiency: " + std::to_string(character.getProfBonus()));
@@ -1294,7 +1322,7 @@ wxPanel* MainFrame::CreateLangProficiencies(wxPanel* parent)
 
 	//panel->SetBackgroundColour(DescColor.first);
 
-	auto& text = std::get<0>(mainPagePanels.LangProf) = new wxStaticText(panel, wxID_ANY, "Languages");
+	auto& text = std::get<0>(mainPagePanels.LangProf) = new wxStaticText(panel, wxID_ANY, "Languages",wxDefaultPosition, wxDefaultSize);
 	auto& add = std::get<1>(mainPagePanels.LangProf);
 	auto& rem = std::get<2>(mainPagePanels.LangProf);
 	auto& list = std::get<3>(mainPagePanels.LangProf);
@@ -1374,7 +1402,7 @@ wxPanel* MainFrame::CreatePlayerConditions(wxPanel* parent)
 wxPanel* MainFrame::CreateMoney(wxPanel* parent)
 {
 	wxSize curSize = baseColSize;
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, curSize);
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, curSize, wxBORDER_THEME);
 	setWindowColour(panel, panelColour);
 	std::string tempStr[4] = { "Platinum", "Gold", "Silver", "Copper" };
 	wxFont curFont(wxFont(wxFontInfo(wxSize(0, 16))));
@@ -1442,7 +1470,7 @@ wxPanel* MainFrame::CreateMoney(wxPanel* parent)
 wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 {
 	using std::get;
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize, wxBORDER_THEME);
 
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -1544,7 +1572,7 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 
 wxPanel* MainFrame::CreateInitiativePanel(wxPanel* parent)
 {
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize, wxBORDER_THEME);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	
 	auto& Init = mainPagePanels.InitMod.first = new wxTextCtrl(panel, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize,
@@ -1612,7 +1640,7 @@ wxPanel* MainFrame::CreateInitiativePanel(wxPanel* parent)
 wxPanel* MainFrame::CreateDeathSavesPanel(wxPanel* parent)
 {
 
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize);
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize, wxBORDER_THEME);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
 	DeathSavesControl* deathSaves = new DeathSavesControl(panel, wxID_ANY, panelColour.second, panelColour.first);
@@ -1663,7 +1691,7 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 	wxSize ACSize = mainPagePanels.AC->GetParent()->GetSize();
 	ACSize.y = -1;
 
-	auto panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, ACSize);
+	auto panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, ACSize, wxBORDER_THEME);
 	auto sizer = new wxBoxSizer(wxVERTICAL);
 	panel->SetScrollRate(0, FromDIP(10));
 
@@ -3216,6 +3244,19 @@ void MainFrame::makeAddRemList(wxStaticText*& title, wxButton*& add, wxButton*& 
 	sizer->Add(list, 1, wxEXPAND);
 }
 
+void MainFrame::calcAC()
+{
+	auto baseStr = mainPagePanels.AC_Base->GetValue().ToStdString();
+	auto modStr = mainPagePanels.AC_Mod->GetValue().ToStdString();
+	int base = 10, mod = 0;
+	if (baseStr != "")
+		base = std::stoi(baseStr);
+	if (modStr != "")
+		mod = std::stoi(modStr);
+
+	character.setAC(base + mod);
+}
+
 void MainFrame::HealToPerc()
 {
 	SetFocus();
@@ -3363,18 +3404,33 @@ void MainFrame::onSpellTreeSelect(wxTreeEvent& event)
 	updateSpellDesc();
 }
 
+void MainFrame::onACValChange(wxCommandEvent& event)
+{
+	auto obj = event.GetEventObject();
+
+	calcAC();
+	mainPagePanels.AC->SetValue(std::to_string(character.getAC()));
+
+	mainPagePanels.AC_MageArmor->SetValue(false);
+	mainPagePanels.AC_Shield->SetValue(false);
+}
+
 void MainFrame::onACCheckBoxTick(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
-	int newAC = character.getAC();
 	
-	if (mainPagePanels.AC_MageArmor->IsChecked())
-		newAC = 13 + character.getSkillMod(Skills::Dexterity);
+	bool mageArmor = mainPagePanels.AC_MageArmor->IsChecked();
+	bool shield = mainPagePanels.AC_Shield->IsChecked();
+	if (mageArmor)
+		character.setAC(13 + character.getSkillMod(Skills::Dexterity));
+	
+	if (shield)
+		character.setAC(character.getAC() + 2);
 
-	if (mainPagePanels.AC_Shield->IsChecked())
-		newAC = newAC + 2;
+	if (!mageArmor && !shield)
+		calcAC();
 
-	mainPagePanels.AC->SetLabel(std::to_string(newAC));
+	mainPagePanels.AC->SetLabel(std::to_string(character.getAC()));
 
 }
 
