@@ -575,9 +575,9 @@ wxScrolled<wxPanel>* MainFrame::CreateSpellSlotsTable(wxNotebook* parent)
 {
 	wxScrolled<wxPanel>* panel = new wxScrolled<wxPanel>(parent, wxID_ANY);
 	panel->SetBackgroundColour(mainColour.first);
-	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* mainSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	wxListView* SlotsTable = new wxListView(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES);
+	wxListView* SlotsTable = new wxListView(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES | wxSUNKEN_BORDER);
 
 	SlotsTable->SetFont(BigFont1);
 	setWindowColour(SlotsTable, mainColour);
@@ -605,7 +605,30 @@ wxScrolled<wxPanel>* MainFrame::CreateSpellSlotsTable(wxNotebook* parent)
 		}
 	}
 
-	mainSizer->Add(SlotsTable, 1, wxEXPAND);
+	wxListView* SpellPointsTable = new wxListView(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES | wxSUNKEN_BORDER);
+	SpellPointsTable->SetFont(BigFont1);
+	setWindowColour(SpellPointsTable, mainColour);
+
+	SpellPointsTable->AppendColumn("Char Level");
+	SpellPointsTable->AppendColumn("Points");
+	SpellPointsTable->AppendColumn("Spell Level");
+	int spellPointColWidth = 150;
+	SpellPointsTable->SetColumnWidth(0, spellPointColWidth);
+	SpellPointsTable->SetColumnWidth(1, spellPointColWidth);
+	SpellPointsTable->SetColumnWidth(2, spellPointColWidth);
+
+	int spellPointValue[20] = { 4,6,14,17,27,32,38,44,57,64,73,73,83,83,94,94,107,114,123,133 };
+	int spellPointLevel[20] = { 1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,9,9 };
+	for (int i = 0; i < 20; ++i)
+	{
+		SpellPointsTable->InsertItem(i, std::to_string(i + 1));
+		SpellPointsTable->SetItem(i, 1, std::to_string(spellPointValue[i]));
+		SpellPointsTable->SetItem(i, 2, std::to_string(spellPointLevel[i]));
+	}
+
+
+	mainSizer->Add(SlotsTable, 0, wxEXPAND | wxALL, 10);
+	mainSizer->Add(SpellPointsTable, 0, wxEXPAND | wxALL, 10);
 
 
 	panel->SetSizerAndFit(mainSizer);
@@ -2077,9 +2100,6 @@ wxPanel* MainFrame::CreateKnownSpells_SpellSlot(wxPanel* parent, int spellLevel)
 
 	if (spellLevel == 0)
 	{
-		//delete slots;
-		//delete useButton;
-		//delete useSpellPoint;
 		slots->Hide();
 		useButton->Hide();
 		useSpellPoint->Hide();
@@ -2861,9 +2881,6 @@ void MainFrame::updateSkills()
 		Skills::Stealth,
 		Skills::Survival
 	};
-
-	
-	
 
 	for (int i = 0; i < curSkill.size(); ++i)
 	{
