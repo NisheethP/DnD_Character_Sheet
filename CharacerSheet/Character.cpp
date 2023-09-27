@@ -219,11 +219,13 @@ int Character::getSkillMod(const Skills& skill, bool isSavingThrow)
 		if (skill & Strength || skill & Dexterity || skill & Constitution || skill & Intelligence || skill & Wisdom || skill & Charisma)
 		{
 			if (isSavingThrow)
-				return mod + profBonus;
+				return mod + profBonus + getSkillModifier(skill);
 			else
 				return mod;
 		}
 	}
+
+	mod += getSkillModifier(skill);
 
 	if (checkExpert(skill))
 		mod += 2 * profBonus;

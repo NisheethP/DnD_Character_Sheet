@@ -154,7 +154,7 @@ private:
 	unsigned int skillProficiencies;
 	unsigned int skillExpertises;
 
-	std::unordered_map<Skills, int> SkillModifiers;
+	std::map<Skills, int> SkillModifiers;
 
 	SpellSlot charSlots;
 	SpellSlot curCharSlots;
@@ -363,4 +363,6 @@ inline void Character::serialize(Archive& ar, const unsigned int version)
 	ar& curCharSlots;
 
 	ar& sliders;
+
+	ar& SkillModifiers;
 }

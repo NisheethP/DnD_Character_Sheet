@@ -136,8 +136,9 @@ void MainFrame::CreateMenuBar()
 	menuBarItems.SetStats = SetMenu->Append(wxID_ANY, "Set Stats");
 	menuBarItems.SetInitMod = SetMenu->Append(wxID_ANY, "Set Initiative Mod");
 	SetMenu->AppendSeparator();
-	menuBarItems.SetSavingThrows = SetMenu->Append(wxID_ANY, "Set Saving Throw proficiency");
+	menuBarItems.SetSavingThrows = SetMenu->Append(wxID_ANY, "Set Saving Throw Proficiency");
 	menuBarItems.SetSavingThrowModifier = SetMenu->Append(wxID_ANY, "Set Saving Throw Modifiers");
+	SetMenu->AppendSeparator();
 	menuBarItems.SetSkillProfs = SetMenu->Append(wxID_ANY, "Set Skill Proficiency");
 	menuBarItems.SetExpertises = SetMenu->Append(wxID_ANY, "Set Skill Expertises");
 	menuBarItems.SetSkillModifiers = SetMenu->Append(wxID_ANY, "Set Skill Modifiers");
@@ -4517,22 +4518,39 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 	if (obj == menuBarItems.SetSkillModifiers->GetId())
 	{
 		auto skills = getSkillsVector();
+		std::unordered_map<Skills, int> list;
 
-		SkillProficiencyModifierDialog dialog(this, wxID_ANY, skills);
+		for (auto& i : skills)
+			list[i] = character.getSkillModifier(i);
+
+		SkillProficiencyModifierDialog dialog(this, wxID_ANY, skills,list);
 		
 		if (dialog.ShowModal() == wxID_CANCEL)
 			return;
 
 
+		for (auto& i : skills)
+			character.setSkillModifier(i, dialog.getSkillModifier(i));
+
+		updateSkills();
 	}
 
 	if (obj == menuBarItems.SetSavingThrowModifier->GetId())
 	{
 		auto savingThrows = getSavingThrowVector();
-		SkillProficiencyModifierDialog dialog(this, wxID_ANY, savingThrows);
+		std::unordered_map<Skills, int> list;
+
+		for (auto& i : savingThrows)
+			list[i] = character.getSkillModifier(i);
+		SkillProficiencyModifierDialog dialog(this, wxID_ANY, savingThrows,list);
 
 		if (dialog.ShowModal() == wxID_CANCEL)
 			return;
+
+		for (auto& i : savingThrows)
+			character.setSkillModifier(i, dialog.getSkillModifier(i));
+
+		updateSavingThrows();
 	}
 }
 
