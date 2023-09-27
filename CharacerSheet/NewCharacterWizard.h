@@ -12,6 +12,8 @@ namespace WizardPages
 		wxChoice* classType = nullptr;
 		wxSpinCtrl* charLevel = nullptr;
 
+		wxButton* rollRandom = nullptr;
+
 		wxSpinCtrl* StatInput[6];
 
 	public:
@@ -27,6 +29,8 @@ namespace WizardPages
 
 		int getStat(int index);
 		Stats getAllStats();
+
+		void onRollRandom(wxCommandEvent& event);
 	};
 
 	class HP_SpeedSelectionPage : public wxWizardPageSimple

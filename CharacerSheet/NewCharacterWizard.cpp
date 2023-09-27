@@ -1,6 +1,7 @@
 #include "PreCompiledHeader.h"
 #include "NewCharacterWizard.h"
 #include "Character.h"
+#include "Util.h"
 
 using namespace WizardPages;
 
@@ -80,7 +81,7 @@ Character NewCharacterWizard::getCharacter()
 }
 
 //======================
-/// CLASS LEVEL SELECTION
+/// CLASS LEVEL STAT SELECTION
 //======================
 
 ClassLevelStatSelectionPage::ClassLevelStatSelectionPage(
@@ -129,8 +130,7 @@ ClassLevelStatSelectionPage::ClassLevelStatSelectionPage(
 	charName = new wxTextCtrl(this, wxID_ANY, "Name");
 
 	int gap = 1;
-	auto sizer = new wxFlexGridSizer(11, 2, gap, gap);
-
+	auto sizer = new wxFlexGridSizer(12, 2, gap, gap);
 
 	sizer->Add(charNameText);
 	sizer->Add(charName, 0, wxTOP | wxLEFT, gap);
@@ -165,8 +165,14 @@ ClassLevelStatSelectionPage::ClassLevelStatSelectionPage(
 		StatInput[i] = new wxSpinCtrl(this, wxID_ANY, "10", wxDefaultPosition, wxDefaultSize);
 		sizer->Add(StatInput[i], 0, wxEXPAND | wxTOP | wxLEFT, gap);
 	}
-
 	delete[] choices;
+
+	rollRandom = new wxButton(this, wxID_ANY, "Random Stats", wxDefaultPosition, wxDefaultSize);
+
+	sizer->AddSpacer(0);
+	sizer->Add(rollRandom, 0, wxALL, 5);
+
+	rollRandom->Bind(wxEVT_BUTTON, &ClassLevelStatSelectionPage::onRollRandom, this);
 	SetSizerAndFit(sizer);
 }
 
@@ -192,6 +198,29 @@ Stats WizardPages::ClassLevelStatSelectionPage::getAllStats()
 	for (int i = 0; i < 6; ++i)
 		x[i] = StatInput[i]->GetValue();
 	return Stats(x[0], x[1], x[2], x[3], x[4], x[5]);
+}
+
+void WizardPages::ClassLevelStatSelectionPage::onRollRandom(wxCommandEvent& event)
+{
+	for (int i = 0; i < 6; ++i)
+	{
+		int tot = 0;
+		int vals[4] = { 0,0,0,0 };
+		
+		for (int j = 0; j < 4; ++j)
+		{
+			vals[j] = Util::RandomGen.rollUniform(1, 6);
+			tot += vals[j];
+		}
+
+		int min = vals[0] < vals[1] ? vals[0] : vals[1];
+		min = min < vals[2] ? min : vals[2];
+		min = min < vals[3] ? min : vals[3];
+
+		tot -= min;
+
+		StatInput[i]->SetValue(tot);
+	}
 }
 //======================
 /// HP SPEED SELECTION
