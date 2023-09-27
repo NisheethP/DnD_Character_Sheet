@@ -757,6 +757,47 @@ int getStatfromSkill(const Skills& skill, const Stats& stat)
 	}
 }
 
+std::vector<Skills> getSavingThrowVector()
+{
+	static std::vector<Skills> SavingThrows =
+	{
+		Skills::Strength, 
+		Skills::Dexterity, 
+		Skills::Constitution, 
+		Skills::Intelligence, 
+		Skills::Wisdom, 
+		Skills::Charisma
+	};
+
+	return SavingThrows;
+}
+
+std::vector<Skills> getSkillsVector()
+{
+	static std::vector<Skills> Skill =
+	{
+		Skills::Acrobatics,
+		Skills::Animal_Handling,
+		Skills::Arcana,
+		Skills::Athletics,
+		Skills::Deception,
+		Skills::History,
+		Skills::Insight,
+		Skills::Intimidation,
+		Skills::Investigation,
+		Skills::Medicine,
+		Skills::Nature,
+		Skills::Perception,
+		Skills::Performance,
+		Skills::Persuasion,
+		Skills::Religion,
+		Skills::Sleight_of_Hand,
+		Skills::Stealth,
+		Skills::Survival
+	};
+	return Skill;
+}
+
 std::string getSkillStr(const Skills& skill)
 {
 	switch (skill)

@@ -164,6 +164,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PreCompiledHeader.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="SkillProfDialog.cpp" />
+    <ClCompile Include="SkillProficiencyModifierDialog.cpp" />
     <ClCompile Include="SliderDialog.cpp" />
     <ClCompile Include="SliderRemDialog.cpp" />
     <ClCompile Include="Spells.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="NewCharacterWizard.h" />
     <ClInclude Include="PreCompiledHeader.h" />
     <ClInclude Include="SkillProfDialog.h" />
+    <ClInclude Include="SkillProficiencyModifierDialog.h" />
     <ClInclude Include="SliderDialog.h" />
     <ClInclude Include="SliderRemDialog.h" />
     <ClInclude Include="Spells.h" />

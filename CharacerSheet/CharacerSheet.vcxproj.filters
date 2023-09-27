@@ -117,6 +117,9 @@
     <ClCompile Include="NewCharacterWizard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SkillProficiencyModifierDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainFrame.h">
@@ -201,6 +204,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NewCharacterWizard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkillProficiencyModifierDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

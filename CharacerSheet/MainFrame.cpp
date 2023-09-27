@@ -21,6 +21,7 @@
 #include "ImagePage.h"
 #include "LevelUpDialog.h"
 #include "NewCharacterWizard.h"
+#include "SkillProficiencyModifierDialog.h"
 
 MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	wxFrame(nullptr, wxID_ANY, title, wxDefaultPosition, wxSize(900, 600)),
@@ -136,8 +137,10 @@ void MainFrame::CreateMenuBar()
 	menuBarItems.SetInitMod = SetMenu->Append(wxID_ANY, "Set Initiative Mod");
 	SetMenu->AppendSeparator();
 	menuBarItems.SetSavingThrows = SetMenu->Append(wxID_ANY, "Set Saving Throw proficiency");
+	menuBarItems.SetSavingThrowModifier = SetMenu->Append(wxID_ANY, "Set Saving Throw Modifiers");
 	menuBarItems.SetSkillProfs = SetMenu->Append(wxID_ANY, "Set Skill Proficiency");
 	menuBarItems.SetExpertises = SetMenu->Append(wxID_ANY, "Set Skill Expertises");
+	menuBarItems.SetSkillModifiers = SetMenu->Append(wxID_ANY, "Set Skill Modifiers");
 	SetMenu->AppendSeparator();
 	menuBarItems.SetSP = SetMenu->Append(wxID_ANY, "Set Spell Points");
 	menuBarItems.SetSlots = SetMenu->Append(wxID_ANY, "Set Spell Slots");
@@ -269,6 +272,8 @@ void MainFrame::BindControls()
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetExpertises->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSlots->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetWarlockSlots->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSkillModifiers->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onSetMenuEvents, this, menuBarItems.SetSavingThrowModifier->GetId());
 
 	this->Bind(wxEVT_MENU, &MainFrame::onResetMenuEvents, this, menuBarItems.ResetDeleteSpells->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onResetMenuEvents, this, menuBarItems.ResetSlots->GetId());
@@ -1124,10 +1129,7 @@ wxPanel* MainFrame::CreateSavingThrows(wxPanel* parent)
 	stSizer->GetStaticBox()->SetFont(stSizer->GetStaticBox()->GetFont().MakeBold().MakeLarger());
 
 	//std::wstring profMarker = std::wstring(1, char(159));
-	std::vector<Skills> tempSkills =
-	{
-		Skills::Strength, Skills::Dexterity, Skills::Constitution, Skills::Intelligence, Skills::Wisdom, Skills::Charisma
-	};
+	std::vector<Skills> tempSkills = getSavingThrowVector();
 
 	wxStaticText* savingThrowName = nullptr;
 	wxTextCtrl* savingThrowValue = nullptr;
@@ -1182,27 +1184,7 @@ wxPanel* MainFrame::CreateSkillProf(wxPanel* parent)
 	std::wstring profMarker = std::wstring(1, char(159));
 	//std::wstring profMarker = L"\t*";
 	
-	std::vector<Skills> curSkill =
-	{
-		Skills::Acrobatics,
-		Skills::Animal_Handling,
-		Skills::Arcana,
-		Skills::Athletics,
-		Skills::Deception,
-		Skills::History,
-		Skills::Insight,
-		Skills::Intimidation,
-		Skills::Investigation,
-		Skills::Medicine,
-		Skills::Nature,
-		Skills::Perception,
-		Skills::Performance,
-		Skills::Persuasion,
-		Skills::Religion,
-		Skills::Sleight_of_Hand,
-		Skills::Stealth,
-		Skills::Survival
-	};	
+	std::vector<Skills> curSkill = getSkillsVector();
 	
 	wxStaticText* skillName = nullptr;
 	wxTextCtrl* skillValue = nullptr;
@@ -2774,6 +2756,12 @@ void MainFrame::updateMoneyCtrls()
 	
 	for (int i = 0; i < 4; i++)
 		mainPagePanels.moneyVals[i]->SetValue(money[i]);
+}
+
+void MainFrame::updateAC()
+{
+	calcAC();
+	mainPagePanels.AC->SetValue(std::to_string(character.getAC()));
 }
 
 void MainFrame::updateName()
@@ -4524,6 +4512,27 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 			updateKnownSpellsLists();
 		}
 		
+	}
+
+	if (obj == menuBarItems.SetSkillModifiers->GetId())
+	{
+		auto skills = getSkillsVector();
+
+		SkillProficiencyModifierDialog dialog(this, wxID_ANY, skills);
+		
+		if (dialog.ShowModal() == wxID_CANCEL)
+			return;
+
+
+	}
+
+	if (obj == menuBarItems.SetSavingThrowModifier->GetId())
+	{
+		auto savingThrows = getSavingThrowVector();
+		SkillProficiencyModifierDialog dialog(this, wxID_ANY, savingThrows);
+
+		if (dialog.ShowModal() == wxID_CANCEL)
+			return;
 	}
 }
 

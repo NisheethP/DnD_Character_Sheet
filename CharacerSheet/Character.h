@@ -147,12 +147,14 @@ private:
 	std::vector<Slider> sliders;
 
 	std::vector<std::string> knownSpells;
-
+	
 	int totalLevel;
 	Stats charStats;
 	Stats charStatMods;
 	unsigned int skillProficiencies;
 	unsigned int skillExpertises;
+
+	std::unordered_map<Skills, int> SkillModifiers;
 
 	SpellSlot charSlots;
 	SpellSlot curCharSlots;
@@ -228,6 +230,7 @@ public:
 	int getSkillsProfs();
 	int getExpertises() { return skillExpertises; }
 
+	int getSkillModifier(const Skills& skill) { return SkillModifiers[skill]; }
 	const std::vector<Slider>& getSliders() const { return sliders; }
 	Slider getSlider(int index) { return sliders[index]; }
 	Slider getSlider(std::string name);
@@ -252,7 +255,8 @@ public:
 	void setSkillProfs(int x);
 	void setSavingThrowProfs(int x);
 	void setExpertises(int x) { skillExpertises = x; }
-	
+	void setSkillModifier(const Skills& skill, int modifier) { SkillModifiers[skill] = modifier; }
+
 	void setSpellPoints(int x) { SpellPoints = x; curSpellPoints = x; }
 	void getCurSpellPoints(int x) { curSpellPoints = x; }
 
@@ -305,7 +309,8 @@ int getStatMod(int x);
 int getProficiency(int level);
 int getStatfromSkill(const Skills& skill, const Stats& stat);
 
-
+std::vector<Skills> getSavingThrowVector();
+std::vector<Skills> getSkillsVector();
 std::string getSkillStr(const Skills& skill);
 Skills getSkillfromStr(const std::string& str);
 std::string getNumStr(int x);

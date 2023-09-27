@@ -103,7 +103,10 @@ class MainFrame : public wxFrame
 		wxMenuItem* SetSP;
 		wxMenuItem* SetSlots;
 		wxMenuItem* SetWarlockSlots;
+		wxMenuItem* SetSkillModifiers;
+		wxMenuItem* SetSavingThrowModifier;
 		
+
 		wxMenuItem* ResetSP;
 		wxMenuItem* ResetSlots;
 		wxMenuItem* ResetUncheckSpells;
@@ -347,6 +350,7 @@ public:
 	void updateKnownSpellMods();
 	void updateKnownSpellsLists();
 
+	void updateAC();
 	void updateName();
 	void updateTempHP();
 	void updateHP();

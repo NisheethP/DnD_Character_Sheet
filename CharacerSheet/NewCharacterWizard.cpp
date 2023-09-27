@@ -234,6 +234,8 @@ HP_SpeedSelectionPage::HP_SpeedSelectionPage(
 			HP_Spin.push_back(new wxSpinCtrl(this, wxID_ANY, "0"));
 			HP_Sizer->Add(levelHP_Text[0]);
 			HP_Sizer->Add(HP_Spin[0]);
+			HP_Spin[0]->SetMin(0);
+			HP_Spin[0]->SetMax(1e5);
 
 			levelHP_Text[0]->Hide();
 			HP_Spin[0]->Hide();
@@ -247,6 +249,9 @@ HP_SpeedSelectionPage::HP_SpeedSelectionPage(
 		HP_Spin.push_back(new wxSpinCtrl(this, wxID_ANY, "0"));
 		HP_Sizer->Add(levelHP_Text[i]);
 		HP_Sizer->Add(HP_Spin[i]);
+
+		HP_Spin[i]->SetMin(0);
+		HP_Spin[i]->SetMax(1e5);
 
 		//levelHP_Text[i]->Hide();
 		//HP_Spin[i]->Hide();
@@ -315,6 +320,9 @@ void WizardPages::HP_SpeedSelectionPage::Create()
 		HP_Spin.push_back(new wxSpinCtrl(this, wxID_ANY, "0"));
 		HP_Sizer->Add(levelHP_Text[i + 1]);
 		HP_Sizer->Add(HP_Spin[i + 1]);
+
+		HP_Spin[i+1]->SetMin(0);
+		HP_Spin[i+1]->SetMax(1e5);
 	
 		//levelHP_Text[i+1]->Hide();
 		//HP_Spin[i+1]->Hide();
