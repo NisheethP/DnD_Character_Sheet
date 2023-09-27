@@ -1,6 +1,7 @@
 #include "PreCompiledHeader.h"
 
 #include "DiceRollerDialog.h"
+#include "Util.h"
 
 DiceRollerDialog::DiceRollerDialog(
 	wxWindow* parent,
@@ -182,7 +183,7 @@ void DiceRollerDialog::onRoll(wxCommandEvent& event)
 
 	std::string str = "";
 	
-	auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	//auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	
 	int total = 0;
 
@@ -213,13 +214,13 @@ void DiceRollerDialog::onRoll(wxCommandEvent& event)
 		if (diceType == "d100")
 			DieMax = 100;
 
-		auto dice_rand = std::bind(std::uniform_int_distribution<int>(1, DieMax), std::mt19937(seed));
+		//auto dice_rand = std::bind(std::uniform_int_distribution<int>(1, DieMax), std::mt19937(seed));
 
 		str += "[";
 
 		for (int j = 0; j < *num; ++j)
 		{
-			int x = dice_rand();
+			int x = Util::RandomGen.rollUniform(1, DieMax);
 			str += std::to_string(x);
 			if (j+1 != *num)
 				str += ", ";

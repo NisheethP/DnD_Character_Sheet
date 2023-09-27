@@ -23,3 +23,16 @@ std::wstring Util::to_wstring(std::string str)
 {
 	return std::wstring(str.begin(), str.end());
 }
+
+Util::RNG::RNG()
+{
+	static auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	rng.seed(seed);
+	rng.discard(10000);
+}
+
+int Util::RNG::rollUniform(int min, int max)
+{
+	std::uniform_int_distribution<int> dice(min, max);
+	return dice(rng);
+}
