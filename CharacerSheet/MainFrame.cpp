@@ -308,6 +308,7 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 	panel->SetScrollRate(0, FromDIP(10));
 	
 	int gap = 5;
+	auto mainSizer = new wxBoxSizer(wxVERTICAL);
 	wxGridBagSizer* mainGridSizer = new wxGridBagSizer(gap, gap);
 
 	std::vector<std::pair<wxGBPosition, wxGBSpan>> items =
@@ -455,24 +456,16 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[18];
-	p = mainPagePanels.AttackPanel = new AttackControl(panel, wxID_ANY, wxDefaultPosition, mainPagePanels.AC->GetParent()->GetSize());
+	p = mainPagePanels.AttackPanel = new AttackControl(panel, wxID_ANY, wxDefaultPosition, mainPagePanels.AC->GetParent()->GetSize(), wxBORDER_THEME);
 	p->SetMinSize(wxSize(p->GetSize().x* acColSizeMod, -1));
 	setWindowColour(p, panelColour);
 	setWindowColour(mainPagePanels.AttackPanel->getList(), listColour);
 
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
-	//mainGridSizer->AddGrowableRow(0);
+	mainSizer->Add(mainGridSizer, 0, wxALL, 5);
 
-	//mainGridSizer->AddGrowableCol(1);
-	//mainGridSizer->AddGrowableCol(2);
-	//mainGridSizer->AddGrowableCol(3);
-	//mainGridSizer->AddGrowableCol(5);
-	
-	//mainGridSizer->SetMinSize(FromDIP(wxSize(masterPanel->GetSize().x, 300)));
-
-
-	panel->SetSizer(mainGridSizer);
+	panel->SetSizer(mainSizer);
 	panel->Layout();
 	
 	return panel;
@@ -1300,7 +1293,7 @@ wxPanel* MainFrame::CreateLangProficiencies(wxPanel* parent)
 	tempSize.x = mainPagePanels.AC->GetParent()->GetSize().x;
 
 	tempSize.y = -1;
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize);
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize, wxBORDER_THEME);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
 	//panel->SetBackgroundColour(DescColor.first);
@@ -1328,7 +1321,7 @@ wxPanel* MainFrame::CreateToolProficiencies(wxPanel* parent)
 	tempSize.x = mainPagePanels.AC->GetParent()->GetSize().x;
 
 	tempSize.y = -1;
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize);
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize, wxBORDER_THEME);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
 	auto& text = std::get<0>(mainPagePanels.ToolProf) = new wxStaticText(panel, wxID_ANY, "Proficiencies");
@@ -3225,7 +3218,7 @@ void MainFrame::makeAddRemList(wxStaticText*& title, wxButton*& add, wxButton*& 
 	buttonSizer->Add(4, -1);
 	buttonSizer->Add(add);
 
-	titleSizer->Add(title, 0, wxALIGN_LEFT | wxALIGN_BOTTOM);
+	titleSizer->Add(title, 0, wxALIGN_LEFT | wxALIGN_BOTTOM | wxLEFT, 10);
 	titleSizer->Add(buttonSizer, 0, wxALIGN_RIGHT | wxALIGN_BOTTOM);
 	
 	sizer->Add(titleSizer, 0, wxEXPAND);
