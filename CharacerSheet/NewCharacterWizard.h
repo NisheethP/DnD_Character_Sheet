@@ -41,6 +41,10 @@ namespace WizardPages
 		std::vector<wxStaticText*> levelHP_Text;
 		wxSpinCtrl* Speed_Spin = nullptr;
 		wxFlexGridSizer* HP_Sizer = nullptr;
+		wxButton* rollRandom;
+
+		CharClass charClass;
+		int conMod = 0;
 	public:
 		HP_SpeedSelectionPage(wxWizard* parent,
 			int p_level = 1,
@@ -48,13 +52,18 @@ namespace WizardPages
 			wxWizardPage* next = NULL,
 			const wxBitmap& bitmap = wxNullBitmap);
 
-		void arrange();
-		void onChoiceChange(wxCommandEvent& event);
-		void setLevel(int p_level) { level = p_level; }
 		void Create();
+		void arrange();
+		
+		void setLevel(int p_level) { level = p_level; }
 		void setHP_Mode(int x) { HP_Mode->SetSelection(x); }
+		void setCharClass(CharClass pClass) { charClass = pClass; }
+		void setConMod(int pMod) { conMod = pMod; }
 
 		int getTotalHP(int conMod);
+
+		void onChoiceChange(wxCommandEvent& event);
+		void onRollRandom(wxCommandEvent& event);
 	};
 
 	class ProficienciesPage : public wxWizardPageSimple

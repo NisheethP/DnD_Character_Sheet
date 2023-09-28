@@ -25,9 +25,9 @@ NewCharacterWizard::NewCharacterWizard(
 	page2->Chain(page3);
 
 	GetPageAreaSizer()->Add((wxWizardPageSimple*)page1);
-	
+
 	this->Bind(wxEVT_WIZARD_BEFORE_PAGE_CHANGED, &NewCharacterWizard::onPageChanging, this);
-	this->SetMinSize(FromDIP(wxSize(600,400)));
+	this->SetMinSize(FromDIP(wxSize(600, 400)));
 }
 
 void NewCharacterWizard::onPageChanging(wxWizardEvent& event)
@@ -38,8 +38,17 @@ void NewCharacterWizard::onPageChanging(wxWizardEvent& event)
 		page2->setLevel(page1->getCharLevel());
 		page2->Create();
 		page2->arrange();
-	}
 
+		std::string classStr = page1->getCharClass();
+
+		CharClass pClass(getClassFromString(classStr), 1, CharClass::CasterType::None);
+		page2->setCharClass(pClass);
+
+		float conMod = page1->getStat(2) - 10.0f;
+		conMod = std::floor(conMod / 2.0f);
+
+		page2->setConMod(conMod);
+	}
 
 	GetPageAreaSizer()->Fit(page2);
 	GetPageAreaSizer()->Layout();
@@ -54,7 +63,7 @@ Character NewCharacterWizard::getCharacter()
 
 	CharClass::CasterType type;
 	std::string choices[4];
-	
+
 	choices[0] = "None";
 	choices[1] = "One-Third Caster";
 	choices[2] = "Half Caster";
@@ -85,9 +94,9 @@ Character NewCharacterWizard::getCharacter()
 //======================
 
 ClassLevelStatSelectionPage::ClassLevelStatSelectionPage(
-	wxWizard* parent, 
-	wxWizardPage* prev, 
-	wxWizardPage* next, 
+	wxWizard* parent,
+	wxWizardPage* prev,
+	wxWizardPage* next,
 	const wxBitmap& bitmap)
 	:
 	wxWizardPageSimple(parent, prev, next, bitmap)
@@ -206,7 +215,7 @@ void WizardPages::ClassLevelStatSelectionPage::onRollRandom(wxCommandEvent& even
 	{
 		int tot = 0;
 		int vals[4] = { 0,0,0,0 };
-		
+
 		for (int j = 0; j < 4; ++j)
 		{
 			vals[j] = Util::RandomGen.rollUniform(1, 6);
@@ -226,10 +235,10 @@ void WizardPages::ClassLevelStatSelectionPage::onRollRandom(wxCommandEvent& even
 /// HP SPEED SELECTION
 //======================
 HP_SpeedSelectionPage::HP_SpeedSelectionPage(
-	wxWizard* parent, 
+	wxWizard* parent,
 	int p_level,
-	wxWizardPage* prev, 
-	wxWizardPage* next, 
+	wxWizardPage* prev,
+	wxWizardPage* next,
 	const wxBitmap& bitmap)
 	:
 	wxWizardPageSimple(parent, prev, next, bitmap),
@@ -241,7 +250,7 @@ HP_SpeedSelectionPage::HP_SpeedSelectionPage(
 	auto hor_Sizer2 = new wxBoxSizer(wxHORIZONTAL);
 	HP_Sizer = new wxFlexGridSizer(level + 1, 4, gap, gap);
 
-	wxString choices[2] = {"Total (with CON mod)" , "Level by Level (w/o CON mod)"};
+	wxString choices[2] = { "Total (with CON mod)" , "Level by Level (w/o CON mod)" };
 
 	auto HP_Mode_Text = new wxStaticText(this, wxID_ANY, "HP method");
 	HP_Mode = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 2, choices);
@@ -255,7 +264,7 @@ HP_SpeedSelectionPage::HP_SpeedSelectionPage(
 	hor_Sizer2->Add(HP_Mode_Text, 0);
 	hor_Sizer2->Add(HP_Mode, 0, wxEXPAND | wxLEFT, gap);
 
-	for (int i = 0; i < level+1; ++i)
+	for (int i = 0; i < level + 1; ++i)
 	{
 		if (i == 0)
 		{
@@ -286,13 +295,18 @@ HP_SpeedSelectionPage::HP_SpeedSelectionPage(
 		//HP_Spin[i]->Hide();
 	}
 
+	rollRandom = new wxButton(this, wxID_ANY, "Random HP");
+
 	sizer->Add(hor_Sizer1, 0, wxEXPAND | wxTOP, gap);
 	sizer->Add(hor_Sizer2, 0, wxEXPAND | wxTOP, gap);
-	sizer->Add(HP_Sizer, 0, wxEXPAND | wxTOP, gap/2.0f);
+	sizer->Add(rollRandom, 0, wxEXPAND | wxTOP, gap);
+	sizer->Add(HP_Sizer, 0, wxEXPAND | wxTOP, gap / 2.0f);
 
 	SetSizerAndFit(sizer);
 	Layout();
+
 	HP_Mode->Bind(wxEVT_CHOICE, &HP_SpeedSelectionPage::onChoiceChange, this);
+	rollRandom->Bind(wxEVT_BUTTON, &HP_SpeedSelectionPage::onRollRandom, this);
 }
 
 void WizardPages::HP_SpeedSelectionPage::arrange()
@@ -330,6 +344,64 @@ void WizardPages::HP_SpeedSelectionPage::onChoiceChange(wxCommandEvent& event)
 	arrange();
 }
 
+void WizardPages::HP_SpeedSelectionPage::onRollRandom(wxCommandEvent& event)
+{
+	DieType type = charClass.getHitDie();
+	int dice = 6;
+
+	switch (type)
+	{
+	case DieType::d4:
+		dice = 4;
+		break;
+	case DieType::d6:
+		dice = 6;
+		break;
+	case DieType::d8:
+		dice = 8;
+		break;
+	case DieType::d10:
+		dice = 10;
+		break;
+	case DieType::d12:
+		dice = 12;
+		break;
+	case DieType::d20:
+		dice = 20;
+		break;
+	case DieType::d100:
+		dice = 100;
+		break;
+	case DieType::error:
+		dice = -1;
+		break;
+	default:
+		dice = -2;
+		break;
+	}
+
+	for (int i = 0; i < HP_Spin.size(); ++i)
+	{
+		if (i == 0)
+		{
+			int total = dice + conMod;
+			for (int j = 1; j < level; ++j)
+				total += Util::RandomGen.rollUniform(2, dice) + conMod;
+
+			HP_Spin[0]->SetValue(total);
+			continue;
+		}
+		
+		if (i == 1)
+		{
+			HP_Spin[i]->SetValue(dice);
+			continue;
+		}
+
+		HP_Spin[i]->SetValue(Util::RandomGen.rollUniform(2, dice));
+	}
+}
+
 void WizardPages::HP_SpeedSelectionPage::Create()
 {
 	for (auto i = HP_Spin.begin() + 1; i != HP_Spin.end(); ++i)
@@ -341,7 +413,7 @@ void WizardPages::HP_SpeedSelectionPage::Create()
 	HP_Spin.erase(HP_Spin.begin() + 1, HP_Spin.end());
 	levelHP_Text.erase(levelHP_Text.begin() + 1, levelHP_Text.end());
 
-	HP_Sizer->SetRows(level+2);
+	HP_Sizer->SetRows(level + 2);
 
 	for (int i = 0; i < level; ++i)
 	{
@@ -350,13 +422,13 @@ void WizardPages::HP_SpeedSelectionPage::Create()
 		HP_Sizer->Add(levelHP_Text[i + 1]);
 		HP_Sizer->Add(HP_Spin[i + 1]);
 
-		HP_Spin[i+1]->SetMin(0);
-		HP_Spin[i+1]->SetMax(1e5);
-	
+		HP_Spin[i + 1]->SetMin(0);
+		HP_Spin[i + 1]->SetMax(1e5);
+
 		//levelHP_Text[i+1]->Hide();
 		//HP_Spin[i+1]->Hide();
 	}
-	
+
 	Layout();
 }
 
@@ -366,7 +438,7 @@ int WizardPages::HP_SpeedSelectionPage::getTotalHP(int conMod)
 
 	if (sel == 0)
 		return HP_Spin[0]->GetValue();
-	
+
 	int totHP = 0;
 	for (auto i = HP_Spin.begin() + 1; i != HP_Spin.end(); ++i)
 		totHP += (*i)->GetValue() + conMod;
@@ -379,17 +451,17 @@ int WizardPages::HP_SpeedSelectionPage::getTotalHP(int conMod)
 //======================
 
 WizardPages::ProficienciesPage::ProficienciesPage(
-	wxWizard* parent, 
-	int p_level, 
-	wxWizardPage* prev, 
-	wxWizardPage* next, 
+	wxWizard* parent,
+	int p_level,
+	wxWizardPage* prev,
+	wxWizardPage* next,
 	const wxBitmap& bitmap)
 	:
 	wxWizardPageSimple(parent, prev, next, bitmap)
 {
 	std::vector<std::string> choicesVector;
 
-	for (int i = Skills::Strength; i <= Skills::Charisma; i =  i << 1)
+	for (int i = Skills::Strength; i <= Skills::Charisma; i = i << 1)
 	{
 		Skills tempSkill = static_cast<Skills>(i);
 		choicesVector.push_back(getSkillStr(tempSkill));
@@ -408,7 +480,7 @@ WizardPages::ProficienciesPage::ProficienciesPage(
 		Skills tempSkill = static_cast<Skills>(i);
 		choicesVector.push_back(getSkillStr(tempSkill));
 	}
-	
+
 	choices = new wxString[choicesVector.size()];
 	std::copy(choicesVector.begin(), choicesVector.end(), choices);
 

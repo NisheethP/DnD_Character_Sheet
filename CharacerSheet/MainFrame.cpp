@@ -5062,10 +5062,8 @@ void MainFrame::onCurInitiativeChange(wxSpinEvent& event)
 	this->curInitiative;
 }
 
-//------------------------------
-///CONDITIONS
-//------------------------------
 
+//CONDITIONS
 void MainFrame::initConditions()
 {
 	Conditions curCond;
@@ -5192,6 +5190,7 @@ void MainFrame::initConditions()
 	curFeature.description += "For each level of fatigue, you have a -1 on all ability checks, saving throws and attack rolls.";
 	allConditions.push_back({ curCond, curFeature });
 }
+
 
 void MainFrame::setWindowColour(wxWindow* window, ColourPair colour)
 {
