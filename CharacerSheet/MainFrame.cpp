@@ -2754,6 +2754,8 @@ void MainFrame::updateMoneyCtrls()
 
 void MainFrame::updateAC()
 {
+	mainPagePanels.AC_Base->SetValue(std::to_string(character.getAC_Base()));
+	mainPagePanels.AC_Mod->SetValue(std::to_string(character.getAC_Mod()));
 	calcAC();
 	mainPagePanels.AC->SetValue(std::to_string(character.getAC()));
 }
@@ -2927,6 +2929,7 @@ void MainFrame::updateAll()
 	updateKnownSpellMods();
 	updateKnownSpellsLists();
 	updateMoneyCtrls();
+	updateAC();
 	updateHP();
 	updatePlayerConds();
 	updateSavingThrows();
@@ -3236,7 +3239,7 @@ void MainFrame::calcAC()
 	if (modStr != "")
 		mod = std::stoi(modStr);
 
-	character.setAC(base + mod);
+	character.setAC(base, mod);
 }
 
 void MainFrame::HealToPerc()
@@ -4127,9 +4130,14 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 
 	if (obj == wxID_OPEN)
 	{
+		wxFileDialog openFileDialog(this, "Open Character", saveFolder + "\\", "", "", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+		
+		if (openFileDialog.ShowModal() == wxID_CANCEL)
+			return;
+		
 		{
 			// create and open an archive for input
-			std::ifstream ifs(saveFolder + "\\" + character.getName(), std::ios::binary);
+			std::ifstream ifs(openFileDialog.GetPath().ToStdString());
 			if (!ifs.is_open())
 				wxMessageBox("OPEN file not opened");
 
@@ -4145,11 +4153,26 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 
 	if (obj == wxID_SAVE)
 	{
+		TransferDataFromWindow();
+		
+		wxFileDialog saveFileDialog(this, "Save Character", saveFolder + "\\", "", "", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+		if (fileName == "")
+		{
+			if (saveFileDialog.ShowModal() == wxID_CANCEL)
+				return;
+			else
+				fileName = saveFileDialog.GetPath().ToStdString();
+		}
 
+			
 		if (!wxDirExists(saveFolder))
 			wxMkDir(saveFolder);
+
 		{
-			std::ofstream ofs(saveFolder + "\\" + character.getName());
+			if (fileName == "")
+				fileName = saveFileDialog.GetPath().ToStdString();
+
+			std::ofstream ofs(fileName);
 			if (!ofs.is_open())
 				wxMessageBox("SAVE file not opened");
 			
@@ -4164,7 +4187,27 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 
 	if (obj == wxID_SAVEAS)
 	{
+		TransferDataFromWindow();
 
+		wxFileDialog saveFileDialog(this, "Save Character", saveFolder + "\\", "", "", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+		if (saveFileDialog.ShowModal() == wxID_CANCEL)
+			return;
+
+		if (!wxDirExists(saveFolder))
+			wxMkDir(saveFolder);
+		{
+			std::ofstream ofs(saveFileDialog.GetPath().ToStdString());
+			if (!ofs.is_open())
+				wxMessageBox("SAVE file not opened");
+
+			boost::archive::text_oarchive oa(ofs);
+			// write class instance to archive
+			oa << *this;
+			// archive and stream closed when destructors are called
+
+			ofs.close();
+		}
 	}
 
 	if (obj == menuBarItems.FileHealthLogger->GetId())

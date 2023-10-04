@@ -73,7 +73,7 @@ void FileLogger::OpenFile()
 
 	auto path = getPath();
 	bool res = file->Create();
-	file->Open();
+	res = file->Open();
 }
 
 void FileLogger::CloseFile()

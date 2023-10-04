@@ -162,6 +162,8 @@ private:
 	int curSpellPoints;
 
 	int AC;
+	int AC_base;
+	int AC_mod;
 	int initMod;
 	int totHP;
 	int totHPMod;
@@ -192,6 +194,8 @@ public:
 	
 	int& getLevel()		{ return totalLevel; }
 	int& getAC()		{ return AC; }
+	int& getAC_Base()	{ return AC_base; }
+	int& getAC_Mod()	{ return AC_mod; }
 	int& getTotHP()		{ return totHP; }
 	int& getCurHP()		{ return curHP; }
 	int& getProfBonus()	{ return profBonus; }
@@ -247,6 +251,7 @@ public:
 	void addTotHP(int x) { totHP += x; }
 	void setTotHPBonus(int x) { totHPMod = x; }
 	void setAC(int x) { AC = x; }
+	void setAC(int base, int mod) { AC_base = base; AC_mod = mod; AC = AC_base + AC_mod; }
 	void giveClass(ClassType pClassType, int pLevel = 1, CharClass::CasterType type = CharClass::CasterType::None, bool updateSlots = false);
 	void giveClass(CharClass pClass, bool updateSlots = false);
 	void setInitMod(int x) { initMod = x; }
@@ -345,6 +350,8 @@ inline void Character::serialize(Archive& ar, const unsigned int version)
 	ar& curSpellPoints;
 	
 	ar& AC;
+	ar& AC_base;
+	ar& AC_mod;
 	ar& initMod;
 	ar& totHP;
 	ar& totHPMod;

@@ -27,6 +27,8 @@ class MainFrame : public wxFrame
 
 		ar& healToPercentageValue;
 
+		ar& fileName;
+
 		ar& notesPanels.pages;
 		ar& notesPanels.pageNames;
 
