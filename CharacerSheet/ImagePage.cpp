@@ -185,6 +185,7 @@ void ImagePage::onAddButton(wxCommandEvent& event)
 {
 	takeImage();
 	loadExistingImages();
+	updateList();
 }
 
 void ImagePage::onRemButton(wxCommandEvent& event)

@@ -195,6 +195,8 @@ void MainFrame::BindControls()
 {
 	using std::get;
 
+	this->Bind(wxEVT_CLOSE_WINDOW, &MainFrame::onExit, this);
+
 	spellDesc.spellSearch->Bind(wxEVT_TEXT, &MainFrame::onSpellSearchType, this);
 	spellDesc.spellSearch->Bind(wxEVT_SEARCHCTRL_SEARCH_BTN, &MainFrame::onSpellSearch, this);
 	spellDesc.spellList->Bind(wxEVT_TREE_SEL_CHANGED, &MainFrame::onSpellTreeSelect, this);
@@ -2300,9 +2302,9 @@ void MainFrame::CreatePages(wxNotebook* parent)
 	setWindowColour(AnimalCards, mainColour);
 	parent->AddPage(AnimalCards, "Animal Cards");
 
-	wxWindow* TestPage = CreateTestPanel(parent);
-	TestPage->SetBackgroundColour(wxColour(0x19, 0x19, 0x22));
-	parent->AddPage(TestPage, "Test");
+	//wxWindow* TestPage = CreateTestPanel(parent);
+	//TestPage->SetBackgroundColour(wxColour(0x19, 0x19, 0x22));
+	//parent->AddPage(TestPage, "Test");
 
 }
 
@@ -3309,6 +3311,40 @@ void MainFrame::DefaultShortSliders()
 	}
 }
 
+void MainFrame::callSave()
+{
+	TransferDataFromWindow();
+
+	wxFileDialog saveFileDialog(this, "Save Character", saveFolder + "\\", "", "", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	if (fileName == "")
+	{
+		if (saveFileDialog.ShowModal() == wxID_CANCEL)
+			return;
+		else
+			fileName = saveFileDialog.GetPath().ToStdString();
+	}
+
+
+	if (!wxDirExists(saveFolder))
+		wxMkDir(saveFolder);
+
+	{
+		if (fileName == "")
+			fileName = saveFileDialog.GetPath().ToStdString();
+
+		std::ofstream ofs(fileName);
+		if (!ofs.is_open())
+			wxMessageBox("SAVE file not opened");
+
+		boost::archive::text_oarchive oa(ofs);
+		// write class instance to archive
+		oa << *this;
+		// archive and stream closed when destructors are called
+
+		ofs.close();
+	}
+}
+
 //------------------------------
 ///EVENT HANDLERS
 //------------------------------
@@ -3321,8 +3357,24 @@ void MainFrame::onTest(wxCommandEvent& event)
 	dialog.ShowModal();
 }
 
-
 /// ACTUAL HANDLERS
+
+void MainFrame::onExit(wxCloseEvent& event)
+{
+	int res = wxMessageBox("Save before exit?", "Exit", wxYES_NO | wxCANCEL | wxYES_DEFAULT, this);
+
+	if (res == wxCANCEL)
+		return;
+
+	if (res == wxYES)
+	{
+		callSave();
+		this->Destroy();
+	}
+
+	if (res == wxNO)
+		this->Destroy();
+}
 
 void MainFrame::onSpellSearchType(wxCommandEvent& event)
 {
@@ -4153,36 +4205,7 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 
 	if (obj == wxID_SAVE)
 	{
-		TransferDataFromWindow();
-		
-		wxFileDialog saveFileDialog(this, "Save Character", saveFolder + "\\", "", "", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-		if (fileName == "")
-		{
-			if (saveFileDialog.ShowModal() == wxID_CANCEL)
-				return;
-			else
-				fileName = saveFileDialog.GetPath().ToStdString();
-		}
-
-			
-		if (!wxDirExists(saveFolder))
-			wxMkDir(saveFolder);
-
-		{
-			if (fileName == "")
-				fileName = saveFileDialog.GetPath().ToStdString();
-
-			std::ofstream ofs(fileName);
-			if (!ofs.is_open())
-				wxMessageBox("SAVE file not opened");
-			
-			boost::archive::text_oarchive oa(ofs);
-			// write class instance to archive
-			oa << *this;
-			// archive and stream closed when destructors are called
-
-			ofs.close();
-		}
+		this->callSave();
 	}
 
 	if (obj == wxID_SAVEAS)

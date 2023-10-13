@@ -391,6 +391,8 @@ public:
 	void DefaultLongSliders();
 	void DefaultShortSliders();
 
+	void callSave();
+
 	//----------------------
 	//Event Handlers
 	//----------------------
@@ -446,6 +448,8 @@ public:
 	void onNotesMenuEvents(wxCommandEvent& event);
 
 	void onTest(wxCommandEvent& event);
+
+	void onExit(wxCloseEvent& event);
 
 	void loadSpells();
 	void fillLevelSpells();
