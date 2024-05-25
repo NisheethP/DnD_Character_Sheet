@@ -2760,8 +2760,11 @@ void MainFrame::updateMoneyCtrls()
 
 void MainFrame::updateAC()
 {
-	mainPagePanels.AC_Base->SetValue(std::to_string(character.getAC_Base()));
-	mainPagePanels.AC_Mod->SetValue(std::to_string(character.getAC_Mod()));
+	mainPagePanels.AC_Base->ChangeValue(std::to_string(character.getAC_Base()));
+	int x = character.getAC_Mod();
+	std::string temp = std::to_string(x);
+	mainPagePanels.AC_Mod->ChangeValue(std::to_string(character.getAC_Mod()));
+	temp = mainPagePanels.AC_Mod->GetValue().ToStdString();
 	calcAC();
 	mainPagePanels.AC->SetValue(std::to_string(character.getAC()));
 }
@@ -4211,7 +4214,6 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 		}
 
 		fileName = openFileDialog.GetPath().ToStdString();
-		//saveFolderPath = saveFolderPath.substr(0, saveFolderPath.size() - fileName.size());
 		TransferDataToWindow();
 		updateAll();
 	}
