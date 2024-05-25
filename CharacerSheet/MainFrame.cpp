@@ -4209,6 +4209,9 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 
 			ifs.close();
 		}
+
+		fileName = openFileDialog.GetPath().ToStdString();
+		//saveFolderPath = saveFolderPath.substr(0, saveFolderPath.size() - fileName.size());
 		TransferDataToWindow();
 		updateAll();
 	}

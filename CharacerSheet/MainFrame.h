@@ -37,6 +37,7 @@ class MainFrame : public wxFrame
 
 	std::string saveFolder = "Character Saves";
 	std::string fileName = "";
+	std::string saveFolderPath = "";
 	int healToPercentageValue;
 	int firstPage = 0;
 
