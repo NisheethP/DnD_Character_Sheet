@@ -61,7 +61,7 @@ Character NewCharacterWizard::getCharacter()
 	std::string classStr = page1->getCharClass();
 	std::string classTypeStr = page1->getClassType();
 
-	CharClass::CasterType type;
+	CharClass::CasterType type = CharClass::CasterType::None;
 	std::string choices[4];
 
 	choices[0] = "None";
@@ -72,11 +72,11 @@ Character NewCharacterWizard::getCharacter()
 	if (classTypeStr == choices[0])
 		type = CharClass::CasterType::None;
 	else if (classTypeStr == choices[1])
-		type = CharClass::CasterType::None;
+		type = CharClass::CasterType::Third;
 	else if (classTypeStr == choices[2])
-		type = CharClass::CasterType::None;
+		type = CharClass::CasterType::Half;
 	else if (classTypeStr == choices[3])
-		type = CharClass::CasterType::None;
+		type = CharClass::CasterType::Full;
 
 	classes.push_back(CharClass(getClassFromString(classStr), page1->getCharLevel(), type));
 	int skills = page3->getSkills();
@@ -84,9 +84,13 @@ Character NewCharacterWizard::getCharacter()
 
 	float conMod = page1->getStat(2) - 10.0f;
 	conMod = std::floor(conMod / 2.0f);
+	
+	Stats tempStats = page1->getAllStats();
+	int totHP = page2->getTotalHP(conMod);
+	int speed = page2->getSpeed();
+	Character tempCharacter(page1->getCharName(), classes, tempStats, totHP, speed, skills | st, Skills::none);
 
-
-	return Character(page1->getCharName(), classes, page1->getAllStats(), page2->getTotalHP(conMod), 30, skills | st, 0);
+	return tempCharacter;
 }
 
 //======================
@@ -203,7 +207,7 @@ int WizardPages::ClassLevelStatSelectionPage::getStat(int index)
 
 Stats WizardPages::ClassLevelStatSelectionPage::getAllStats()
 {
-	int x[6];
+	int x[6] = { 0,0,0,0,0,0 };
 	for (int i = 0; i < 6; ++i)
 		x[i] = StatInput[i]->GetValue();
 	return Stats(x[0], x[1], x[2], x[3], x[4], x[5]);
@@ -444,6 +448,11 @@ int WizardPages::HP_SpeedSelectionPage::getTotalHP(int conMod)
 		totHP += (*i)->GetValue() + conMod;
 
 	return totHP;
+}
+
+int WizardPages::HP_SpeedSelectionPage::getSpeed()
+{
+	return Speed_Spin->GetValue();
 }
 
 //======================

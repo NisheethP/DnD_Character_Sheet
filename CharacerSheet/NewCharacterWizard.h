@@ -61,6 +61,7 @@ namespace WizardPages
 		void setConMod(int pMod) { conMod = pMod; }
 
 		int getTotalHP(int conMod);
+		int getSpeed();
 
 		void onChoiceChange(wxCommandEvent& event);
 		void onRollRandom(wxCommandEvent& event);

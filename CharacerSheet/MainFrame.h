@@ -361,6 +361,7 @@ public:
 	void updateInitiative();
 	void updateSavingThrows();
 	void updateSkills();
+	void updateSpeed();
 
 	void updateMoneyCtrls();
 	void updatePlayerConds();

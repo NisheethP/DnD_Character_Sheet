@@ -2734,7 +2734,11 @@ void MainFrame::updateKnownSpellsLists()
 			{
 				if (spell.getName() == *it)
 					if (spell.getLevel() == i)
-						list->Append(*it);
+					{
+						int pos = list->FindString(spell.getName());
+						if ( pos == wxNOT_FOUND)
+							list->Append(*it);
+					}						
 			}
 		}
 	}
@@ -2921,6 +2925,11 @@ void MainFrame::updateSkills()
 	}
 }
 
+void MainFrame::updateSpeed()
+{
+	mainPagePanels.Speed->SetValue(std::to_string(character.getSpeed()));
+}
+
 void MainFrame::updateAll()
 {
 	TransferDataToWindow();
@@ -2944,6 +2953,7 @@ void MainFrame::updateAll()
 	updateToolProfs();
 	updateHitDie();
 	updateName();
+	updateSpeed();
 }
 
 void MainFrame::SpellDesc::fillAllSpellTree(std::vector<Spell>& allSpells)
@@ -3989,11 +3999,11 @@ void MainFrame::onKnownSpellsAddRemSpell(wxCommandEvent& event)
 				{
 					list->Append(tempString);
 
-					for (auto& i : allSpells)
+					for (auto& curSpell : allSpells)
 					{
-						if (i.getName() == tempString)
+						if (curSpell.getName() == tempString)
 						{
-							character.addSpell(i);
+							character.addSpell(curSpell);
 							break;
 						}
 					}
@@ -4667,7 +4677,9 @@ void MainFrame::onRestMenuEvents(wxCommandEvent& event)
 		FillWarlockSlots();
 		DefaultLongSliders();
 		DefaultShortSliders();
-		knownPagePanels.SpellPoints_Val->SetLabel(std::to_string(character.getDefaultSpellPoints()));
+		int defSpellPoints = character.getDefaultSpellPoints();
+		character.setCurSpellPoints(defSpellPoints);
+		knownPagePanels.SpellPoints_Val->SetLabel(std::to_string(defSpellPoints));
 
 	}
 

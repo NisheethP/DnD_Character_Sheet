@@ -263,7 +263,7 @@ public:
 	void setSkillModifier(const Skills& skill, int modifier) { SkillModifiers[skill] = modifier; }
 
 	void setSpellPoints(int x) { SpellPoints = x; curSpellPoints = x; }
-	void getCurSpellPoints(int x) { curSpellPoints = x; }
+	void setCurSpellPoints(int x) { curSpellPoints = x; }
 
 	void addLanguage(std::string str);
 	bool remLanguage(std::string str);
