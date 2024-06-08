@@ -3910,7 +3910,18 @@ void MainFrame::onFeatureSelect(wxCommandEvent& event)
 				if (i.title == str)
 				{
 					title->SetLabel("  " + i.title);
-					desc->SetPage("<b>" + i.description + "</b>");
+
+					std::string tempDescription = i.description;
+					std::string newDesc = "";
+					for (auto& strIter : tempDescription)
+					{
+						//int str_iter = 0; str_iter < tempDescription.length(); ++str_iter
+						if (strIter != '\n')
+							newDesc += strIter;
+						else
+							newDesc += "<br>";
+					}
+					desc->SetPage("<b>" + newDesc + "</b>");
 					setWindowColour(desc, descColour);
 					return;
 				}
