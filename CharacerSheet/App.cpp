@@ -34,7 +34,7 @@ bool App::OnInit()
 	MainFrame* mainframe = new MainFrame(character.getName(), character);
 
 	
-	
+	//mainframe->SetTitle("Character Sheet");
 	mainframe->Show(true);
 
 	return true;

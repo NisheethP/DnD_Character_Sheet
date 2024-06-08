@@ -102,6 +102,8 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 
 	this->SetSizer(mainSizer);
 	this->Layout();
+
+	//this->SetIcon(wxIcon("Icon\\icon.png",wxBITMAP_TYPE_PNG));
 	
 	//BINDING ALL CONTROLS FOR THE FRAME
 	BindControls();
@@ -4201,6 +4203,7 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 			return;
 
 		character = dialog.getCharacter();
+		this->SetTitle(character.getName());
 		updateAll();
 	}
 
@@ -4226,6 +4229,7 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 
 		fileName = openFileDialog.GetPath().ToStdString();
 		TransferDataToWindow();
+		this->SetTitle(character.getName());
 		updateAll();
 	}
 
