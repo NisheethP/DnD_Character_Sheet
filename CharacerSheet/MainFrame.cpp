@@ -103,7 +103,7 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	this->SetSizer(mainSizer);
 	this->Layout();
 
-	//this->SetIcon(wxIcon("Icon\\icon.png",wxBITMAP_TYPE_PNG));
+	//this->SetIcon(wxIcon("icon.png",wxBITMAP_TYPE_PNG));
 	
 	//BINDING ALL CONTROLS FOR THE FRAME
 	BindControls();
@@ -4189,6 +4189,7 @@ void MainFrame::onNotesDClick(wxCommandEvent& event)
 	if (res.ToStdString() == "")
 		res = str;
 	notesPanels.PageList->SetString(i, res);
+	notesPanels.pageNames[i] = res;
 }
 
 void MainFrame::onFileMenuEvents(wxCommandEvent& event)

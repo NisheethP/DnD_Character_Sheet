@@ -265,6 +265,7 @@
     <ClInclude Include="MoneyDialog.h" />
     <ClInclude Include="NewCharacterWizard.h" />
     <ClInclude Include="PreCompiledHeader.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SkillProfDialog.h" />
     <ClInclude Include="SkillProficiencyModifierDialog.h" />
     <ClInclude Include="SliderDialog.h" />
