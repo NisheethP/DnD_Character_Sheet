@@ -3,8 +3,6 @@
 #include "Util.h"
 #include <locale>
 
-
-
 void Util::toLowerString(std::string& str)
 {
 	for (auto it = str.begin(); it != str.end(); ++it)

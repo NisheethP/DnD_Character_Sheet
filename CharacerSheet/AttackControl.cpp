@@ -16,14 +16,16 @@ AttackControl::AttackControl(
 	list = new wxListView(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL);
 
 	list->AppendColumn("NAME");
-	list->AppendColumn("ATK MOD");
+	list->AppendColumn("TO HIT");
 	list->AppendColumn("DMG");
+	list->AppendColumn("DMG MOD");
 	list->AppendColumn("TYPE");
 
 	list->SetColumnWidth(0, size.x*.4);
-	list->SetColumnWidth(1, size.x*.15);
+	list->SetColumnWidth(1, size.x*.2);
 	list->SetColumnWidth(2, size.x*.2);
-	list->SetColumnWidth(3, size.x*.3);
+	list->SetColumnWidth(3, size.x*.2);
+	list->SetColumnWidth(4, size.x*.3);
 
 	auto sizer = new wxBoxSizer(wxVERTICAL);
 	auto buttonSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -49,6 +51,16 @@ AttackControl::AttackControl(
 	list->Bind(wxEVT_LIST_ITEM_ACTIVATED, &AttackControl::onListDClick, this);
 }
 
+void AttackControl::resizeList()
+{
+	auto size = this->GetMinSize();
+	list->SetColumnWidth(0, size.x * .35);
+	list->SetColumnWidth(1, size.x * .15);
+	list->SetColumnWidth(2, size.x * .15);
+	list->SetColumnWidth(3, size.x * .15);
+	list->SetColumnWidth(4, size.x * .2);
+}
+
 void AttackControl::onAddButton(wxCommandEvent& event)
 {
 	AddDialog dialog(this, wxID_ANY, "");
@@ -59,13 +71,15 @@ void AttackControl::onAddButton(wxCommandEvent& event)
 	std::string name = dialog.getName();
 	std::string mod = dialog.getInput(1);
 	std::string dmg = dialog.getInput(2) + dialog.getDieType();
+	std::string dmgMod = dialog.getInput(3);
 	std::string dmgType = dialog.getDmgType();
 
 	int x = list->GetItemCount();
 	list->InsertItem(x, name);
 	list->SetItem(x, 1, mod);
 	list->SetItem(x, 2, dmg);
-	list->SetItem(x, 3, dmgType);
+	list->SetItem(x, 3, dmgMod);
+	list->SetItem(x, 4, dmgType);
 }
 
 void AttackControl::onRemButton(wxCommandEvent& event)
@@ -109,13 +123,45 @@ void AttackControl::onListDClick(wxListEvent& event)
 			numLen++;
 		}
 		std::string dice = DMG.substr(numLen);
-		int mod = std::stoi(list->GetItemText(item, 1).ToStdString());
+		int mod = std::stoi(list->GetItemText(item, 3).ToStdString());
+		int to_hit = std::stoi(list->GetItemText(item, 1).ToStdString());
 
-		auto dialog = new DiceRollerDialog(this, wxID_ANY, "Attack Dice", wxDefaultPosition, wxDefaultSize, wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE);
+		auto dialog = new DiceRollerDialog(this, wxID_ANY, "Damage Dice", {80, 80}, wxDefaultSize, wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE);
 
 		dialog->addDiceRow(num, dice, mod);
 		dialog->Show();
+
+		auto Hit_dialog = new DiceRollerDialog(this, wxID_ANY, "Attack Dice", {90, 240}, wxDefaultSize, wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE);
+
+		Hit_dialog->addDiceRow(1, "d20", to_hit);
+		Hit_dialog->Show();
 	}
+}
+
+void AttackControl::addEntry(std::string name, std::string mod, std::string dice, std::string damageType)
+{
+	int x = list->GetItemCount();
+	list->InsertItem(x, name);
+	list->SetItem(x, 1, mod);
+	list->SetItem(x, 2, dice);
+	list->SetItem(x, 3, damageType);
+}
+
+void AttackControl::addEntry(ListItem entry)
+{
+	this->addEntry(entry.name, entry.to_hit, entry.dice, entry.damageType);
+}
+
+AttackControl::ListItem AttackControl::getEntry(int x)
+{
+	if (x > list->GetItemCount())
+		return ListItem("Error", "Error", "Error", "Error");
+	std::string name = list->GetItemText(x, 0).ToStdString();
+	std::string mod = list->GetItemText(x, 1).ToStdString();
+	std::string dice = list->GetItemText(x, 2).ToStdString();
+	std::string damageType = list->GetItemText(x, 3).ToStdString();
+	
+	return ListItem(name, mod, dice, damageType);
 }
 
 AttackControl::AddDialog::AddDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style, const wxString& name):
@@ -127,6 +173,7 @@ AttackControl::AddDialog::AddDialog(wxWindow* parent, wxWindowID id, const wxStr
 		"Name",
 		"Attack Bonus",
 		"Damage",
+		"Damage Mod",
 		"Type"
 	};
 
@@ -135,16 +182,20 @@ AttackControl::AddDialog::AddDialog(wxWindow* parent, wxWindowID id, const wxStr
 		"Dagger",
 		"0",
 		"1",
+		"0",
 		"Piercing"
 	};
 
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 5; ++i)
 	{
 		auto horSizer = new wxBoxSizer(wxHORIZONTAL);
 		auto text = new wxStaticText(this, wxID_ANY, names[i]);
 		auto& val = input[i] = new wxTextCtrl(this, wxID_ANY, defVal[i]);
 
 		if (names[i] == "Attack Bonus")
+			val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+
+		if (names[i] == "Damage Mod")
 			val->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 		
 		horSizer->Add(text);

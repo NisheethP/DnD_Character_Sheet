@@ -32,7 +32,7 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	SkillFont(wxFontInfo(wxSize(0, 12))),
 	baseColSize(190, -1),
 	buttonSize(40,-1),
-	acColSizeMod(1.2),
+	acColSizeMod(1),
 	masterPanel(new wxPanel(this, wxID_ANY, wxPoint(100, 400), wxDefaultSize)),
 	mainNotebook(new wxNotebook(masterPanel, wxID_ANY))
 {
@@ -357,10 +357,10 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 		{{7,2}, {3,2}},		//16   SLIDERS
 
 		//Conditions
-		{{5,4}, {1,2}},		//17   CONDITIONS
+		{{5,4}, {2,2}},		//17   CONDITIONS
 		
 		//ATTACK LIST
-		{{6,4}, {2,2}}		//18   ATTACKS
+		{{0,6}, {3,3}}		//18   ATTACKS
 	};
 
 	wxPanel* p;
@@ -461,7 +461,9 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 
 	curItem = items[18];
 	p = mainPagePanels.AttackPanel = new AttackControl(panel, wxID_ANY, wxDefaultPosition, mainPagePanels.AC->GetParent()->GetSize(), wxBORDER_THEME);
-	p->SetMinSize(wxSize(p->GetSize().x* acColSizeMod, -1));
+	p->SetMinSize(wxSize(p->GetSize().x* 1.5, -1));
+	p->Layout();
+	mainPagePanels.AttackPanel->resizeList();
 	setWindowColour(p, panelColour);
 	setWindowColour(mainPagePanels.AttackPanel->getList(), listColour);
 
@@ -1360,7 +1362,7 @@ wxPanel* MainFrame::CreatePlayerConditions(wxPanel* parent)
 	setWindowColour(mainPagePanels.EL_Conditions->GetParent(), descColour);
 
 	mainPagePanels.EL_Conditions->SetupColours();
-	mainPagePanels.EL_Conditions->SetMaxSize(FromDIP(wxSize(-1, 120)));
+	mainPagePanels.EL_Conditions->SetMaxSize(FromDIP(wxSize(-1, -1)));
 	mainPagePanels.EL_Conditions->SetFont(mainPagePanels.EL_Conditions->GetFont().Bold());
 
 	auto list = mainPagePanels.EL_Conditions->GetListCtrl();
@@ -3329,6 +3331,7 @@ void MainFrame::DefaultShortSliders()
 void MainFrame::callSave()
 {
 	TransferDataFromWindow();
+	this->AttackPanelSave();
 
 	wxFileDialog saveFileDialog(this, "Save Character", saveFolder + "\\", "", "", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 	if (fileName == "")
@@ -3357,6 +3360,27 @@ void MainFrame::callSave()
 		// archive and stream closed when destructors are called
 
 		ofs.close();
+	}
+}
+
+void MainFrame::AttackPanelSave()
+{
+	int num = mainPagePanels.AttackPanel->getList()->GetItemCount();
+	auto& saveList = mainPagePanels.attackPanelAttacks;
+	saveList.clear();
+	
+	for (int i = 0; i < num; ++i)
+	{
+		saveList.push_back(mainPagePanels.AttackPanel->getEntry(i));
+	}
+}
+
+void MainFrame::AttackPanelLoad()
+{
+	for (auto& entry : mainPagePanels.attackPanelAttacks)
+	{
+		auto& control = mainPagePanels.AttackPanel;
+		control->addEntry(entry);
 	}
 }
 
@@ -4230,6 +4254,7 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 
 		fileName = openFileDialog.GetPath().ToStdString();
 		TransferDataToWindow();
+		this->AttackPanelLoad();
 		this->SetTitle(character.getName());
 		updateAll();
 	}

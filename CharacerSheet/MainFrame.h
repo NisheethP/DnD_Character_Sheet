@@ -33,6 +33,8 @@ class MainFrame : public wxFrame
 		ar& notesPanels.pageNames;
 
 		ar& character;
+
+		ar& mainPagePanels.attackPanelAttacks;
 	}
 
 	std::string saveFolder = "Character Saves";
@@ -228,6 +230,9 @@ class MainFrame : public wxFrame
 		//MainPagePanels();
 
 		AttackControl* AttackPanel = nullptr;
+		std::vector<AttackControl::ListItem> attackPanelAttacks;
+
+
 
 	}mainPagePanels;
 
@@ -393,6 +398,9 @@ public:
 	void DefaultShortSliders();
 
 	void callSave();
+
+	void AttackPanelSave();
+	void AttackPanelLoad();
 
 	//----------------------
 	//Event Handlers

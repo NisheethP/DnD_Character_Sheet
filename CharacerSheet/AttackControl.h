@@ -4,7 +4,7 @@ class AttackControl : public wxPanel
 {
 	class AddDialog : public wxDialog
 	{
-		wxTextCtrl* input[4] = { nullptr, nullptr, nullptr, nullptr };
+		wxTextCtrl* input[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
 		wxChoice* diceType = nullptr;
 	public:
 		AddDialog(wxWindow* parent,
@@ -17,11 +17,12 @@ class AttackControl : public wxPanel
 		);
 
 		std::string getInput(int index);
-		std::string getName() { return input[0]->GetValue().ToStdString(); }
-		int getMod() { return std::stoi(input[1]->GetValue().ToStdString()); }
-		int getDmgDice() { return std::stoi(input[2]->GetValue().ToStdString()); }
-		std::string getDieType() { return diceType->GetString(diceType->GetSelection()).ToStdString(); };
-		std::string getDmgType() { return input[3]->GetValue().ToStdString(); }
+		std::string getName()		{ return input[0]->GetValue().ToStdString(); }
+		int getMod()				{ return std::stoi(input[1]->GetValue().ToStdString()); }
+		int getDmgDice()			{ return std::stoi(input[2]->GetValue().ToStdString()); }
+		std::string getDieType()	{ return diceType->GetString(diceType->GetSelection()).ToStdString(); };
+		int getDamageMod()			{ return std::stoi(input[3]->GetValue().ToStdString()); }
+		std::string getDmgType()	{ return input[4]->GetValue().ToStdString(); }
 
 	};
 
@@ -38,12 +39,39 @@ public:
 		const wxString& name = wxPanelNameStr
 	);
 
+	struct ListItem
+	{
+		template<class Archive>
+		void serialize(Archive& ar, const unsigned int version);
+
+		std::string name;
+		std::string to_hit;
+		std::string dice;
+		std::string dmg_mod;
+		std::string damageType;
+	};
+
 	wxListView* getList()		{ return list; }
 	wxButton* getAddButton()	{ return Add; }
 	wxButton* getRemButton()	{ return Rem; }
 
+	void resizeList();
+
 	void onAddButton(wxCommandEvent& event);
 	void onRemButton(wxCommandEvent& event);
 	void onListDClick(wxListEvent& event);
+
+	void addEntry(std::string name, std::string mod, std::string dice, std::string damageType);
+	void addEntry(ListItem entry);
+	ListItem getEntry(int x);
 };
 
+template<class Archive>
+inline void AttackControl::ListItem::serialize(Archive& ar, const unsigned int version)
+{
+	ar& name;
+	ar& to_hit;
+	ar& dice;
+	ar& dmg_mod;
+	ar& damageType;
+}
