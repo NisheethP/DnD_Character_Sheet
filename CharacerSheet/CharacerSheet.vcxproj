@@ -224,6 +224,7 @@
     <ClCompile Include="FeatureDialog.cpp" />
     <ClCompile Include="FileLogger.cpp" />
     <ClCompile Include="ImagePage.cpp" />
+    <ClCompile Include="InventoryControl.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="ItemDisplayControl.cpp" />
     <ClCompile Include="LevelUpDialog.cpp" />
@@ -258,6 +259,7 @@
     <ClInclude Include="FeatureDialog.h" />
     <ClInclude Include="FileLogger.h" />
     <ClInclude Include="ImagePage.h" />
+    <ClInclude Include="InventoryControl.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemDisplayControl.h" />
     <ClInclude Include="LevelUpDialog.h" />

@@ -85,7 +85,7 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 
 	masterSizer = new wxBoxSizer(wxVERTICAL);
 	
-	this->SetSize(FromDIP(wxSize(1000,700)));
+	this->SetSize(FromDIP(wxSize(1800,900)));
 	
 	updatePlayerConds();
 
@@ -359,8 +359,9 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 		//Conditions
 		{{5,4}, {2,2}},		//17   CONDITIONS
 		
-		//ATTACK LIST
-		{{0,6}, {3,3}}		//18   ATTACKS
+		//ATTACK COLUMN
+		{{0,6}, {3,3}},		//18   ATTACKS
+		{{3,6}, {5,3}}		//19   INVENTORY
 	};
 
 	wxPanel* p;
@@ -460,14 +461,23 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[18];
-	p = mainPagePanels.AttackPanel = new AttackControl(panel, wxID_ANY, wxDefaultPosition, mainPagePanels.AC->GetParent()->GetSize(), wxBORDER_THEME);
+	p = mainPagePanels.AttackPanel = new AttackControl(panel, wxID_ANY, wxDefaultPosition, baseColSize*2, wxBORDER_THEME);
 	p->SetMinSize(wxSize(p->GetSize().x* 1.5, -1));
 	p->Layout();
-	mainPagePanels.AttackPanel->resizeList();
+	mainPagePanels.AttackPanel->resizeCtrl();
 	setWindowColour(p, panelColour);
 	setWindowColour(mainPagePanels.AttackPanel->getList(), listColour);
-
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
+
+	curItem = items[19];
+	p = mainPagePanels.InventoryPanel = new InventoryControl(panel, wxID_ANY, wxDefaultPosition, baseColSize*2, wxBORDER_THEME);
+	p->SetMinSize(wxSize(p->GetSize().x * 1.5, -1));
+	p->Layout();
+	mainPagePanels.InventoryPanel->resizeCtrl();
+	setWindowColour(p, panelColour);
+	setWindowColour(mainPagePanels.InventoryPanel->getList(), listColour);
+	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
+
 
 	mainSizer->Add(mainGridSizer, 0, wxALL, 5);
 
@@ -1683,6 +1693,15 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 
 	auto tempClasses = character.getCombinedClasses();
 	
+	auto title = new wxStaticText(panel, wxID_ANY, "Hit Dice", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
+	title->SetFont(BigFont1);
+	title->SetForegroundColour(*wxWHITE);
+	sizer->Add(title, 0, wxEXPAND | wxTOP, 2);
+
+	auto line = new wxStaticLine(panel, wxID_ANY, wxDefaultPosition, ACSize, wxLI_HORIZONTAL);
+	line->SetBackgroundColour(*wxWHITE);
+	sizer->Add(line, 0, wxTOP, 2);
+
 	for (auto it = tempClasses.begin(); it != tempClasses.end(); ++it)
 	{
 		auto text = new wxStaticText(panel, wxID_ANY, "");
@@ -1748,7 +1767,7 @@ wxScrolled<wxPanel>* MainFrame::CreateHitDiePanel(wxPanel* parent)
 	//panel->SetMaxSize(tempSize);
 
 	panel->SetSizer(sizer);
-	//panel->Layout();
+	panel->Layout();
 
 	return panel;
 }

@@ -286,6 +286,9 @@ public:
 
 	int addCondition(int cond);
 	int remCondition(int cond);
+
+	void addInventory(Item entry);
+	void removeInventory(Item entry);
 	//-------------
 	//OTHER FUNCTIONS
 	//-------------

@@ -548,6 +548,20 @@ int Character::remCondition(int cond)
 	return 0;
 }
 
+void Character::addInventory(Item entry)
+{
+	inventory.push_back(entry);
+}
+
+void Character::removeInventory(Item entry)
+{
+	for (auto it = inventory.begin(); it != inventory.end(); ++it)
+	{
+		if (entry == *it)
+			it = inventory.erase(it);
+	}
+}
+
 int Character::getCasterLevel()
 {
 	float castLevel = 0.f, tempLevel = 0.f;

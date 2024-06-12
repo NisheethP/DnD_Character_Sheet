@@ -120,6 +120,9 @@
     <ClCompile Include="SkillProficiencyModifierDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="InventoryControl.cpp">
+      <Filter>Source Files\Controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainFrame.h">
@@ -211,6 +214,9 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InventoryControl.h">
+      <Filter>Header Files\Controls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

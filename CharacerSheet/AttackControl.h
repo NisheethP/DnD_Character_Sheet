@@ -29,6 +29,7 @@ class AttackControl : public wxPanel
 	wxButton* Add = nullptr;
 	wxButton* Rem = nullptr;
 	wxListView* list = nullptr;
+	wxStaticText* title = nullptr;
 
 public:
 	AttackControl(wxWindow* parent,
@@ -55,7 +56,7 @@ public:
 	wxButton* getAddButton()	{ return Add; }
 	wxButton* getRemButton()	{ return Rem; }
 
-	void resizeList();
+	void resizeCtrl();
 
 	void onAddButton(wxCommandEvent& event);
 	void onRemButton(wxCommandEvent& event);

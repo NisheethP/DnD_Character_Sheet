@@ -28,6 +28,7 @@ AttackControl::AttackControl(
 	list->SetColumnWidth(4, size.x*.3);
 
 	auto sizer = new wxBoxSizer(wxVERTICAL);
+	auto titleSizer = new wxBoxSizer(wxHORIZONTAL);
 	auto buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	wxSize bSize(40, -1);
@@ -37,12 +38,22 @@ AttackControl::AttackControl(
 	Add->SetBitmap(wxArtProvider().GetBitmap(wxART_PLUS, wxART_BUTTON));
 	Rem->SetBitmap(wxArtProvider().GetBitmap(wxART_MINUS, wxART_BUTTON));
 
+	title = new wxStaticText(this, wxID_ANY, "Attacks", wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	title->SetFont(title->GetFont().MakeBold().MakeLarger());
+	title->SetForegroundColour(*wxWHITE);
+
+	auto titleLine = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, -1), wxLI_VERTICAL);
+
 	buttonSizer->Add(Rem, 0, wxALL, 3);
 	buttonSizer->Add(Add, 0, wxALL, 3);
 
-	sizer->Add(buttonSizer, 0, wxALIGN_RIGHT | wxRIGHT, 5);
+	titleSizer->Add(title, 0, wxEXPAND | wxRIGHT | wxLEFT, 10);
+	titleSizer->Add(titleLine, 0, wxEXPAND | wxLEFT | wxRIGHT, 3);
+	titleSizer->Add(buttonSizer, 0, wxLEFT , 5);
+
+	sizer->Add(titleSizer, 0, wxEXPAND | wxRIGHT, 5);
 	sizer->Add(list, 1, wxEXPAND);
-	
+
 	SetSizer(sizer);
 	Layout();
 
@@ -51,7 +62,7 @@ AttackControl::AttackControl(
 	list->Bind(wxEVT_LIST_ITEM_ACTIVATED, &AttackControl::onListDClick, this);
 }
 
-void AttackControl::resizeList()
+void AttackControl::resizeCtrl()
 {
 	auto size = this->GetMinSize();
 	list->SetColumnWidth(0, size.x * .35);
@@ -59,6 +70,9 @@ void AttackControl::resizeList()
 	list->SetColumnWidth(2, size.x * .15);
 	list->SetColumnWidth(3, size.x * .15);
 	list->SetColumnWidth(4, size.x * .2);
+
+	title->SetMinSize(wxSize(size.x - 2*(40 + 5 + 6 + 10 + 5) - 5, -1));
+	Layout();
 }
 
 void AttackControl::onAddButton(wxCommandEvent& event)

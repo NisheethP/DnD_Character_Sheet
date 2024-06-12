@@ -4,7 +4,7 @@
 #include "Character.h"
 #include "Spells.h"
 #include "FileLogger.h"
-
+#include "InventoryControl.h"
 
 using ColourPair = std::pair<wxColour, wxColour>;
 
@@ -33,7 +33,7 @@ class MainFrame : public wxFrame
 		ar& notesPanels.pageNames;
 
 		ar& character;
-
+		
 		ar& mainPagePanels.attackPanelAttacks;
 	}
 
@@ -232,7 +232,7 @@ class MainFrame : public wxFrame
 		AttackControl* AttackPanel = nullptr;
 		std::vector<AttackControl::ListItem> attackPanelAttacks;
 
-
+		InventoryControl* InventoryPanel = nullptr;
 
 	}mainPagePanels;
 
