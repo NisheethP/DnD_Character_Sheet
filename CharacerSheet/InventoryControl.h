@@ -23,7 +23,7 @@ class InventoryControl :
 	{
 		wxTextCtrl* itemName  = nullptr;
 		wxTextCtrl* description = nullptr;
-		wxSpinCtrl* weight = nullptr;
+		wxSpinCtrlDouble* weight = nullptr;
 		wxSpinCtrl* count = nullptr;
 		wxCheckBox* attunement = nullptr;
 		wxEditableListBox* tags = nullptr;
@@ -41,13 +41,13 @@ class InventoryControl :
 		std::string getName() { return itemName->GetValue().ToStdString(); }
 		std::string getDescription() { return description->GetValue().ToStdString(); }
 		bool getAttunement() { return attunement->GetValue(); }
-		int getWeight() { return weight->GetValue(); }
+		float getWeight() { return weight->GetValue(); }
 		int getCount() { return count->GetValue(); }
 
 		wxEditableListBox* getTags() { return tags; }
 
-		void openDialog(std::string pItemName, std::string pItemDesc, int pWeight, int pCount, bool pAttunement, std::vector<std::string>* pTags);
-		void setDialog(std::string pItemName, std::string pItemDesc, int pWeight, int pCount, bool pAttunement, std::vector<std::string>* pTags);
+		void openDialog(std::string pItemName, std::string pItemDesc, float pWeight, int pCount, bool pAttunement, std::vector<std::string>* pTags);
+		void setDialog(std::string pItemName, std::string pItemDesc, float pWeight, int pCount, bool pAttunement, std::vector<std::string>* pTags);
 	};
 
 public:
@@ -66,8 +66,17 @@ public:
 	void onSearchType(wxCommandEvent& event);
 
 	void updateItem(AddDialog& dialog, int curItem = -1);
+	void fillList();
+
+	bool isDisplayed(int index);
+	void addToDisplayedList(int x);
+
+	bool isSearchable(std::string entry);
 
 	void resizeCtrl();
+
+	bool hasTag(std::string pTag);
+	void updateAllTags();
 
 	wxListView* getList() { return list; }
 

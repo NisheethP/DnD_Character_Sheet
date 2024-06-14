@@ -18,7 +18,7 @@ class Item
 	std::string itemName;
 	std::string itemDescription;
 	bool reqAttunement;
-	int weight;
+	float weight;
 	int count;
 	std::vector<std::string> tags;
 
@@ -42,7 +42,7 @@ public:
 	void setName(std::string name) { itemName = name; }
 	void setDescription(std::string desc) { itemDescription = desc; }
 	void setAttunement(bool att) { reqAttunement = att; }
-	void setWeight(int wt) { weight = wt; }
+	void setWeight(float wt) { weight = wt; }
 	
 	void setCount(int ct) { count = ct; }
 	int incCount(int x);

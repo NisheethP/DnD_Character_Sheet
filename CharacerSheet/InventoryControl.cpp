@@ -1,6 +1,8 @@
 #include "PreCompiledHeader.h"
 #include "InventoryControl.h"
 
+#include "Util.h"
+
 InventoryControl::InventoryControl(
 	wxWindow* parent,
 	wxWindowID id,
@@ -74,6 +76,7 @@ InventoryControl::InventoryControl(
 	Add->Bind(wxEVT_BUTTON, &InventoryControl::onAddButton, this);
 	Rem->Bind(wxEVT_BUTTON, &InventoryControl::onRemButton, this);
 	list->Bind(wxEVT_LIST_ITEM_ACTIVATED, &InventoryControl::onListDClick, this);
+	search->Bind(wxEVT_TEXT, &InventoryControl::onSearchType, this);
 	Layout();
 }
 
@@ -85,6 +88,8 @@ void InventoryControl::onAddButton(wxCommandEvent& event)
 		return;
 
 	updateItem(dialog);
+
+	dialog.Destroy();
 }
 
 void InventoryControl::onRemButton(wxCommandEvent& event)
@@ -112,6 +117,8 @@ void InventoryControl::onRemButton(wxCommandEvent& event)
 
 		list->DeleteItem(sel);
 	}
+
+	updateAllTags();
 }
 
 void InventoryControl::onListDClick(wxListEvent& event)
@@ -129,13 +136,13 @@ void InventoryControl::onListDClick(wxListEvent& event)
 
 		for (auto& i : items)
 		{
-			if (i.getName() != list->GetItemText(sel, 0).ToStdString())
-				if (std::to_string(i.getCount()) != list->GetItemText(sel, 1).ToStdString())
-					if (std::to_string(i.getWeight()) != list->GetItemText(sel, 2).ToStdString())
+			if (i.getName() != list->GetItemText(sel, 0).ToStdString() ||
+				std::to_string(i.getCount()) != list->GetItemText(sel, 1).ToStdString() ||
+				std::to_string(i.getWeight()) != list->GetItemText(sel, 2).ToStdString())
 						continue;
 			
 			dialog.setDialog(i.getName(),i.getDescription(), i.getWeight(),i.getCount(), i.getAttunement(), &i.getTags());
-				break;
+			break;
 		}
 
 		if (dialog.ShowModal() == wxID_CANCEL)
@@ -148,7 +155,32 @@ void InventoryControl::onListDClick(wxListEvent& event)
 
 void InventoryControl::onSearchType(wxCommandEvent& event)
 {
+	displayEntries.clear();
+	int filter = searchType->GetSelection();
+	
+	if (filter == 0)
+	{
+		for (int it = 0; it < items.size(); ++it)
+		{
+			if (isSearchable(items[it].getName()))
+				addToDisplayedList(it);
+		}
+	}
 
+	if (filter == 1)
+	{
+		for (int it = 0; it < allTags.size(); ++it)
+		{
+			if (isSearchable(allTags[it]))
+			{
+				for (int j = 0; j < items.size(); ++j)
+					if (items[j].hasTag(allTags[it]))
+						addToDisplayedList(j);
+			}
+		}
+	}
+
+	fillList();
 }
 
 void InventoryControl::updateItem(AddDialog& dialog, int curItem)
@@ -172,18 +204,72 @@ void InventoryControl::updateItem(AddDialog& dialog, int curItem)
 		items[curItem] = tempItem;
 
 	int totalWeight = 0;
-	list->DeleteAllItems();
-	for (int i = 0; i < items.size(); ++i)
-	{
-		list->InsertItem(i, items[i].getName());
-		list->SetItem(i, 1, std::to_string(items[i].getCount()));
-		list->SetItem(i, 2, std::to_string(items[i].getWeight()));
-		list->SetItem(i, 3, std::to_string(items[i].getTotalWeight()));
+	for (auto& it : items)
+		totalWeight += it.getTotalWeight();
 
-		totalWeight += items[i].getTotalWeight();
-	}
+	int numItems = items.size() - 1;
+	if (isSearchable(items[numItems].getName()))
+		addToDisplayedList(numItems);
+
+	fillList();
 
 	weight->SetValue("Weight : " + std::to_string(totalWeight));
+
+	updateAllTags();
+}
+
+void InventoryControl::fillList()
+{
+	list->DeleteAllItems();
+	int j = 0;
+	for (int i = 0; i < items.size(); ++i)
+	{
+		if (isDisplayed(i))
+		{
+			list->InsertItem(j, items[i].getName());
+			list->SetItem(j, 1, std::to_string(items[i].getCount()));
+			list->SetItem(j, 2, std::to_string(items[i].getWeight()));
+			list->SetItem(j, 3, std::to_string(items[i].getTotalWeight()));
+			++j;
+
+		}
+	}
+}
+
+bool InventoryControl::isDisplayed(int index)
+{
+	for (auto& i : displayEntries)
+		if (i == index)
+			return true;
+
+	return false;
+}
+
+void InventoryControl::addToDisplayedList(int x)
+{
+	for (auto& it : displayEntries)
+	{
+		if (it == x)
+			return;
+	}
+
+	displayEntries.push_back(x);
+	std::sort(displayEntries.begin(), displayEntries.end());
+}
+
+bool InventoryControl::isSearchable(std::string entry)
+{
+	std::string searchEntry = search->GetValue().ToStdString();
+
+	if (searchEntry == "")
+		return true;
+
+	Util::toLowerString(searchEntry);
+	Util::toLowerString(entry);
+	if (entry.find(searchEntry) != std::string::npos)
+		return true;
+	
+	return false;
 }
 
 void InventoryControl::resizeCtrl()
@@ -199,6 +285,32 @@ void InventoryControl::resizeCtrl()
 	Layout();
 }
 
+bool InventoryControl::hasTag(std::string pTag)
+{
+	for (auto& it : allTags)
+		if (it == pTag)
+			return true;
+
+	return false;
+}
+
+void InventoryControl::updateAllTags()
+{
+	std::set<std::string> tempTags;
+
+	allTags.clear();
+
+	for (auto& it : items)
+	{
+		auto& curTags = it.getTags();
+		for (auto& iTag : curTags)
+			tempTags.insert(iTag);
+	}
+
+	for (auto& it : tempTags)
+		allTags.push_back(it);
+}
+
 
 InventoryControl::AddDialog::AddDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style, const wxString& name) :
 	wxDialog(parent, id, title, pos, size, style, name)
@@ -206,7 +318,7 @@ InventoryControl::AddDialog::AddDialog(wxWindow* parent, wxWindowID id, const wx
 	openDialog("", "", 0, 1, false, nullptr);
 }
 
-void InventoryControl::AddDialog::openDialog(std::string pItemName, std::string pItemDesc, int pWeight, int pCount, bool pAttunement, std::vector<std::string>* pTags)
+void InventoryControl::AddDialog::openDialog(std::string pItemName, std::string pItemDesc, float pWeight, int pCount, bool pAttunement, std::vector<std::string>* pTags)
 {
 	int gap = 3;
 	auto sizer = new wxBoxSizer(wxVERTICAL);
@@ -239,7 +351,7 @@ void InventoryControl::AddDialog::openDialog(std::string pItemName, std::string 
 		horSizer->Add(Line, 0, wxEXPAND | wxLEFT | wxRIGHT, gap);
 
 		text = new wxStaticText(this, wxID_ANY, "Weight");
-		weight = new wxSpinCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS | wxALIGN_CENTER_HORIZONTAL, 0, 1e5, pWeight);
+		weight = new wxSpinCtrlDouble(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS | wxALIGN_CENTER_HORIZONTAL, 0, 1e5, pWeight, 0.1);
 		horSizer->Add(text, 0, wxALIGN_CENTER);
 		horSizer->Add(weight, 0, wxALIGN_CENTER | wxTOP | wxLEFT | wxRIGHT, gap);
 
@@ -301,7 +413,7 @@ void InventoryControl::AddDialog::openDialog(std::string pItemName, std::string 
 	Layout();
 }
 
-void InventoryControl::AddDialog::setDialog(std::string pItemName, std::string pItemDesc, int pWeight, int pCount, bool pAttunement, std::vector<std::string>* pTags)
+void InventoryControl::AddDialog::setDialog(std::string pItemName, std::string pItemDesc, float pWeight, int pCount, bool pAttunement, std::vector<std::string>* pTags)
 {
 	itemName->SetValue(pItemName);
 	description->SetValue(pItemDesc);
