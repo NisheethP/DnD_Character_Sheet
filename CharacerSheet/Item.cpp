@@ -25,6 +25,33 @@ void Item::setItem(std::string name, std::string desc, bool att, int wt, int ct)
 	*this = Item(name, desc, att, wt, ct);
 }
 
+void Item::addTag(std::string pTag)
+{
+	if (pTag == "")
+		return;
+
+	if (hasTag(pTag))
+		return;
+
+	tags.push_back(pTag);
+}
+
+void Item::addTag(std::vector<std::string> pTag)
+{
+	for (auto& i : pTag)
+	{
+		if (hasTag(i))
+			continue;
+
+		tags.push_back(i);
+	}
+}
+
+void Item::setTag(std::vector<std::string> pTag)
+{
+	tags = pTag;
+}
+
 int Item::incCount(int x)
 {
 	count += x;
@@ -38,4 +65,15 @@ int Item::decCount(int x)
 		count = 0;
 	
 	return count;
+}
+
+bool Item::hasTag(std::string pTag)
+{
+	for (auto& i : tags)
+	{
+		if (i == pTag)
+			return true;
+	}
+
+	return false;
 }

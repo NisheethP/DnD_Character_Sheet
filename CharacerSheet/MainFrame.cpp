@@ -318,7 +318,7 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 	std::vector<std::pair<wxGBPosition, wxGBSpan>> items =
 	{
 		//Name Title
-		{{0,0}, {1,1}},		//0
+		{{0,0}, {1,1}},		//0  NAME
 
 		//Health Plate
 		{{0,4}, {1,2}},		//1  AC
@@ -327,22 +327,22 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 		{{0,3}, {1,1}},		//4  TEMP-HP
 
 		//Stats
-		{{1,0}, {6,1}},		//5
+		{{1,0}, {6,1}},		//5  STATS
 
 		//Saving Throws
-		{{2,1}, {2,1}},		//6
+		{{2,1}, {2,1}},		//6  SAVING THROSES
 
 		//Skills
-		{{4,1}, {6,1}},		//7
+		{{4,1}, {6,1}},		//7  SKILLS
 
 		//Features
-		{{2,2}, {5,2}},		//8
+		{{2,2}, {5,2}},		//8  FEATURES
 
 		//Tool Proficiencies
-		{{3,4}, {2,2}},		//9   TOOL PROFS
+		{{3,4}, {2,2}},		//9	  TOOL PROFS
 
 		//Money
-		{{7,0}, {1,1}},		//10
+		{{7,0}, {2,1}},		//10  MONEY
 
 		//Below Health
 		{{1,1}, {1,1}},		//11  INITIATIVE
@@ -354,14 +354,14 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 		{{2,4}, {1,2}},		//15   LANG PROFS
 
 		//Sliders
-		{{7,2}, {3,2}},		//16   SLIDERS
+		{{7,2}, {3,4}},		//16   SLIDERS
 
 		//Conditions
 		{{5,4}, {2,2}},		//17   CONDITIONS
 		
 		//ATTACK COLUMN
 		{{0,6}, {3,3}},		//18   ATTACKS
-		{{3,6}, {5,3}}		//19   INVENTORY
+		{{3,6}, {7,3}}		//19   INVENTORY
 	};
 
 	wxPanel* p;
@@ -1646,7 +1646,7 @@ wxPanel* MainFrame::CreateDeathSavesPanel(wxPanel* parent)
 
 wxScrolled<wxPanel>* MainFrame::CreateSliderPanel(wxPanel* parent)
 {
-	auto panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, 2*baseColSize, wxVSCROLL);
+	auto panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, wxSize(2*baseColSize.x + mainPagePanels.AC->GetParent()->GetSize().x, -1), wxVSCROLL);
 	panel->SetBackgroundColour(mainColour.first);
 	auto sizer = new wxStaticBoxSizer(wxVERTICAL, panel, "Sliders");
 	wxBoxSizer* buttonSizer = new wxBoxSizer(wxHORIZONTAL);

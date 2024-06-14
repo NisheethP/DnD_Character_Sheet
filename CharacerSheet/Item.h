@@ -12,6 +12,7 @@ class Item
 		ar& reqAttunement;
 		ar& weight;
 		ar& count;
+		ar& tags;
 	}
 
 	std::string itemName;
@@ -19,6 +20,7 @@ class Item
 	bool reqAttunement;
 	int weight;
 	int count;
+	std::vector<std::string> tags;
 
 public:
 
@@ -41,16 +43,24 @@ public:
 	void setDescription(std::string desc) { itemDescription = desc; }
 	void setAttunement(bool att) { reqAttunement = att; }
 	void setWeight(int wt) { weight = wt; }
+	
 	void setCount(int ct) { count = ct; }
 	int incCount(int x);
 	int decCount(int x);
+	
+	void addTag(std::string pTag);
+	void addTag(std::vector<std::string> pTag);
+	void setTag(std::vector<std::string> pTag);
 
 	std::string getName()		{ return itemName; }
 	std::string getDescription(){ return itemDescription; }
-	bool getAttunement()		{ return reqAttunement; }
-	int getWeight()				{ return weight; }
-	int getTotalWeight()		{ return weight * count; }
-	int getCount()				{ return count; }
+	bool getAttunement() const { return reqAttunement; }
+	int getWeight() const { return weight; }
+	int getTotalWeight() const { return weight * count; }
+	int getCount() const { return count; }
+	std::vector<std::string>& getTags() { return tags; }
+
+	bool hasTag(std::string pTag);
 
 };
 
