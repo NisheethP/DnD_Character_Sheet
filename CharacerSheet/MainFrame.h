@@ -39,7 +39,7 @@ class MainFrame : public wxFrame
 
 	std::string saveFolder = "Character Saves";
 	std::string fileName = "";
-	int healToPercentageValue;
+	int healToPercentageValue = 100;
 	int firstPage = 0;
 
 	FileLogger healthLog;
@@ -73,6 +73,8 @@ class MainFrame : public wxFrame
 	wxSize baseColSize;
 	wxSize buttonSize;
 	double acColSizeMod = 1.2;
+	double hpColSizeMod = 1.3;
+	double invColSizeMod = 1.4;
 
 	wxSizer* masterSizer;
 	wxPanel* masterPanel;

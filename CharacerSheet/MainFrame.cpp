@@ -33,6 +33,7 @@ MainFrame::MainFrame(const wxString& title, const Character& pChar) :
 	baseColSize(190, -1),
 	buttonSize(40,-1),
 	acColSizeMod(1),
+	hpColSizeMod(1.3),
 	masterPanel(new wxPanel(this, wxID_ANY, wxPoint(100, 400), wxDefaultSize)),
 	mainNotebook(new wxNotebook(masterPanel, wxID_ANY))
 {
@@ -336,10 +337,10 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 		{{4,1}, {6,1}},		//7  SKILLS
 
 		//Features
-		{{2,2}, {5,2}},		//8  FEATURES
+		{{2,3}, {5,2}},		//8  FEATURES
 
 		//Tool Proficiencies
-		{{3,4}, {2,2}},		//9	  TOOL PROFS
+		{{3,2}, {2,1}},		//9	  TOOL PROFS
 
 		//Money
 		{{7,0}, {2,1}},		//10  MONEY
@@ -351,13 +352,13 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 		{{1,4}, {1,2}},		//14  DEATH SAVES
 
 		//Language Proficiencies
-		{{2,4}, {1,2}},		//15   LANG PROFS
+		{{2,2}, {1,1}},		//15   LANG PROFS
 
 		//Sliders
 		{{7,2}, {3,4}},		//16   SLIDERS
 
 		//Conditions
-		{{5,4}, {2,2}},		//17   CONDITIONS
+		{{5,2}, {2,1}},		//17   CONDITIONS
 		
 		//ATTACK COLUMN
 		{{0,6}, {3,3}},		//18   ATTACKS
@@ -389,6 +390,7 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 	curItem = items[3];
 	p = CreateHPPanel(panel);
 	p->SetBackgroundColour(panelBGColour);
+	p->SetMinSize(wxSize(p->GetSize().x * hpColSizeMod, -1));
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[4];
@@ -418,7 +420,7 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 
 	curItem = items[9];
 	p = CreateToolProficiencies(panel);
-	p->SetMinSize(wxSize(p->GetSize().x * acColSizeMod, p->GetSize().y));
+	//p->SetMinSize(wxSize(p->GetSize().x * acColSizeMod, p->GetSize().y));
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[10];
@@ -448,7 +450,7 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 
 	curItem = items[15];
 	p = CreateLangProficiencies(panel);
-	p->SetMinSize(wxSize(p->GetSize().x* acColSizeMod, -1));
+	//p->SetMinSize(wxSize(p->GetSize().x* acColSizeMod, -1));
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[16];
@@ -457,12 +459,12 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 
 	curItem = items[17];
 	p = CreatePlayerConditions(panel);
-	p->SetMinSize(wxSize(p->GetSize().x* acColSizeMod, -1));
+	//p->SetMinSize(wxSize(p->GetSize().x* acColSizeMod, -1));
 	mainGridSizer->Add(p, curItem.first, curItem.second, wxEXPAND | wxALIGN_CENTER_HORIZONTAL);
 
 	curItem = items[18];
 	p = mainPagePanels.AttackPanel = new AttackControl(panel, wxID_ANY, wxDefaultPosition, baseColSize*2, wxBORDER_THEME);
-	p->SetMinSize(wxSize(p->GetSize().x* 1.5, -1));
+	p->SetMinSize(wxSize(p->GetSize().x* invColSizeMod, -1));
 	p->Layout();
 	mainPagePanels.AttackPanel->resizeCtrl();
 	setWindowColour(p, panelColour);
@@ -471,7 +473,7 @@ wxScrolled<wxPanel>* MainFrame::CreateMainPage(wxNotebook* parent)
 
 	curItem = items[19];
 	p = mainPagePanels.InventoryPanel = new InventoryControl(panel, wxID_ANY, wxDefaultPosition, baseColSize*2, wxBORDER_THEME);
-	p->SetMinSize(wxSize(p->GetSize().x * 1.5, -1));
+	p->SetMinSize(wxSize(p->GetSize().x * invColSizeMod, -1));
 	p->Layout();
 	mainPagePanels.InventoryPanel->resizeCtrl();
 	setWindowColour(p, panelColour);
@@ -1238,7 +1240,7 @@ wxPanel* MainFrame::CreateSkillProf(wxPanel* parent)
 wxPanel* MainFrame::CreateFeaturesPanel(wxPanel* parent)
 {
 	wxSize tempSize;
-	tempSize.x = baseColSize.x * 2;
+	tempSize.x = mainPagePanels.AC->GetParent()->GetSize().x + mainPagePanels.TempHP->GetParent()->GetSize().x;
 	tempSize.y = -1;
 
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize);
@@ -1305,10 +1307,9 @@ wxPanel* MainFrame::CreateFeaturesPanel(wxPanel* parent)
 wxPanel* MainFrame::CreateLangProficiencies(wxPanel* parent)
 {
 	wxSize tempSize;
-	//tempSize.x = baseColSize.x*1.3;
-	tempSize.x = mainPagePanels.AC->GetParent()->GetSize().x;
-
+	tempSize.x = mainPagePanels.HP->GetParent()->GetSize().x * hpColSizeMod;
 	tempSize.y = -1;
+	
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize, wxBORDER_THEME);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -1333,10 +1334,9 @@ wxPanel* MainFrame::CreateLangProficiencies(wxPanel* parent)
 wxPanel* MainFrame::CreateToolProficiencies(wxPanel* parent)
 {
 	wxSize tempSize;
-	//tempSize.x = baseColSize.x*1.3;
-	tempSize.x = mainPagePanels.AC->GetParent()->GetSize().x;
-
+	tempSize.x = mainPagePanels.HP->GetParent()->GetSize().x * hpColSizeMod;
 	tempSize.y = -1;
+
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize, wxBORDER_THEME);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -1359,10 +1359,9 @@ wxPanel* MainFrame::CreateToolProficiencies(wxPanel* parent)
 wxPanel* MainFrame::CreatePlayerConditions(wxPanel* parent)
 {
 	wxSize tempSize;
-	//tempSize.x = baseColSize.x*1.3;
-	tempSize.x = mainPagePanels.AC->GetParent()->GetSize().x;
-
+	tempSize.x = mainPagePanels.HP->GetParent()->GetSize().x * hpColSizeMod;
 	tempSize.y = -1;
+
 	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -1462,7 +1461,12 @@ wxPanel* MainFrame::CreateMoney(wxPanel* parent)
 wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 {
 	using std::get;
-	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, baseColSize, wxBORDER_THEME);
+
+	wxSize tempSize;
+	tempSize.x = mainPagePanels.HP->GetParent()->GetSize().x * hpColSizeMod;
+	tempSize.y = -1;
+
+	wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, tempSize, wxBORDER_THEME);
 
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -1478,7 +1482,7 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 	auto& healToText = get<0>(mainPagePanels.HealToX) = new wxStaticText(panel, wxID_ANY, "Heal to % ", wxDefaultPosition, wxDefaultSize,
 		wxALIGN_RIGHT);
 	auto& healToSpin = get<1>(mainPagePanels.HealToX) = new wxSpinCtrl(panel, wxID_ANY, "100", wxDefaultPosition, wxDefaultSize, 
-		wxSP_ARROW_KEYS | wxALIGN_CENTER_HORIZONTAL);
+		wxSP_ARROW_KEYS | wxALIGN_CENTER_HORIZONTAL, 0,100,100);
 	auto& healToButton = get<2>(mainPagePanels.HealToX) = new wxButton(panel, wxID_ANY, "Heal", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
 
 	auto& hpText = get<0>(mainPagePanels.MaxHPBonus) = new wxStaticText(panel, wxID_ANY, "Max HP Mod: ");
@@ -1512,7 +1516,7 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 	sizer0->Add(gap, -1);
 	sizer0->Add(healButton, 0, wxEXPAND);
 	sizer0->Add(gap, -1);
-	sizer0->Add(healDamageSpin, 0, wxEXPAND);
+	sizer0->Add(healDamageSpin, 1, wxEXPAND);
 	sizer0->Add(gap, -1);
 	sizer0->Add(dmgSizer, 0, wxALIGN_CENTER);
 	sizer0->Add(gap, -1);
@@ -1531,11 +1535,11 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 	sizer2->Add(gap, -1);
 
 	sizer->Add(-1, 2*gap);
-	sizer->Add(sizer0, 0, wxALIGN_CENTER);
+	sizer->Add(sizer0, 0, wxALIGN_CENTER_HORIZONTAL);
 	sizer->Add(-1, 2*gap);
-	sizer->Add(sizer1, 0, wxALIGN_CENTER);
+	sizer->Add(sizer1, 0, wxALIGN_CENTER_HORIZONTAL);
 	sizer->Add(-1, gap);
-	sizer->Add(sizer2, 0, wxALIGN_CENTER);
+	sizer->Add(sizer2, 0, wxALIGN_CENTER_HORIZONTAL);
 	sizer->Add(-1, gap);
 
 	int maxColour = 0xFF, subColour = 0xBB;
@@ -1554,7 +1558,7 @@ wxPanel* MainFrame::CreateSubHPPanel(wxPanel* parent)
 	setWindowColour(hpText, panelColour);
 	setWindowColour(healToText, panelColour);
 
-	mainSizer->Add(sizer, 0, wxALIGN_CENTER);
+	mainSizer->Add(sizer, 0, wxALIGN_CENTER );
 
 	healToSpin->SetValue(100);
 	
@@ -1646,7 +1650,14 @@ wxPanel* MainFrame::CreateDeathSavesPanel(wxPanel* parent)
 
 wxScrolled<wxPanel>* MainFrame::CreateSliderPanel(wxPanel* parent)
 {
-	auto panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, wxSize(2*baseColSize.x + mainPagePanels.AC->GetParent()->GetSize().x, -1), wxVSCROLL);
+	wxSize tempSize;
+	tempSize.x = mainPagePanels.HP->GetParent()->GetSize().x * hpColSizeMod 
+		+ mainPagePanels.TempHP->GetParent()->GetSize().x 
+		+ mainPagePanels.AC->GetParent()->GetSize().x;
+
+	tempSize.y = -1;
+
+	auto panel = new wxScrolled<wxPanel>(parent, wxID_ANY, wxDefaultPosition, tempSize, wxVSCROLL);
 	panel->SetBackgroundColour(mainColour.first);
 	auto sizer = new wxStaticBoxSizer(wxVERTICAL, panel, "Sliders");
 	wxBoxSizer* buttonSizer = new wxBoxSizer(wxHORIZONTAL);
