@@ -216,6 +216,7 @@ public:
 	std::vector<std::string>& getToolProf()		{ return toolProf; }
 	std::vector<feature>& getFeatures()			{ return features; }
 	std::vector<std::string>& getKnownSpells()	{ return knownSpells; }
+	std::vector<Item>& getInventory()			{ return inventory; }
 
 	SpellSlot& getSpellSlots()		{ return charSlots; }
 	SpellSlot& getCurSpellSlots()	{ return curCharSlots; }
@@ -266,9 +267,11 @@ public:
 	void setCurSpellPoints(int x) { curSpellPoints = x; }
 
 	void addLanguage(std::string str);
+	bool modifyLanguage(std::string oldTool, std::string newTool);
 	bool remLanguage(std::string str);
 	
 	void addTool(std::string str);
+	bool modifyTool(std::string oldTool, std::string newTool);
 	bool remTool(std::string str);
 
 	void addSpell(Spell pSpell);
@@ -289,6 +292,7 @@ public:
 
 	void addInventory(Item entry);
 	void removeInventory(Item entry);
+	void emptyInventory();
 	//-------------
 	//OTHER FUNCTIONS
 	//-------------

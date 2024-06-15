@@ -11,7 +11,7 @@ Item::Item() :
 {
 }
 
-Item::Item(std::string pName, std::string pDesc, bool pAtt, int pWt, int pCount):
+Item::Item(std::string pName, std::string pDesc, bool pAtt, double pWt, int pCount):
 	itemName(pName),
 	itemDescription(pDesc),
 	reqAttunement(pAtt),
@@ -20,7 +20,7 @@ Item::Item(std::string pName, std::string pDesc, bool pAtt, int pWt, int pCount)
 {
 }
 
-void Item::setItem(std::string name, std::string desc, bool att, int wt, int ct)
+void Item::setItem(std::string name, std::string desc, bool att, double wt, int ct)
 {
 	*this = Item(name, desc, att, wt, ct);
 }

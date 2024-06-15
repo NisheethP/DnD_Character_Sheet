@@ -377,6 +377,24 @@ void Character::addLanguage(std::string str)
 	languages.push_back(str);
 }
 
+bool Character::modifyLanguage(std::string oldTool, std::string newTool)
+{
+	Util::toLowerString(oldTool);
+
+	for (auto it = languages.begin(); it != languages.end(); ++it)
+	{
+		auto cur = *it;
+		Util::toLowerString(cur);
+		if (cur == oldTool)
+		{
+			*it = newTool;
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool Character::remLanguage(std::string str)
 {
 	Util::toLowerString(str);
@@ -398,6 +416,24 @@ bool Character::remLanguage(std::string str)
 void Character::addTool(std::string str)
 {
 	toolProf.push_back(str);
+}
+
+bool Character::modifyTool(std::string oldTool, std::string newTool)
+{
+	Util::toLowerString(oldTool);
+
+	for (auto it = toolProf.begin(); it != toolProf.end(); ++it)
+	{
+		auto cur = *it;
+		Util::toLowerString(cur);
+		if (cur == oldTool)
+		{
+			*it = newTool;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool Character::remTool(std::string str)
@@ -550,6 +586,12 @@ int Character::remCondition(int cond)
 
 void Character::addInventory(Item entry)
 {
+	for (auto it = inventory.begin(); it != inventory.end(); ++it)
+	{
+		if (entry == *it)
+			return;
+	}
+
 	inventory.push_back(entry);
 }
 
@@ -560,6 +602,11 @@ void Character::removeInventory(Item entry)
 		if (entry == *it)
 			it = inventory.erase(it);
 	}
+}
+
+void Character::emptyInventory()
+{
+	inventory.clear();
 }
 
 int Character::getCasterLevel()

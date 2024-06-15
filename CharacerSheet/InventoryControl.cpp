@@ -136,9 +136,12 @@ void InventoryControl::onListDClick(wxListEvent& event)
 
 		for (auto& i : items)
 		{
+			std::string curWeight = std::format("{:.2f}", i.getWeight());
+			std::string curCount = std::to_string(i.getCount());
+
 			if (i.getName() != list->GetItemText(sel, 0).ToStdString() ||
-				std::to_string(i.getCount()) != list->GetItemText(sel, 1).ToStdString() ||
-				std::to_string(i.getWeight()) != list->GetItemText(sel, 2).ToStdString())
+				curCount != list->GetItemText(sel, 1).ToStdString() ||
+				curWeight != list->GetItemText(sel, 2).ToStdString())
 						continue;
 			
 			dialog.setDialog(i.getName(),i.getDescription(), i.getWeight(),i.getCount(), i.getAttunement(), &i.getTags());
@@ -181,6 +184,23 @@ void InventoryControl::onSearchType(wxCommandEvent& event)
 	}
 
 	fillList();
+}
+
+void InventoryControl::addItem(Item inv)
+{
+	for (auto& i : items)
+	{
+		if (i == inv)
+			return;
+	}
+
+	items.push_back(inv);
+
+}
+
+void InventoryControl::setInventory(std::vector<Item> inv)
+{
+	items = inv;
 }
 
 void InventoryControl::updateItem(AddDialog& dialog, int curItem)
@@ -226,10 +246,13 @@ void InventoryControl::fillList()
 	{
 		if (isDisplayed(i))
 		{
+			std::string curWeight = std::format("{:.2f}",items[i].getWeight());
+			std::string curTotWeight = std::format("{:.2f}",items[i].getTotalWeight());
+			
 			list->InsertItem(j, items[i].getName());
 			list->SetItem(j, 1, std::to_string(items[i].getCount()));
-			list->SetItem(j, 2, std::to_string(items[i].getWeight()));
-			list->SetItem(j, 3, std::to_string(items[i].getTotalWeight()));
+			list->SetItem(j, 2, curWeight);
+			list->SetItem(j, 3, curTotWeight);
 			++j;
 
 		}
@@ -309,6 +332,14 @@ void InventoryControl::updateAllTags()
 
 	for (auto& it : tempTags)
 		allTags.push_back(it);
+}
+
+void InventoryControl::updateList()
+{
+	for (int i = 0; i < items.size(); ++i)
+		displayEntries.push_back(i);
+
+	fillList();
 }
 
 

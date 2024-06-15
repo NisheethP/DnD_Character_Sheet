@@ -399,7 +399,7 @@ public:
 	void DefaultLongSliders();
 	void DefaultShortSliders();
 
-	void callSave();
+	void callSave(bool saveAs = false);
 
 	void AttackPanelSave();
 	void AttackPanelLoad();

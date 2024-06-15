@@ -62,7 +62,7 @@ public:
 	void onRemButton(wxCommandEvent& event);
 	void onListDClick(wxListEvent& event);
 
-	void addEntry(std::string name, std::string mod, std::string dice, std::string damageType);
+	void addEntry(std::string name, std::string mod, std::string dice, std::string dmgMod, std::string damageType);
 	void addEntry(ListItem entry);
 	ListItem getEntry(int x);
 };

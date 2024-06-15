@@ -246,9 +246,11 @@ void MainFrame::BindControls()
 
 	get<1>(mainPagePanels.ToolProf)->Bind(wxEVT_BUTTON, &MainFrame::onToolProfecs, this);
 	get<2>(mainPagePanels.ToolProf)->Bind(wxEVT_BUTTON, &MainFrame::onToolProfecs, this);
+	get<3>(mainPagePanels.ToolProf)->Bind(wxEVT_LISTBOX_DCLICK, &MainFrame::onToolProfecs, this);
 
 	get<1>(mainPagePanels.LangProf)->Bind(wxEVT_BUTTON, &MainFrame::onLangProfecs, this);
 	get<2>(mainPagePanels.LangProf)->Bind(wxEVT_BUTTON, &MainFrame::onLangProfecs, this);
+	get<3>(mainPagePanels.LangProf)->Bind(wxEVT_LISTBOX_DCLICK, &MainFrame::onLangProfecs, this);
 
 	mainPagePanels.EL_Conditions->Bind(wxEVT_LIST_ITEM_ACTIVATED, &MainFrame::onConditionListDClick, this);
 
@@ -2991,6 +2993,7 @@ void MainFrame::updateAll()
 	updateHitDie();
 	updateName();
 	updateSpeed();
+	mainPagePanels.InventoryPanel->updateList();
 }
 
 void MainFrame::SpellDesc::fillAllSpellTree(std::vector<Spell>& allSpells)
@@ -3358,20 +3361,34 @@ void MainFrame::DefaultShortSliders()
 	}
 }
 
-void MainFrame::callSave()
+void MainFrame::callSave(bool saveAs)
 {
 	TransferDataFromWindow();
 	this->AttackPanelSave();
+	
+	auto invItems = mainPagePanels.InventoryPanel->getAllItems();
+	
+	character.emptyInventory();
+	for (auto& i : invItems)
+		character.addInventory(i);
 
 	wxFileDialog saveFileDialog(this, "Save Character", saveFolder + "\\", "", "", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-	if (fileName == "")
+	if (!saveAs)
+	{
+		if (fileName == "")
+		{
+			if (saveFileDialog.ShowModal() == wxID_CANCEL)
+				return;
+			else
+				fileName = saveFileDialog.GetPath().ToStdString();
+		}
+	}
+
+	if (saveAs)
 	{
 		if (saveFileDialog.ShowModal() == wxID_CANCEL)
 			return;
-		else
-			fileName = saveFileDialog.GetPath().ToStdString();
 	}
-
 
 	if (!wxDirExists(saveFolder))
 		wxMkDir(saveFolder);
@@ -3407,9 +3424,10 @@ void MainFrame::AttackPanelSave()
 
 void MainFrame::AttackPanelLoad()
 {
+	auto& control = mainPagePanels.AttackPanel;
+
 	for (auto& entry : mainPagePanels.attackPanelAttacks)
 	{
-		auto& control = mainPagePanels.AttackPanel;
 		control->addEntry(entry);
 	}
 }
@@ -4286,6 +4304,8 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 		TransferDataToWindow();
 		this->AttackPanelLoad();
 		this->SetTitle(character.getName());
+		mainPagePanels.InventoryPanel->setInventory(character.getInventory());
+
 		updateAll();
 	}
 
@@ -4296,27 +4316,7 @@ void MainFrame::onFileMenuEvents(wxCommandEvent& event)
 
 	if (obj == wxID_SAVEAS)
 	{
-		TransferDataFromWindow();
-
-		wxFileDialog saveFileDialog(this, "Save Character", saveFolder + "\\", "", "", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-
-		if (saveFileDialog.ShowModal() == wxID_CANCEL)
-			return;
-
-		if (!wxDirExists(saveFolder))
-			wxMkDir(saveFolder);
-		{
-			std::ofstream ofs(saveFileDialog.GetPath().ToStdString());
-			if (!ofs.is_open())
-				wxMessageBox("SAVE file not opened");
-
-			boost::archive::text_oarchive oa(ofs);
-			// write class instance to archive
-			oa << *this;
-			// archive and stream closed when destructors are called
-
-			ofs.close();
-		}
+		this->callSave(true);
 	}
 
 	if (obj == menuBarItems.FileHealthLogger->GetId())
@@ -5106,6 +5106,23 @@ void MainFrame::onToolProfecs(wxCommandEvent& event)
 		list->Delete(i);
 		
 	}
+
+	if (obj == std::get<3>(mainPagePanels.ToolProf))
+	{
+		int i = list->GetSelection();
+		std::string tool = list->GetString(i).ToStdString();
+
+		if (tool == "")
+			return;
+
+		auto newTool = wxGetTextFromUser("", "Proficiency", tool, this);
+		
+		if (newTool == "")
+			return;
+
+		character.modifyTool(tool, newTool.ToStdString());
+		list->SetString(i, newTool);
+	}
 }
 
 void MainFrame::onLangProfecs(wxCommandEvent& event)
@@ -5136,6 +5153,23 @@ void MainFrame::onLangProfecs(wxCommandEvent& event)
 
 		character.remLanguage(lang);
 		list->Delete(i);
+	}
+
+	if (obj == std::get<3>(mainPagePanels.LangProf))
+	{
+		int i = list->GetSelection();
+		std::string lang = list->GetString(i).ToStdString();
+
+		if (lang == "")
+			return;
+
+		auto newLang = wxGetTextFromUser("", "Proficiency", lang, this);
+
+		if (newLang == "")
+			return;
+
+		character.modifyLanguage(lang, newLang.ToStdString());
+		list->SetString(i, newLang);
 	}
 }
 

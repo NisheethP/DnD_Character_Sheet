@@ -18,14 +18,14 @@ class Item
 	std::string itemName;
 	std::string itemDescription;
 	bool reqAttunement;
-	float weight;
+	double weight;
 	int count;
 	std::vector<std::string> tags;
 
 public:
 
 	Item();
-	Item(std::string pName, std::string pDesc, bool pAtt, int pWt, int pCount);
+	Item(std::string pName, std::string pDesc, bool pAtt, double pWt, int pCount);
 	bool operator== (Item& item)
 	{
 		if (itemName == item.itemName
@@ -38,11 +38,11 @@ public:
 		return false;
 	}
 
-	void setItem(std::string name, std::string desc, bool att, int wt, int ct);
+	void setItem(std::string name, std::string desc, bool att, double wt, int ct);
 	void setName(std::string name) { itemName = name; }
 	void setDescription(std::string desc) { itemDescription = desc; }
 	void setAttunement(bool att) { reqAttunement = att; }
-	void setWeight(float wt) { weight = wt; }
+	void setWeight(double wt) { weight = wt; }
 	
 	void setCount(int ct) { count = ct; }
 	int incCount(int x);
@@ -55,8 +55,8 @@ public:
 	std::string getName()		{ return itemName; }
 	std::string getDescription(){ return itemDescription; }
 	bool getAttunement() const { return reqAttunement; }
-	int getWeight() const { return weight; }
-	int getTotalWeight() const { return weight * count; }
+	double getWeight() const { return weight; }
+	double getTotalWeight() const { return weight * count; }
 	int getCount() const { return count; }
 	std::vector<std::string>& getTags() { return tags; }
 

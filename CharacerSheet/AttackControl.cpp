@@ -152,18 +152,19 @@ void AttackControl::onListDClick(wxListEvent& event)
 	}
 }
 
-void AttackControl::addEntry(std::string name, std::string mod, std::string dice, std::string damageType)
+void AttackControl::addEntry(std::string name, std::string mod, std::string dice, std::string dmgMod, std::string damageType)
 {
 	int x = list->GetItemCount();
 	list->InsertItem(x, name);
 	list->SetItem(x, 1, mod);
 	list->SetItem(x, 2, dice);
-	list->SetItem(x, 3, damageType);
+	list->SetItem(x, 3, dmgMod);
+	list->SetItem(x, 4, damageType);
 }
 
 void AttackControl::addEntry(ListItem entry)
 {
-	this->addEntry(entry.name, entry.to_hit, entry.dice, entry.damageType);
+	this->addEntry(entry.name, entry.to_hit, entry.dice, entry.dmg_mod, entry.damageType);
 }
 
 AttackControl::ListItem AttackControl::getEntry(int x)

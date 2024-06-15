@@ -41,7 +41,7 @@ class InventoryControl :
 		std::string getName() { return itemName->GetValue().ToStdString(); }
 		std::string getDescription() { return description->GetValue().ToStdString(); }
 		bool getAttunement() { return attunement->GetValue(); }
-		float getWeight() { return weight->GetValue(); }
+		double getWeight() { return weight->GetValue(); }
 		int getCount() { return count->GetValue(); }
 
 		wxEditableListBox* getTags() { return tags; }
@@ -65,6 +65,8 @@ public:
 	void onListDClick(wxListEvent& event);
 	void onSearchType(wxCommandEvent& event);
 
+	void addItem(Item inv);
+	void setInventory(std::vector<Item> inv);
 	void updateItem(AddDialog& dialog, int curItem = -1);
 	void fillList();
 
@@ -77,9 +79,11 @@ public:
 
 	bool hasTag(std::string pTag);
 	void updateAllTags();
+	void updateList();
 
 	wxListView* getList() { return list; }
 
 	std::vector<std::string> getAllTags() const { return allTags; }
+	std::vector<Item> getAllItems() const { return items; }
 };
 
