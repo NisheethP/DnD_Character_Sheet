@@ -152,6 +152,7 @@ void MainFrame::CreateMenuBar()
 
 	menuBarItems.RestLong = RestMenu->Append(wxID_ANY, "Long Rest");
 	menuBarItems.RestShort = RestMenu->Append(wxID_ANY, "Short Rest");
+	menuBarItems.RestShortWithHitDice = RestMenu->Append(wxID_ANY, "Short Rest with Hit Dice");
 	RestMenu->AppendSeparator();
 	RestMenu->AppendSubMenu(RestAddMenu, "Add Slider");
 		menuBarItems.RestAddSliderToLong = RestAddMenu->Append(wxID_ANY, "To Long Rest");
@@ -290,6 +291,7 @@ void MainFrame::BindControls()
 
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestLong->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestShort->GetId());
+	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestShortWithHitDice->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestAddSliderToLong->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestAddSliderToShort->GetId());
 	this->Bind(wxEVT_MENU, &MainFrame::onRestMenuEvents, this, menuBarItems.RestRemSliderToLong->GetId());
@@ -3067,6 +3069,30 @@ void MainFrame::DrawMain()
 	
 }
 
+void MainFrame::rollHitDice()
+{
+	auto combinedClass = character.getCombinedClasses();
+
+	int posMod = 30, iter = 0;
+
+	for (auto it = combinedClass.begin(); it != combinedClass.end(); ++it)
+	{
+		wxPoint pos = this->GetPosition();
+		pos.x += FromDIP(iter * posMod);
+		pos.y += FromDIP(iter * posMod);
+
+		auto dialog = new DiceRollerDialog(this, wxID_ANY, it->getClassName(), pos, wxDefaultSize, wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE);
+
+		int numDie = it->level;
+		auto dieType = getDieTypeStr(it->hitDie);
+		int mod = character.getStatsMods().Con;
+
+		dialog->addDiceRow(numDie, dieType, mod);
+		dialog->Show();
+		iter++;
+	}
+}
+
 void MainFrame::loadSpells()
 {
 	//LOADING SPELLS INTO MEMORY
@@ -4559,7 +4585,9 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 		title += std::to_string(character.getDefaultSpellPoints());
 		title += ")";
 		int max = character.getDefaultSpellPoints();
-		int x = wxGetNumberFromUser(title, "", "Spell Points", max, 0, 10 * max);
+		int x = wxGetNumberFromUser(title, "", "Spell Points", max, 0, 1000);
+		if (x == -1)
+			x = 0;
 		knownPagePanels.SpellPoints_Val->SetValue(std::to_string(x));
 
 		character.setSpellPoints(x);
@@ -4606,12 +4634,15 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 
 				if (numSlots > 0)
 					uses.SpellSlots = true;
+				
+				if (numSlots == 0)
+					numSlots = -1;
 
 				newSlots.slots.push_back({numSlots, oldSlots.slots[i].second});
 			}
 
-			if (uses.SpellSlots)
-				character.setSpellSlots(newSlots);
+			//if (uses.SpellSlots)
+			character.setSpellSlots(newSlots);
 
 			updateKnownSpellsLists();
 		}
@@ -4763,27 +4794,14 @@ void MainFrame::onRestMenuEvents(wxCommandEvent& event)
 	{
 		DefaultShortSliders();
 		FillWarlockSlots();
+	}
 
-		auto combinedClass = character.getCombinedClasses();
-		
-		int posMod = 30, iter = 0;
-		for (auto it = combinedClass.begin(); it != combinedClass.end(); ++it)
-		{
-			wxPoint pos = this->GetPosition();
-			pos.x += FromDIP(iter * posMod);
-			pos.y += FromDIP(iter * posMod);
+	if (obj == menuBarItems.RestShortWithHitDice->GetId())
+	{
+		DefaultShortSliders();
+		FillWarlockSlots();
 
-			auto dialog = new DiceRollerDialog(this, wxID_ANY, it->getClassName(), pos, wxDefaultSize, wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE);
-			
-			int numDie = it->level;
-			auto dieType = getDieTypeStr(it->hitDie);
-			int mod = character.getStatsMods().Con;
-			
-			dialog->addDiceRow(numDie, dieType, mod);
-			dialog->Show();
-			iter++;
-		}
-
+		this->rollHitDice();
 	}
 
 	if (obj == menuBarItems.RestAddSliderToLong->GetId())

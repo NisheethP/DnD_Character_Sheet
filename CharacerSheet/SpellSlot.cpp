@@ -156,6 +156,11 @@ int convSlotToPoint(int spell_Level)
 {
 	switch (spell_Level)
 	{
+	case -4:
+	case -3:
+	case -2:
+	case -1:
+		return 0;
 	case 0:
 		return 0;
 	case 1:

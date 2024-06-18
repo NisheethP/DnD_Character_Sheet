@@ -254,6 +254,8 @@ int Character::getDefaultSpellPoints()
 		int y;
 		y = charSlots.getSlotsByType(i, SpellSlot::slotType::RegularSlot);
 		y *= convSlotToPoint(i);
+		if (y < 0)
+			y = 0;
 		x += y;
 	}
 

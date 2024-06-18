@@ -120,6 +120,7 @@ class MainFrame : public wxFrame
 		
 		wxMenuItem* RestLong;
 		wxMenuItem* RestShort;
+		wxMenuItem* RestShortWithHitDice;
 
 		wxMenuItem* RestAddSliderToShort;
 		wxMenuItem* RestAddSliderToLong;
@@ -385,6 +386,8 @@ public:
 	void calcCheckedSpells();
 
 	void DrawMain();
+
+	void rollHitDice();
 
 	void makeSlider(std::string title, int val, int min, int max, int def);
 	void makeSavingThrowPair(wxStaticText* savingThrowName, wxTextCtrl* savingThrowValue, Skills curSkill);
