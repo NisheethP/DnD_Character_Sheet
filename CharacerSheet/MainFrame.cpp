@@ -2716,13 +2716,21 @@ void MainFrame::updateKnownSpellsLists()
 		int maxSlotsNumber = maxSlots.slots[i].first;
 		
 		if (spSlots.slots[i].second != -1)
+		{
 			curSlots += spSlots.slots[i].second;
+			if (spSlots.slots[i].first == -1)
+				curSlots++;
+		}
 		
 		if (maxSlotsNumber == -1)
 			slotSpin->SetMax(0);
 
 		if (spSlots.slots[i].second != -1)
+		{
 			maxSlotsNumber += spSlots.slots[i].second;
+			if (spSlots.slots[i].first == -1)
+				maxSlotsNumber++;
+		}
 		
 		if (curSlots > 0)
 		{
@@ -4632,8 +4640,8 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 					return;
 				}
 
-				if (numSlots > 0)
-					uses.SpellSlots = true;
+				/*if (numSlots > 0)
+					uses.SpellSlots = true;*/
 				
 				if (numSlots == 0)
 					numSlots = -1;
@@ -4644,6 +4652,7 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 			//if (uses.SpellSlots)
 			character.setSpellSlots(newSlots);
 
+			uses.SpellSlots = character.hasSpellSlots();
 			updateKnownSpellsLists();
 		}
 	}
@@ -4660,33 +4669,44 @@ void MainFrame::onSetMenuEvents(wxCommandEvent& event)
 			SpellSlot newSlots;
 			SpellSlot oldSlots = character.getSpellSlots();
 			
-			for (int i = 0; i < 10; ++i)
+			int numSlots = dialog->getNumSlots();
+			int level = dialog->getLevel();
+			
+			if (level != 0 && numSlots != 0)
 			{
-				if (i == 0)
+				for (int i = 0; i < 10; ++i)
 				{
-					newSlots.slots.push_back({ oldSlots.slots[i].first, oldSlots.slots[i].second });
-					continue;
+					if (i == 0)
+					{
+						newSlots.slots.push_back({ oldSlots.slots[i].first, oldSlots.slots[i].second });
+						continue;
+					}
+
+					if (numSlots == 0)
+						break;
+
+					if (i == level)
+					{
+						newSlots.slots.push_back({ oldSlots.slots[i].first , numSlots });
+					}
+
+					else
+					{
+						newSlots.slots.push_back({ oldSlots.slots[i].first , -1 });
+					}
 				}
-
-				int numSlots = dialog->getNumSlots();
-				int level = dialog->getLevel();
-				
-				if (numSlots != 0)
-					uses.SpellSlots = true;
-
-				if (i == level)
-				{
-					newSlots.slots.push_back({ oldSlots.slots[i].first , numSlots});
-				}
-
-				else
-				{
-					newSlots.slots.push_back({ oldSlots.slots[i].first , -1 });
-				}
-
-				if (uses.SpellSlots)
-					character.setSpellSlots(newSlots);
 			}
+
+			else
+			{
+				newSlots.slots.push_back({ oldSlots.slots[0].first, oldSlots.slots[0].second });
+
+				for (int i = 1; i < 10; ++i)
+					newSlots.slots.push_back({ oldSlots.slots[i].first , -1 });
+			}
+
+			character.setSpellSlots(newSlots);
+			uses.SpellSlots = character.hasSpellSlots();
 
 			updateKnownSpellsLists();
 		}

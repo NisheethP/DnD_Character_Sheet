@@ -167,6 +167,17 @@ bool Character::checkExpert(const Skills& skill)
 	return skillExpertises & skill;
 }
 
+bool Character::hasSpellSlots()
+{
+	for (int i = 1; i < 10; ++i)
+	{
+		if (charSlots.slots[i].first > 0 || charSlots.slots[i].second > 0)
+			return true;
+	}
+
+	return false;
+}
+
 void Character::initSlots()
 {
 	charSlots.slots.clear();

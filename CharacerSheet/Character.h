@@ -299,6 +299,7 @@ public:
 	bool checkProf(const Skills& skill);
 	bool checkExpert(const Skills& skill);
 	
+	bool hasSpellSlots();
 
 	void initSlots();
 
